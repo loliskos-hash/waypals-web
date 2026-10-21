@@ -4471,15 +4471,15 @@ function hashStr(s){var h=0,i;for(i=0;i<s.length;i++)h=(h*31+s.charCodeAt(i))>>>
 function fmtStamp(iso){var m=/^(\d{4})-(\d{2})-(\d{2})/.exec(iso||'');return m?m[3]+'.'+m[2]+'.'+m[1]:''}
 function journeyItems(){
   var today=todayISO(),out=[];
-  allFriends().forEach(function(f){if(f.place)out.push({place:f.place,country:f.country,lat:f.lat,lon:f.lon,date:f.metDate||'',to:'',kind:'met',fid:f.id})});
-  tripsAllOf('me').forEach(function(tr){if(tr.from<=today)out.push({place:tr.dest.name,lat:tr.dest.lat,lon:tr.dest.lon,date:tr.from,to:tr.to,kind:tr.kind==='work'?'work':'trip'})});
+  allFriends().forEach(function(f){if(f.place)out.push({place:f.place,country:f.country,lat:f.lat,lon:f.lon,date:f.metDate||'',to:'',kind:'met',fid:f.id,ex:!!f.example})});
+  tripsAllOf('me').forEach(function(tr){if(tr.from<=today)out.push({place:tr.dest.name,lat:tr.dest.lat,lon:tr.dest.lon,date:tr.from,to:tr.to,kind:tr.kind==='work'?'work':'trip',ex:!!tr.example})});
   out.forEach(function(it){it.c=it.country||countryOfPlace(it.place,it.lat,it.lon)});
   return out;
 }
 function passportData(){
   var home=myCountry(),map={},items=journeyItems();
   items.forEach(function(it){
-    if(!it.c||it.c===home)return;
+    if(!it.c||it.c===home||it.ex)return;
     var c=map[it.c]||(map[it.c]={name:it.c,first:'',places:{},met:0});
     if(it.date&&(!c.first||it.date<c.first))c.first=it.date;
     c.places[NORM(it.place)]=it.place;if(it.kind==='met')c.met++;
