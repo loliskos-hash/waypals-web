@@ -1,0 +1,4 @@
+body{font:16px/1.6 Nunito,system-ui,sans-serif;max-width:46rem;margin:0 auto;padding:24px 16px 64px;background:#FFF8EE;color:#2D2A3E}
+h1{font-size:28px}h2{font-size:19px;margin-top:28px}a{color:#0B7F78}.ph{background:#FFD166;padding:0 4px;border-radius:4px}
+nav{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+@media (prefers-color-scheme:dark){body{background:#1b1a26;color:#eee}a{color:#6fd3c9}}
