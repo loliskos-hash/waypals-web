@@ -59,6 +59,7 @@
 
   function deleteAccount() {
     var uid = user.uid;
+    try { localStorage.removeItem('wegmarken-post-v1'); localStorage.removeItem('wegmarken-v1'); localStorage.removeItem('wegmarken-owner'); localStorage.removeItem(LOCALKEY) } catch (e) {}
     function wipe(colPath) {
       return fs.collection(colPath).get().then(function (s) {
         return Promise.all(s.docs.map(function (d) { return d.ref.delete() }));

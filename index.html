@@ -6223,6 +6223,7 @@ function dexState(){var l=store.post.loft||{};if(!l.dex||typeof l.dex!=='object'
 var DEX_SRC=['travel','meet','travel','meet','both'];
 function dexSrcLabel(i){var k=DEX_SRC[i];return k==='travel'?L('Bereist','Travelled'):k==='meet'?L('Getroffen','Met'):L('Länder-Meister','Country master')}
 function dexRoll(cn,boost,mode){
+  var okc=dexVisited();if(!okc.length)okc=[myCountry()||'Deutschland'];if(okc.indexOf(cn)<0)cn=okc[Math.floor(Math.random()*okc.length)];
   var idx=mode==='travel'?[0,2]:mode==='meet'?[1,3]:[0,1,2,3,4];
   var w=idx.map(function(i){return DEX_RAR[i].w*(boost&&i>0?1+boost*i:1)}),sum=w.reduce(function(a,b){return a+b},0),x=Math.random()*sum,j=0;
   while(j<idx.length-1&&x>=w[j]){x-=w[j];j++}return cn+'|'+idx[j];
