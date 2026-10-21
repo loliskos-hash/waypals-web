@@ -4213,11 +4213,15 @@ var store={
       return (user?user.id():Promise.resolve(null)).then(function(id){
         if(db&&id){
           self.col=db.collection('data/users/'+id);self.mode='cloud';circle.start(db,id);
+          var prevOwner=null;try{prevOwner=localStorage.getItem('wegmarken-owner')}catch(e){}
+          var foreign=!!(prevOwner&&prevOwner!==id);
+          if(foreign){self.post=normPost({});self.friends=[];try{localStorage.setItem('wegmarken-post-v1',JSON.stringify(self.post));localStorage.setItem(LS_KEY,'[]')}catch(e){}}
+          try{localStorage.setItem('wegmarken-owner',id)}catch(e){}
           self.col.onSnapshot(function(snap){
             self.friends=snap.docs.filter(function(d){return d.id!=='_post'}).map(function(d){return Object.assign({},d.data(),{id:d.id})});
             var pd=snap.docs.find(function(d){return d.id==='_post'});
             if(pd){var po=pd.data();if(po){self.post=normPost(po);try{localStorage.setItem('wegmarken-post-v1',JSON.stringify(self.post))}catch(e){}}}
-            else if(self.post.pigeons.length||self.post.me||self.post.trips.length||self.post.posts.length){self.savePost()}
+            else if(!foreign&&(self.post.pigeons.length||self.post.me||self.post.trips.length||self.post.posts.length)){self.savePost()}
             self.saveLocal();onChange();
           },function(){self.mode='local';self.col=null;onChange()});
         }else{self.mode='local'}
