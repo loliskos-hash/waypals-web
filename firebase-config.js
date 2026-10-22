@@ -1,11 +1,11 @@
 /* Firebase-Web-Konfiguration (nicht geheim). */
 window.FIREBASE_CONFIG = {
-  apiKey: "AIzaSyD_d_fcU9Y7v6fnwtIfBNARkhvChTtkw-Y",
-  authDomain: "waypals-d3fca.firebaseapp.com",
-  projectId: "waypals-d3fca",
-  storageBucket: "waypals-d3fca.firebasestorage.app",
-  messagingSenderId: "767455047720",
-  appId: "1:767455047720:web:cce22223398be9ea56051d"
+  apiKey: "AIzaSyA1AZHMrhSEcTg_ZINv62qaQindenZ4qXw",
+  authDomain: "waypals-c0a68.firebaseapp.com",
+  projectId: "waypals-c0a68",
+  storageBucket: "waypals-c0a68.firebasestorage.app",
+  messagingSenderId: "559989226370",
+  appId: "1:559989226370:web:1ff6e2b46cf8041b512d9b"
 };
 /* Angaben für Impressum/Datenschutz in der App (Pflicht, sobald du die App öffentlich anbietest). */
 window.WAYPALS_CONFIG = {
