@@ -439,6 +439,7 @@ label.chk{display:flex!important;flex-direction:row!important;gap:12px;align-ite
 .fkp{flex:none;width:48px;height:60px;display:block}.fkp .p3,.fkp .p3s{width:48px;height:60px}
 .fkalb{display:flex;gap:10px;overflow-x:auto;padding:4px 2px 8px;-webkit-overflow-scrolling:touch}.fkph{margin:0;flex:none;display:grid;gap:4px;justify-items:center;max-width:124px}
 .fkph figcaption{text-align:center;font-size:.8rem;min-width:0}.fkph small{display:block;color:var(--muted);overflow-wrap:anywhere}
+.dove.top{width:56px;height:70px;margin:-35px 0 0 -28px}.dove.top .p3s{filter:drop-shadow(0 5px 3px rgba(0,0,0,.28))}
 </style>
 
 <div id="splash" role="presentation"><div class="sp-in"><svg class="sp-pin" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s7-6.2 7-12a7 7 0 1 0-14 0c0 5.8 7 12 7 12Z" fill="#FF6B5B"/><circle cx="12" cy="10" r="2.6" fill="#FFF8EE"/></svg><div class="sp-name"><span style="--i:0">W</span><span style="--i:1">a</span><span style="--i:2">y</span><span style="--i:3">p</span><span style="--i:4">a</span><span style="--i:5">l</span><span style="--i:6">s</span></div><div class="sp-by"><i></i><span>by Ludeldoo</span><i></i></div></div></div>
@@ -4092,7 +4093,7 @@ function Globe(opts){
       var q=at(p),q2=at(Math.min(1,p+0.01)),q0=at(Math.max(0,p-0.01));
       if(q.z<=0.02){e.style.display='none';return}
       e.style.display='';var dx=q2.x-q0.x,dy=q2.y-q0.y,flip=dx<0?-1:1,rot=Math.atan2(dy,Math.abs(dx)||1e-6)*180/Math.PI*flip*0.5;
-      e.style.transform='translate('+q.x.toFixed(1)+'px,'+q.y.toFixed(1)+'px) scaleX('+flip+') rotate('+rot.toFixed(0)+'deg)';
+      e.style.transform=dv.skin?'translate('+q.x.toFixed(1)+'px,'+q.y.toFixed(1)+'px) rotate('+(Math.atan2(dy,dx)*180/Math.PI+90).toFixed(0)+'deg)':'translate('+q.x.toFixed(1)+'px,'+q.y.toFixed(1)+'px) scaleX('+flip+') rotate('+rot.toFixed(0)+'deg)';
       e.style.zIndex='5000';e.style.opacity=Math.min(1,(q.z-0.02)/0.15).toFixed(2);
     });
   }
@@ -4133,7 +4134,7 @@ function Globe(opts){
   }
   function setDoves(list){
     doves=list||[];var keep={};
-    doves.forEach(function(d){keep[d.id]=1;if(!dEls[d.id]){var e=document.createElement('div');e.className='dove';e.setAttribute('data-dove',d.id);e.innerHTML=d.skin?p3Wrap(d.skin,1):doveSVG(d.tier||0);if((d.tier||0)>=3||(d.skin&&skinParse(d.skin).i>=3))e.classList.add('gold');if(!d.skin&&d.hue&&e.firstChild&&e.firstChild.style)e.firstChild.style.filter='hue-rotate('+d.hue+'deg) drop-shadow(0 2px 3px rgba(0,0,0,.4))';fl.appendChild(e);dEls[d.id]=e}});
+    doves.forEach(function(d){keep[d.id]=1;if(!dEls[d.id]){var e=document.createElement('div');e.className='dove';e.setAttribute('data-dove',d.id);if(d.skin)e.classList.add('top');e.innerHTML=d.skin?p3Wrap(d.skin,1):doveSVG(d.tier||0);if((d.tier||0)>=3||(d.skin&&skinParse(d.skin).i>=3))e.classList.add('gold');if(!d.skin&&d.hue&&e.firstChild&&e.firstChild.style)e.firstChild.style.filter='hue-rotate('+d.hue+'deg) drop-shadow(0 2px 3px rgba(0,0,0,.4))';fl.appendChild(e);dEls[d.id]=e}});
     Object.keys(dEls).forEach(function(k){if(!keep[k]){dEls[k].remove();delete dEls[k]}});
     schedule();
   }
@@ -6697,10 +6698,10 @@ function todayHTML(){
 var P3={gl:null,cv:null,progs:{},cache:{},queue:[],busy:false,fail:false,W:192,H:240,F:16};
 var P3_PRE=[
 'precision highp float;',
-'#define WPV 45',
+'#define WPV 50',
 'uniform vec2 uRes;uniform float uT,uFly,uYaw;',
 'const float TAU=6.2831853;',
-'float gBob,gHead,gBlink,gWag,gWing,gProp,gAura,gTuck,gArm,gBr;',
+'float gBob,gHead,gBlink,gWag,gWing,gProp,gAura,gTuck,gArm,gBr,gFl,gSw;',
 'mat2 rot(float a){float c=cos(a),s=sin(a);return mat2(c,s,-s,c);}',
 'vec3 rz(vec3 p,float a){p.xy=rot(a)*p.xy;return p;}',
 'vec3 rx(vec3 p,float a){p.yz=rot(a)*p.yz;return p;}',
@@ -6788,7 +6789,7 @@ scarf:[['sdTor(q-vec3(0,.8,.1),vec2(.48,.12))','ACC'],['sdBox(q-vec3(.22,.38,.68
 jersey:[['SHELL(-q.y-.45)','WING'],['sdRC(aq,vec3(0.),vec3(.12,-.4,.05),.26,.22)','WING'],['sdTor(q-vec3(0,.85,.08),vec2(.45,.07))','ACC'],['sdBox(q-vec3(0,.1,.72),vec3(.12,.2,.04),.02)','ACC']],
 cape:[['sdEll(q-vec3(0,.1,-.62),vec3(.95,1.15,.08))','ACC'],['sdSph(q-vec3(.4,.78,.38),.09)','#FFD23F'],['sdTor(q-vec3(0,.82,.05),vec2(.5,.07))','ACC']],
 vest:[['SHELL(-q.y-.4)','#FFFFFF'],['SHELL2(max(.1-q.x,-q.y-.45))','#2F3035'],['sdSph(q-vec3(.42,.3,.62),.06)','#C8102E'],['sdSph(q-vec3(.3,.0,.68),.06)','#C8102E'],['sdSph(q-vec3(.45,-.1,.58),.05)','#C8102E']],
-apron:[['sdBox(q-vec3(0,-.15,.7),vec3(.45,.62,.05),.04)','#FFFFFF'],['SHELL3(max(abs(q.x-.4)-.06,-q.y-.2))','#FFFFFF']]
+apron:[['sdBox(q-vec3(0,-.15,.3+.68*FX),vec3(.45,.62,.05),.04)','#FFFFFF'],['SHELL3(max(abs(q.x-.4)-.06,-q.y-.2))','#FFFFFF']]
 };
 var P3_OUT={lederhose:{pt:2,a:'#FFFFFF',b:'#3D6FC4'},stripes:{pt:1,a:'#FFFFFF',b:'ACC'},poncho:{pt:4}};
 Object.assign(P3_HAT,{
@@ -6876,10 +6877,10 @@ function p3Gen(skin){
   'float dTorso(vec3 q){vec3 fv=FATV*(1.+gBr);float d=sdEll(q,fv);return smin(d,sdEll(q-vec3(0.,.22,.2),fv*vec3(.82,.72,.8)),.3);}',
   'const float PS=.72;vec3 hatO,propO,qq,H,aq;',
   'vec2 map(vec3 p){',
-  'p.xz=rot(uYaw+.07*sin(TAU*uT))*p.xz;p.y-=gBob;',
+  'if(uFly>.5){vec3 s=vec3(p.x,p.y-.72,p.z);p=vec3(s.x,s.z*.97+s.y*.24+.45,s.y*.97-s.z*.24+.2);}p.xz=rot(uYaw+.07*sin(TAU*uT))*p.xz;p.y-=gBob;',
   'vec3 q=vec3(abs(p.x),p.y,p.z);qq=q;',
   'H=vec3(0.,1.2+gHead,.1);hatO=H+vec3(0.,.44*HS,0.);propO=vec3(.5,-.05+gProp,.98);',
-  'vec3 SH=vec3(.7*FX,.5,.04);aq=q-SH;aq.xy=rot(-gArm)*aq.xy;',
+  'vec3 SH=vec3(.7*FX+.3*gTuck,.5+.12*gTuck,.04);aq=q-SH;aq.xy=rot(-gArm)*aq.xy;',
   'float dT=dTorso(q);',
   'float dN=sdRC(q,vec3(0.,.7,.05),H+vec3(0.,-.1,-.02),.5,.42*max(HS,.95));',
   'float dC=sdEll(q-vec3(0.,.88,.12),vec3(.62,.34,.55));',
@@ -6898,12 +6899,12 @@ function p3Gen(skin){
   'r=opU(r,vec2(sdCap(q,vec3(.32*FX,ly,.12),vec3(.34*FX,ly+.02,.5),.05),11.));r=opU(r,vec2(sdCap(q,vec3(.32*FX,ly,.12),vec3(.5*FX,ly+.02,.44),.045),11.));r=opU(r,vec2(sdCap(q,vec3(.32*FX,ly,.12),vec3(.16*FX,ly+.02,.44),.045),11.));',
   out.join('\n'),
   'return r;}',
-  'void anim(){float t=uT;float f=uFly;gBob=mix(.03*sin(TAU*t*2.),-.1*sin(TAU*t),f);gHead=mix(.03*sin(TAU*t*2.+.4)-.13*pow(max(sin(TAU*(t-.1)),0.),8.),.02*sin(TAU*t),f);gBr=(1.-f)*.022*sin(TAU*t*2.+1.);gBlink=clamp(abs(t-.6)*16.-.4,.08,1.);gArm=mix(.1+.05*sin(TAU*t)+.5*smoothstep(.5,.58,t)*smoothstep(.95,.8,t)*sin(TAU*(t-.5)*2.5),1.35+.65*sin(TAU*t),f);gProp=mix(.03*sin(TAU*t*2.+.8),-.05,f);gAura=TAU*t;gTuck=f;}',
+  'void anim(){float t=uT;float f=uFly;gBob=mix(.03*sin(TAU*t*2.),-.1*sin(TAU*t),f);gHead=mix(.03*sin(TAU*t*2.+.4)-.13*pow(max(sin(TAU*(t-.1)),0.),8.),.02*sin(TAU*t),f);gBr=(1.-f)*.022*sin(TAU*t*2.+1.);gBlink=clamp(abs(t-.6)*16.-.4,.08,1.);gArm=mix(.1+.05*sin(TAU*t)+.5*smoothstep(.5,.58,t)*smoothstep(.95,.8,t)*sin(TAU*(t-.5)*2.5),1.5+.55*sin(TAU*t),f);gProp=mix(.03*sin(TAU*t*2.+.8),-.05,f);gAura=TAU*t;gTuck=f;float sn=sin(TAU*t);gFl=.2+.75*sn;gSw=.2+.3*max(sn,0.)+.1*max(-sn,0.);}',
   'vec3 calcN(vec3 p){vec2 e=vec2(.004,-.004);return normalize(e.xyy*map(p+e.xyy).x+e.yyx*map(p+e.yyx).x+e.yxy*map(p+e.yxy).x+e.xxx*map(p+e.xxx).x);}',
   'float shadow(vec3 ro,vec3 rd){float res=1.,t=.04;for(int i=0;i<16;i++){float h=map(ro+rd*t).x;res=min(res,8.*h/t);t+=clamp(h,.05,.4);if(res<.01||t>5.)break;}return clamp(res,0.,1.);}',
   'float occl(vec3 p,vec3 n){float o=0.,sc=1.;for(int i=0;i<4;i++){float h=.03+.12*float(i);float d=map(p+h*n).x;o+=(h-d)*sc;sc*=.8;}return clamp(1.-1.6*o,0.,1.);}',
   'void main(){',
-  'anim();vec2 uv=(2.*gl_FragCoord.xy-uRes)/uRes.y;',
+  'anim();vec2 uv=(2.*gl_FragCoord.xy-uRes)/uRes.y;uv*=1.+.68*uFly;',
   'vec3 ro=vec3(0.,.72,11.5),ta=vec3(0.,.72,0.);vec3 ww=normalize(ta-ro),uu=normalize(cross(ww,vec3(0.,1.,0.))),vv=cross(uu,ww);vec3 rd=normalize(uv.x*uu+uv.y*vv+4.6*ww);',
   'vec3 bc=vec3(0.,.72,0.);float b=dot(bc-ro,rd);float h=dot(bc-ro,bc-ro)-b*b;float R=3.2;',
   'float t=0.,hit=-1.;vec2 m=vec2(0.);',
@@ -6929,10 +6930,11 @@ function p3Gen(skin){
   return src;
 }
 function HOLDARM(hold){
-  var s='r=opU(r,vec2(sdRC(aq,vec3(0.),vec3(.16,-.95,.12),.25,.14)'+(hold?'':'')+',7.));';
-  if(hold)s='r=opU(r,vec2(max(sdRC(aq,vec3(0.),vec3(.16,-.95,.12),.25,.14),p.x+.05),7.));r=opU(r,vec2(max(sdEll(aq-vec3(.17,-1.0,.12),vec3(.1,.3,.1)),p.x+.05),8.));'+
+  var s='r=opU(r,vec2(sdRC(aq,vec3(0.),vec3(.16,-.95,.12)*(1.+.4*gTuck),.28+.04*gTuck,.15)'+(hold?'':'')+',7.));';
+  if(hold)s='r=opU(r,vec2(max(sdRC(aq,vec3(0.),vec3(.16,-.95,.12)*(1.+.4*gTuck),.28+.04*gTuck,.15),p.x+.05),7.));r=opU(r,vec2(max(sdEll(aq-vec3(.17,-1.0,.12),vec3(.1,.3,.1)),p.x+.05),8.));'+
    'r=opU(r,vec2(max(sdCap(p,vec3(.7*FX,.5,.04),vec3(.85*FX,.0,.5),.22),-p.x-.05),7.));r=opU(r,vec2(max(sdCap(p,vec3(.85*FX,.0,.5),vec3(.5,-.05,.88),.17),-p.x-.05),7.));r=opU(r,vec2(max(sdEll(p-vec3(.5,-.05,.9),vec3(.14,.2,.12)),-p.x-.05),8.));';
   else s+='r=opU(r,vec2(sdEll(aq-vec3(.17,-1.0,.12),vec3(.1,.3,.1)),8.));';
+  s='if(uFly>.5){vec3 w=q-vec3(.5*FX,.55,.02);w.xy=rot(-gFl)*w.xy;w.xz=rot(gSw)*w.xz;r=opU(r,vec2(sdEll(w-vec3(.85,0.,0.),vec3(.9,.06,.5)),7.));for(int j=0;j<5;j++){float fj=float(j);vec3 c=w-vec3(1.7+.17*fj,0.,-.03*fj-.05);c.xz=rot(.08*fj-.1)*c.xz;r=opU(r,vec2(sdEll(c,vec3(.68-.04*fj,.045,.16)),8.));}r=opU(r,vec2(sdEll(q-vec3(0.,-.35,-1.0),vec3(.46,.05,.6)),9.));aq=vec3(w.z,-w.x*.45,w.y);}else{'+s+'}';
   return s;
 }
 /* GL */
@@ -7003,7 +7005,7 @@ function p3Make(s,f,cb){
   o=P3S[key]={cbs:[cb]};
   var ci=-1,pc=skinParse(s);for(var z=0;z<DEX_C.length;z++)if(DEX_C[z][0]===pc.c){ci=z;break}
   if(P3STATIC&&ci>=0&&location.protocol!=='file:'){
-    var u='sprites/'+ci+'-'+pc.i+(f?'f':'')+'.webp?v=44',im=new Image();
+    var u='sprites/'+ci+'-'+pc.i+(f?'f':'')+'.webp?v=50',im=new Image();
     im.onload=function(){o.url=u;var c=o.cbs;o.cbs=[];c.forEach(function(g){try{g(u)}catch(e){}})};
     im.onerror=function(){P3Q.push([s,f,key]);p3Pump()};im.src=u;return;
   }
@@ -7052,7 +7054,7 @@ function p3Scan(root){
 function liveLoop(cv,draw){
   var raf=0,last=0,vis=true,until=0,dead=false,io=null;
   function stop(){dead=true;if(io)try{io.disconnect()}catch(e){}document.removeEventListener('visibilitychange',onVis)}
-  function wake(){if(dead)return;until=performance.now()+8000;if(!raf)raf=requestAnimationFrame(tick)}
+  function wake(){if(dead)return;until=performance.now()+45000;if(!raf)raf=requestAnimationFrame(tick)}
   function tick(now){
     raf=0;if(!cv.isConnected){stop();return}
     if(!vis||document.hidden)return;
@@ -7087,7 +7089,7 @@ function p3Live(box,skin,w,h){
 var F3={prog:null,fail:false,reg:{},sheet:{},q:[],run:false};
 var F3_FS=[
 'precision highp float;',
-'#define WPV 45',
+'#define WPV 50',
 'uniform vec4 uCam;',
 'uniform vec3 uSkin,uHair,uTopC,uTopD,uPants,uEye,uHatC,uHatD,uAcc,uBP;',
 'uniform vec4 uA,uB,uC,uD;',
