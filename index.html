@@ -3914,7 +3914,7 @@ function avatarEditor(host,st){
   function paint(){
     var full=avFull(st.av,st.name);
     var pv=$('.avprev',host),fm={name:st.name||'?',photo:st.photo,av:full};
-    if(!st.photo&&!F3.fail&&f3Init()){if(!lv||!lv.el.isConnected)lv=f3Live(pv,fm,190,238,false);else lv.set(fm)}else{lv=null;pv.innerHTML=figSVG2D(fm,'ed'+Math.random().toString(36).slice(2,6))}
+    if(!st.photo&&!F3.fail&&F3.prog){if(!lv||!lv.el.isConnected)lv=f3Live(pv,fm,190,238,false);else lv.set(fm)}else{lv=null;pv.innerHTML=figSVG2D(fm,'ed'+Math.random().toString(36).slice(2,6));if(!st.photo&&!F3.fail)f3Ready(function(ok){if(ok&&pv.isConnected)paint()})}
     $('.avopts',host).innerHTML=opts(full);
     $$('[data-avt]',host).forEach(function(b){b.setAttribute('aria-pressed',String(b.getAttribute('data-avt')===tab))});
     $$('[data-k]',host).forEach(function(b){b.setAttribute('aria-pressed',String(full[b.getAttribute('data-k')]===+b.getAttribute('data-v')))});
@@ -6821,11 +6821,39 @@ function p3Prog(skin){
   var o={pr:pr,uRes:gl.getUniformLocation(pr,'uRes'),uT:gl.getUniformLocation(pr,'uT'),uFly:gl.getUniformLocation(pr,'uFly'),uYaw:gl.getUniformLocation(pr,'uYaw')};
   P3.progs[skin]=o;return o;
 }
+function glAsyncProg(vs,fs,cb){
+  var gl=P3.gl;if(P3.pext===undefined){try{P3.pext=gl.getExtension('KHR_parallel_shader_compile')||null}catch(e){P3.pext=null}}
+  var ext=P3.pext;
+  setTimeout(function(){
+    try{
+      function mk(ty,s){var o=gl.createShader(ty);gl.shaderSource(o,s);gl.compileShader(o);return o}
+      var pr=gl.createProgram();gl.attachShader(pr,mk(gl.VERTEX_SHADER,vs));gl.attachShader(pr,mk(gl.FRAGMENT_SHADER,fs));gl.bindAttribLocation(pr,0,'a');gl.linkProgram(pr);
+      (function poll(){
+        try{if(ext&&!gl.getProgramParameter(pr,ext.COMPLETION_STATUS_KHR)){setTimeout(poll,60);return}
+          cb(gl.getProgramParameter(pr,gl.LINK_STATUS)?pr:null)}catch(e){cb(null)}
+      })();
+    }catch(e){cb(null)}
+  },0);
+}
+var P3W={};
+function p3ProgAsync(skin,cb){
+  if(P3.progs[skin]){cb(P3.progs[skin]);return}
+  if(P3.fail||!p3Init()){cb(null);return}
+  if(P3W[skin]){P3W[skin].push(cb);return}
+  P3W[skin]=[cb];
+  function fin(o){var c=P3W[skin]||[];delete P3W[skin];c.forEach(function(f){try{f(o)}catch(e){}})}
+  var src;try{src=p3Gen(skin)}catch(e){fin(null);return}
+  glAsyncProg(P3_VS,src,function(pr){
+    var o=null,gl=P3.gl;
+    if(pr){o={pr:pr,uRes:gl.getUniformLocation(pr,'uRes'),uT:gl.getUniformLocation(pr,'uT'),uFly:gl.getUniformLocation(pr,'uFly'),uYaw:gl.getUniformLocation(pr,'uYaw')};P3.progs[skin]=o}
+    fin(o);
+  });
+}
 function p3Draw(skin,w,h,t,fly,yaw){
   var gl=P3.gl,o=p3Prog(skin);
   if(P3.cv.width!==w||P3.cv.height!==h){P3.cv.width=w;P3.cv.height=h}
   gl.viewport(0,0,w,h);gl.clearColor(0,0,0,0);gl.clear(gl.COLOR_BUFFER_BIT);gl.useProgram(o.pr);
-  gl.bindBuffer(gl.ARRAY_BUFFER,gl.createBuffer());gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,3,-1,-1,3]),gl.STREAM_DRAW);
+  if(!P3.buf){P3.buf=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,P3.buf);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,3,-1,-1,3]),gl.STATIC_DRAW)}else gl.bindBuffer(gl.ARRAY_BUFFER,P3.buf);
   gl.enableVertexAttribArray(0);gl.vertexAttribPointer(0,2,gl.FLOAT,false,0,0);
   gl.uniform2f(o.uRes,w,h);gl.uniform1f(o.uT,t);gl.uniform1f(o.uFly,fly?1:0);gl.uniform1f(o.uYaw,yaw);
   gl.drawArrays(gl.TRIANGLES,0,3);
@@ -6853,7 +6881,7 @@ function p3Pump(){
         if(at.toBlob)at.toBlob(function(b){end(b?URL.createObjectURL(b):at.toDataURL('image/png'))},'image/png');else end(at.toDataURL('image/png'));}catch(e){P3.fail=true;end(null)}})();
     }catch(e){P3.fail=true;end(null)}
   };
-  (window.requestAnimationFrame||setTimeout)(function(){setTimeout(run,0)});
+  var nx=P3Q[0];p3ProgAsync(nx[0],function(){(window.requestAnimationFrame||setTimeout)(function(){setTimeout(run,0)})});
 }
 function p3Apply(el){
   if(el.hasAttribute('data-f3')){f3Apply(el);return}
@@ -6900,6 +6928,7 @@ function liveLoop(cv,draw){
 /* Live-3D: dreh- und ziehbar, Atem + Blinzeln */
 function p3Live(box,skin,w,h){
   if(!box||P3.fail||!p3Init())return;
+  if(!P3.progs[skin]){p3ProgAsync(skin,function(o){if(o&&box.isConnected)p3Live(box,skin,w,h)});return}
   try{p3Prog(skin)}catch(e){P3.fail=true;return}
   var cv=document.createElement('canvas');cv.width=w*2;cv.height=h*2;cv.className='p3live-c';cv.style.cssText='width:'+w+'px;height:'+h+'px;touch-action:none;cursor:grab;max-width:100%';
   var x=cv.getContext('2d'),yaw=0,vel=0,drag=false,lx=0,t0=performance.now(),idle=0;
@@ -7098,26 +7127,22 @@ function f3Init(){
     names.forEach(function(n){U[n]=gl.getUniformLocation(pr,n)});F3.prog={pr:pr,U:U};return true;
   }catch(e){F3.fail=true;return false}
 }
+function f3Ready(cb){if(F3.prog){cb(true);return}if(F3.fail){cb(false);return}(F3.wq=F3.wq||[]).push(cb);f3Warm()}
 function f3Warm(){
   if(F3.prog||F3.fail||F3.warm)return;F3.warm=1;
-  try{
-    if(!p3Init())return;var gl=P3.gl,ext=gl.getExtension('KHR_parallel_shader_compile');
-    if(!ext){f3Init();return}
-    function sh(t,s){var o=gl.createShader(t);gl.shaderSource(o,s);gl.compileShader(o);return o}
-    var pr=gl.createProgram();gl.attachShader(pr,sh(gl.VERTEX_SHADER,P3_VS));gl.attachShader(pr,sh(gl.FRAGMENT_SHADER,F3_FS));gl.bindAttribLocation(pr,0,'a');gl.linkProgram(pr);
-    (function poll(){
-      if(F3.prog||F3.fail)return;
-      if(!gl.getProgramParameter(pr,ext.COMPLETION_STATUS_KHR)){setTimeout(poll,120);return}
-      if(!gl.getProgramParameter(pr,gl.LINK_STATUS)){F3.fail=true;return}
-      var U={};['uRes','uT','uYaw','uCam','uSkin','uHair','uTopC','uTopD','uPants','uEye','uHatC','uHatD','uAcc','uBP','uA','uB','uC','uD'].forEach(function(n){U[n]=gl.getUniformLocation(pr,n)});F3.prog={pr:pr,U:U};
-    })();
-  }catch(e){}
+  function flush(){var q=F3.wq||[];F3.wq=[];q.forEach(function(f){try{f(!!F3.prog)}catch(e){}})}
+  if(!p3Init()){F3.fail=true;flush();return}
+  glAsyncProg(P3_VS,F3_FS,function(pr){
+    if(!pr)F3.fail=true;
+    else{var gl=P3.gl,U={};['uRes','uT','uYaw','uCam','uSkin','uHair','uTopC','uTopD','uPants','uEye','uHatC','uHatD','uAcc','uBP','uA','uB','uC','uD'].forEach(function(n){U[n]=gl.getUniformLocation(pr,n)});F3.prog={pr:pr,U:U}}
+    flush();
+  });
 }
 function f3Draw(u,w,h,t,yaw,bust){
   var gl=P3.gl,o=F3.prog,U=o.U;
   if(P3.cv.width!==w||P3.cv.height!==h){P3.cv.width=w;P3.cv.height=h}
   gl.viewport(0,0,w,h);gl.clearColor(0,0,0,0);gl.clear(gl.COLOR_BUFFER_BIT);gl.useProgram(o.pr);
-  gl.bindBuffer(gl.ARRAY_BUFFER,gl.createBuffer());gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,3,-1,-1,3]),gl.STREAM_DRAW);
+  if(!P3.buf){P3.buf=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,P3.buf);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,3,-1,-1,3]),gl.STATIC_DRAW)}else gl.bindBuffer(gl.ARRAY_BUFFER,P3.buf);
   gl.enableVertexAttribArray(0);gl.vertexAttribPointer(0,2,gl.FLOAT,false,0,0);
   function c3(n,hex){var c=p3Hex(hex);gl.uniform3f(U[n],c[0],c[1],c[2])}
   gl.uniform2f(U.uRes,w,h);gl.uniform1f(U.uT,t);gl.uniform1f(U.uYaw,yaw);
@@ -7153,7 +7178,7 @@ function f3Pump(){
         if(at.toBlob)at.toBlob(function(b){end(b?URL.createObjectURL(b):at.toDataURL('image/png'))},'image/png');else end(at.toDataURL('image/png'));}catch(e){F3.fail=true;end(null)}})();
     }catch(e){F3.fail=true;end(null)}
   };
-  (window.requestAnimationFrame||setTimeout)(function(){setTimeout(go,0)});
+  f3Ready(function(){(window.requestAnimationFrame||setTimeout)(function(){setTimeout(go,0)})});
 }
 function f3Apply(el){
   if(el.getAttribute('data-p3d'))return;el.setAttribute('data-p3d','1');
