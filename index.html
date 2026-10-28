@@ -344,7 +344,7 @@ label.chk{display:flex!important;flex-direction:row!important;gap:12px;align-ite
 .drawfig{margin:0;display:grid;gap:6px}.drawsvg{width:100%;height:auto;border-radius:10px;border:1px solid var(--line);display:block}
 .drawfig figcaption{text-align:center;font-size:1.1rem}
 .loftcard{display:flex;gap:12px;align-items:center}.loftcard>div{min-width:0;display:grid;gap:3px}
-.p3{display:block;width:100%;height:100%;position:relative}.p3 svg{display:block;width:100%;height:100%}.p3s{display:block;width:100%;height:100%;background-size:800% 100%;background-repeat:no-repeat;animation:p3a .9s steps(8) infinite;filter:drop-shadow(0 1px 1px rgba(0,0,0,.18))}.p3s.fly{animation-duration:.5s}@keyframes p3a{to{background-position:114.2857% 0}}.dxs .p3s{animation:none}.dove .p3{width:100%;height:100%}.dove .p3s{filter:drop-shadow(0 2px 2px rgba(0,0,0,.35))}.dove.gold .p3s{filter:drop-shadow(0 0 5px rgba(255,214,90,.95))}.dove.rest .p3s{animation-play-state:paused}.pgico.gold .p3s{filter:drop-shadow(0 0 5px rgba(255,214,90,.9))}.p3lv{display:block;line-height:0}.p3live-c{display:block;margin:0 auto;filter:drop-shadow(0 0 10px var(--rc,transparent))}.dxd .p3box{flex:none;display:block;width:100px;min-height:100px}.dxd .p3box .pgico{width:80px;height:100px}.dexbig .p3box{display:block}.dexcard .p3live-c{max-width:100%}
+.p3{display:block;width:100%;height:100%;position:relative}.p3 svg{display:block;width:100%;height:100%}.p3s{display:block;width:100%;height:100%;background-size:800% 100%;background-repeat:no-repeat;animation:p3a .9s steps(8) infinite;filter:drop-shadow(0 1px 1px rgba(0,0,0,.18))}.p3s.fly{animation-duration:.5s}@keyframes p3a{to{background-position:114.2857% 0}}@keyframes p3a12{to{background-position:109.0909% 0}}.dxs .p3s{animation:none}.dove .p3{width:100%;height:100%}.dove .p3s{filter:drop-shadow(0 2px 2px rgba(0,0,0,.35))}.dove.gold .p3s{filter:drop-shadow(0 0 5px rgba(255,214,90,.95))}.dove.rest .p3s{animation-play-state:paused}.pgico.gold .p3s{filter:drop-shadow(0 0 5px rgba(255,214,90,.9))}.p3lv{display:block;line-height:0}.p3live-c{display:block;margin:0 auto;filter:drop-shadow(0 0 10px var(--rc,transparent))}.dxd .p3box{flex:none;display:block;width:100px;min-height:100px}.dxd .p3box .pgico{width:80px;height:100px}.dexbig .p3box{display:block}.dexcard .p3live-c{max-width:100%}
 .pgico{display:inline-block;width:44px;height:55px;flex:none}.pgico svg{display:block;width:100%;height:100%;overflow:visible}
 .pgico.gold svg{filter:drop-shadow(0 0 5px rgba(255,214,90,.95))}
 .pgname{font:inherit;border:1px solid var(--line);border-radius:10px;padding:4px 8px;background:var(--paper);color:var(--ink);width:100%;max-width:200px}
@@ -6697,7 +6697,7 @@ function todayHTML(){
 var P3={gl:null,cv:null,progs:{},cache:{},queue:[],busy:false,fail:false,W:192,H:240,F:16};
 var P3_PRE=[
 'precision highp float;',
-'#define WPV 44',
+'#define WPV 45',
 'uniform vec2 uRes;uniform float uT,uFly,uYaw;',
 'const float TAU=6.2831853;',
 'float gBob,gHead,gBlink,gWag,gWing,gProp,gAura,gTuck,gArm,gBr;',
@@ -7030,7 +7030,7 @@ function p3Apply(el){
   var s=el.getAttribute('data-p3'),f=el.getAttribute('data-p3f')==='1';
   p3Make(s,f,function(url){
     if(!url||!el.isConnected)return;
-    var i=document.createElement('i');i.className='p3s'+(f?' fly':'');i.style.backgroundImage='url("'+url+'")';i.style.backgroundSize=(P3PN*100)+'% 100%';i.style.animationTimingFunction='steps('+P3PN+')';
+    var i=document.createElement('i');i.className='p3s'+(f?' fly':'');i.style.backgroundImage='url("'+url+'")';i.style.backgroundSize=(P3PN*100)+'% 100%';i.style.animationTimingFunction='steps('+P3PN+')';i.style.animationName='p3a12';
     var svg=el.firstChild;el.appendChild(i);el.classList.add('p3on');if(svg&&svg.parentNode===el)el.removeChild(svg);
   });
 }
@@ -7087,7 +7087,7 @@ function p3Live(box,skin,w,h){
 var F3={prog:null,fail:false,reg:{},sheet:{},q:[],run:false};
 var F3_FS=[
 'precision highp float;',
-'#define WPV 44',
+'#define WPV 45',
 'uniform vec4 uCam;',
 'uniform vec3 uSkin,uHair,uTopC,uTopD,uPants,uEye,uHatC,uHatD,uAcc,uBP;',
 'uniform vec4 uA,uB,uC,uD;',
