@@ -8,7 +8,7 @@
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#FFF8EE",
-  "theme_color": "#0B7F78",
+  "theme_color": "#FFF8EE",
   "lang": "en",
   "categories": ["travel", "social", "lifestyle"],
   "icons": [

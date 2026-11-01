@@ -3,7 +3,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Waypals</title>
 <meta name="description" content="Waypals – your friend book for the road">
-<meta name="theme-color" content="#0B7F78">
+<meta name="theme-color" content="#FFF8EE">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
@@ -445,7 +445,9 @@ label.chk{display:flex!important;flex-direction:row!important;gap:12px;align-ite
 .avdet .avprev{position:sticky;top:calc(58px + env(safe-area-inset-top,0px));z-index:1;margin-top:0;padding:4px;box-shadow:0 8px 10px -8px rgba(0,0,0,.35)}.avdet .avprev .p3,.avdet .avprev svg,.avdet .avprev canvas{height:132px;width:auto;max-width:100%}
 #app.mapfull{max-width:none;padding-inline:0}
 #app.mapfull .top{display:none}
-#app.mapfull .tabs{padding-inline:20px;background:var(--paper)}
+#app.mapfull .tabs{padding-inline:20px;background:#070A22;border-top-color:rgba(255,255,255,.08);position:relative;z-index:7}
+#app.mapfull .tab{color:#A9AFD0}#app.mapfull .tab[aria-current="page"]{color:#fff}
+.maptab.full .ghint{bottom:80px}
 #main.mapmain{padding:0;margin:0;overflow:hidden;position:relative}
 .maptab.full{display:block;position:relative;height:100%}
 .maptab.full .mapframe{height:100%;min-height:0;border-radius:0;box-shadow:none}
@@ -453,7 +455,7 @@ label.chk{display:flex!important;flex-direction:row!important;gap:12px;align-ite
 .mswitch{position:absolute;left:12px;top:calc(12px + env(safe-area-inset-top,0px));z-index:6;display:grid;justify-items:center;gap:2px;min-width:58px;padding:7px 8px 6px;border:0;border-radius:18px;background:rgba(255,255,255,.94);color:#2D2A3E;box-shadow:0 4px 14px rgba(0,0,0,.4);font:800 .68rem/1 var(--f-ui)}
 .mswitch svg{width:34px;height:34px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
 .mswitch:active{transform:scale(.96)}
-#mapinfo{position:absolute;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px)*0);z-index:6;pointer-events:none;display:block}
+#mapinfo{position:absolute;left:12px;right:12px;bottom:26px;z-index:6;pointer-events:none;display:block}
 #mapinfo>*{pointer-events:auto}
 .mbar{display:flex;gap:8px;flex-wrap:wrap}
 .mpill{display:inline-flex;align-items:center;gap:6px;border:0;border-radius:999px;background:rgba(255,255,255,.95);color:#2D2A3E;padding:10px 14px;font:700 .84rem/1 var(--f-ui);box-shadow:0 4px 14px rgba(0,0,0,.35)}
@@ -6139,7 +6141,10 @@ function renderMain(){
   if(S.tab==='map')mapTab();else if(S.tab==='explore')exploreTab();else if(S.tab==='me')meTab();else peopleTab();
   $('#app').classList.toggle('mapfull',S.tab==='map');main.classList.toggle('mapmain',S.tab==='map');
   $$('.tab').forEach(function(b){if(b.getAttribute('data-tab')===S.tab)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current')});
+  setBar();
 }
+function setBar(){var m=document.querySelector('meta[name="theme-color"]');if(!m)return;var c=(S.tab==='map'&&!layer.children.length)?'#070A22':getComputedStyle(document.documentElement).getPropertyValue('--paper').trim();if(c&&m.content!==c)m.content=c}
+try{new MutationObserver(setBar).observe(layer,{childList:true});new MutationObserver(setBar).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme','data-style']});window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change',setBar)}catch(e){}
 var repaints=[];
 function onChange(){
   try{circlePublish()}catch(e){}
