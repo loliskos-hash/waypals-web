@@ -24,7 +24,8 @@
     return {
       doc: function (id) { return wrapDoc(ref.doc(id)) },
       onSnapshot: function (ok, err) { return ref.onSnapshot(ok, err) },
-      get: function () { return ref.get() }
+      get: function () { return ref.get() },
+      where: function (f, op, v) { return wrapCol(ref.where(f, op, v)) }
     };
   }
   var dbApi = {
@@ -71,6 +72,7 @@
       .then(function () { return fs.collection('quests').where('from', '==', uid).get().then(function (s) { return Promise.all(s.docs.map(function (d) { return d.ref.delete() })) }).catch(function () {}) })
       .then(function () { return fs.collection('quests').where('to', '==', uid).get().then(function (s) { return Promise.all(s.docs.map(function (d) { return d.ref.delete() })) }).catch(function () {}) })
       .then(function () { return fs.collection('usernames').where('uid', '==', uid).get().then(function (s) { return Promise.all(s.docs.map(function (d) { return d.ref.delete() })) }).catch(function () {}) })
+      .then(function () { return Promise.all(['from', 'to'].map(function (k) { return fs.collection('friendRequests').where(k, '==', uid).get().then(function (s) { return Promise.all(s.docs.map(function (d) { return d.ref.delete() })) }).catch(function () {}) })) })
       .then(function () { return user.delete() })
       .then(function () { try { localStorage.clear() } catch (e) {} setTimeout(function () { location.reload() }, 800) });
   }
