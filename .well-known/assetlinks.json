@@ -2,7 +2,7 @@
   "relation": ["delegate_permission/common.handle_all_urls"],
   "target": {
     "namespace": "android_app",
-    "package_name": "DEIN.PAKETNAME",
-    "sha256_cert_fingerprints": ["DEIN:SHA256:FINGERABDRUCK"]
+    "package_name": "de.ludeldoo.waypals",
+    "sha256_cert_fingerprints": ["BE:61:DB:DA:35:C4:BF:5D:4C:B5:21:38:81:AE:B4:FD:B9:7E:04:2C:7F:47:02:C6:C9:21:B2:13:0C:8A:00:D7"]
   }
 }]
