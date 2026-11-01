@@ -6819,13 +6819,13 @@ olive:[['sdEll(q,vec3(.3,.42,.3))','#5C6B2A'],['sdSph(q-vec3(0,.4,.0),.08)','#a3
 };
 /* Kleidung am Körper: Hülle um den Torso. Bereich = GLSL-Bedingung (positiv = außerhalb) */
 var P3_BODY={
-lederhose:[['SHELL(-q.y-.15)','PAT'],['sdRC(aq,vec3(0.),vec3(.12,-.42,.05),.27,.23)','PAT'],['SHELL2(q.y+.15)','#8A5A2B'],['sdCap(q,vec3(.3,-.8,.05),vec3(.33,-1.15,.08),.22)','#8A5A2B'],['sdTor(q-vec3(.33,-1.15,.08),vec2(.21,.045))','#3E9B4A'],['SHELL3(max(max(.15-q.z,q.y-.5),max(q.x-.45,-q.y-.15)))','#8A5A2B'],['sdEll(q-vec3(0,.12,.72),vec3(.22,.12,.06))','#E5B83E'],['SHELL3(max(abs(q.x-.36)-.08,-q.y-.15))','#A66E34'],['sdSph(q-vec3(.36,.45,.66),.05)','#FFD23F']],
+lederhose:[['SHELL(-q.y-.15)','PAT'],['sdRC(aq,vec3(0.),vec3(.15,-.8,.1),.31,.24)','PAT'],['SHELL2(q.y+.15)','#8A5A2B'],['sdCap(q,vec3(.3,-.8,.05),vec3(.33,-1.15,.08),.22)','#8A5A2B'],['sdTor(q-vec3(.33,-1.15,.08),vec2(.21,.045))','#3E9B4A'],['SHELL3(max(max(.15-q.z,q.y-.5),max(q.x-.45,-q.y-.15)))','#8A5A2B'],['sdEll(q-vec3(0,.12,.72),vec3(.22,.12,.06))','#E5B83E'],['SHELL3(max(abs(q.x-.36)-.08,-q.y-.15))','#A66E34'],['sdSph(q-vec3(.36,.45,.66),.05)','#FFD23F']],
 dirndl:[['sdCC(q-vec3(0,-.78,0),.42,1.2,.84)','#3A6FB0'],['sdTor(q-vec3(0,-1.19,0),vec2(1.2,.05))','#FFFFFF'],['SHELL2(max(-q.y,q.y-.6))','#2F7D4F'],['sdEll(q-vec3(.74,.38,.05),vec3(.24,.28,.24))','#FFFFFF'],['sdBox(q-vec3(0,-.72,.86),vec3(.42,.38,.05),.04)','#FFFFFF'],['sdSph(q-vec3(.2,-.36,.93),.1)','ACC'],['sdSph(q-vec3(0,.35,.72),.045)','#FFD23F'],['sdSph(q-vec3(0,.15,.74),.045)','#FFD23F']],
-stripes:[['SHELL(-q.y-.3)','PAT'],['sdRC(aq,vec3(0.),vec3(.12,-.42,.05),.27,.23)','PAT'],['sdTor(q-vec3(0,.8,.1),vec2(.46,.1))','#D63B3B'],['sdSph(q-vec3(.12,.72,.55),.1)','#D63B3B'],['sdBox(q-vec3(.1,.5,.6),vec3(.08,.2,.04),.03)','#D63B3B']],
+stripes:[['SHELL(-q.y-.3)','PAT'],['sdRC(aq,vec3(0.),vec3(.15,-.8,.1),.31,.24)','PAT'],['sdTor(q-vec3(0,.8,.1),vec2(.46,.1))','#D63B3B'],['sdSph(q-vec3(.12,.72,.55),.1)','#D63B3B'],['sdBox(q-vec3(.1,.5,.6),vec3(.08,.2,.04),.03)','#D63B3B']],
 poncho:[['sdCC(q-vec3(0,-.05,0),.7,1.12,.62)','PAT']],
 kimono:[['SHELL(-q.y-.7)','#F4F4F4'],['sdEll(q-vec3(.86,-.05,.05),vec3(.2,.55,.3))','#F4F4F4'],['SHELL2(abs(q.y+.15)-.11)','#1f1f24'],['SHELL3(max(abs(q.x-.14)-.07,max(-q.y-.1,.1-q.z)))','#1f1f24']],
 scarf:[['sdTor(q-vec3(0,.8,.1),vec2(.48,.12))','ACC'],['sdBox(q-vec3(.22,.38,.68),vec3(.1,.4,.05),.03)','ACC']],
-jersey:[['SHELL(-q.y-.45)','WING'],['sdRC(aq,vec3(0.),vec3(.12,-.4,.05),.26,.22)','WING'],['sdTor(q-vec3(0,.85,.08),vec2(.45,.07))','ACC'],['sdBox(q-vec3(0,.1,.72),vec3(.12,.2,.04),.02)','ACC']],
+jersey:[['SHELL(-q.y-.45)','WING'],['sdRC(aq,vec3(0.),vec3(.15,-.8,.1),.30,.24)','WING'],['sdTor(q-vec3(0,.85,.08),vec2(.45,.07))','ACC'],['sdBox(q-vec3(0,.1,.72),vec3(.12,.2,.04),.02)','ACC']],
 cape:[['sdEll(q-vec3(0,.1,-.62),vec3(.95,1.15,.08))','ACC'],['sdSph(q-vec3(.4,.78,.38),.09)','#FFD23F'],['sdTor(q-vec3(0,.82,.05),vec2(.5,.07))','ACC']],
 vest:[['SHELL(-q.y-.4)','#FFFFFF'],['SHELL2(max(.1-q.x,-q.y-.45))','#2F3035'],['sdSph(q-vec3(.42,.3,.62),.06)','#C8102E'],['sdSph(q-vec3(.3,.0,.68),.06)','#C8102E'],['sdSph(q-vec3(.45,-.1,.58),.05)','#C8102E']],
 apron:[['sdBox(q-vec3(0,-.15,.3+.68*FX),vec3(.45,.62,.05),.04)','#FFFFFF'],['SHELL3(max(abs(q.x-.4)-.06,-q.y-.2))','#FFFFFF']]
@@ -6848,15 +6848,15 @@ umbrella:[['sdCap(q,vec3(0,-.85,0),vec3(0,.3,0),.035)','#222222'],['sdRC(q,vec3(
 flag:[['sdCap(q,vec3(-.55,-.8,0),vec3(-.55,.85,0),.035)','#8a6a3a'],['sdBox(q-vec3(.05,.5,0),vec3(.6,.36,.02),.01)','#FFFFFF'],['sdBox(q-vec3(.05,.78,.015),vec3(.6,.05,.02),0.)','#B22234'],['sdBox(q-vec3(.05,.56,.015),vec3(.6,.05,.02),0.)','#B22234'],['sdBox(q-vec3(.05,.34,.015),vec3(.6,.05,.02),0.)','#B22234'],['sdBox(q-vec3(-.28,.66,.02),vec3(.3,.2,.02),0.)','#3C3B6E']]
 });
 Object.assign(P3_BODY,{
-suit:[['SHELL(-q.y-.45)','#FFFFFF'],['sdRC(aq,vec3(0.),vec3(.12,-.42,.05),.27,.23)','#FFFFFF'],['SHELL2(max(.12-q.x,-q.y-.45))','#25252b'],['sdBox(q-vec3(0,.4,.76),vec3(.06,.32,.03),.02)','#111118'],['sdSph(q-vec3(.3,.1,.74),.035)','#C0C6D2'],['sdSph(q-vec3(.3,-.1,.76),.035)','#C0C6D2']],
-matador:[['SHELL(-q.y-.45)','#C8102E'],['sdRC(aq,vec3(0.),vec3(.12,-.42,.05),.27,.23)','#C8102E'],['SHELL3(max(abs(q.x-.12)-.05,-q.y-.45))','#E5B83E'],['sdEll(q-vec3(.66,.66,.04),vec3(.16,.08,.16))','#E5B83E'],['sdTor(q-vec3(0,.85,.1),vec2(.46,.06))','#E5B83E'],['sdBox(q-vec3(0,.7,.72),vec3(.06,.1,.03),.02)','#111118'],['sdSph(q-vec3(.34,.35,.72),.05)','#E5B83E'],['sdSph(q-vec3(.34,.05,.74),.05)','#E5B83E']],
+suit:[['SHELL(-q.y-.45)','#FFFFFF'],['sdRC(aq,vec3(0.),vec3(.15,-.8,.1),.31,.24)','#FFFFFF'],['SHELL2(max(.12-q.x,-q.y-.45))','#25252b'],['sdBox(q-vec3(0,.4,.76),vec3(.06,.32,.03),.02)','#111118'],['sdSph(q-vec3(.3,.1,.74),.035)','#C0C6D2'],['sdSph(q-vec3(.3,-.1,.76),.035)','#C0C6D2']],
+matador:[['SHELL(-q.y-.45)','#C8102E'],['sdRC(aq,vec3(0.),vec3(.15,-.8,.1),.31,.24)','#C8102E'],['SHELL3(max(abs(q.x-.12)-.05,-q.y-.45))','#E5B83E'],['sdEll(q-vec3(.66,.66,.04),vec3(.16,.08,.16))','#E5B83E'],['sdTor(q-vec3(0,.85,.1),vec2(.46,.06))','#E5B83E'],['sdBox(q-vec3(0,.7,.72),vec3(.06,.1,.03),.02)','#111118'],['sdSph(q-vec3(.34,.35,.72),.05)','#E5B83E'],['sdSph(q-vec3(.34,.05,.74),.05)','#E5B83E']],
 bandana:[['sdTor(q-vec3(0,.8,.1),vec2(.46,.1))','#C8102E'],['max(max(max(abs(q.x)-(q.y-.25)*.55,abs(q.z-.66)-.04),.25-q.y),q.y-.82)','#C8102E'],['sdSph(q-vec3(0,.6,.71),.04)','#FFFFFF'],['sdSph(q-vec3(.12,.7,.71),.035)','#FFFFFF']],
-happi:[['SHELL(-q.y-.55)','#2C5FB5'],['sdRC(aq,vec3(0.),vec3(.12,-.42,.05),.28,.24)','#2C5FB5'],['SHELL3(max(abs(q.x-.1)-.07,-q.y-.55))','#FFFFFF'],['SHELL2(abs(q.y+.15)-.09)','#1f1f24']],
-mountie:[['SHELL(-q.y-.5)','#C8102E'],['sdRC(aq,vec3(0.),vec3(.12,-.42,.05),.27,.23)','#C8102E'],['sdTor(q-vec3(0,.85,.08),vec2(.45,.07))','#1a1a1a'],['SHELL2(abs(q.y+.05)-.07)','#5a3a1a'],['sdBox(q-vec3(0,-.05,.76),vec3(.1,.08,.03),.02)','#FFD23F'],['sdSph(q-vec3(0,.4,.76),.04)','#FFD23F'],['sdSph(q-vec3(0,.2,.78),.04)','#FFD23F']],
-tartan:[['SHELL(-q.y-.45)','#FFFFFF'],['sdRC(aq,vec3(0.),vec3(.12,-.42,.05),.27,.23)','#FFFFFF'],['sdCC(q-vec3(0,-.62,0),.34,1.0,.82)','PAT'],['SHELL3(abs(q.x+q.y*.8-.5)-.1)','PAT']],
-sherwani:[['SHELL(-q.y-.75)','#E8802B'],['sdRC(aq,vec3(0.),vec3(.12,-.42,.05),.27,.23)','#E8802B'],['SHELL3(max(abs(q.x-.1)-.06,-q.y-.75))','#8B1E2B'],['sdTor(q-vec3(0,.85,.08),vec2(.45,.07))','#FFD23F'],['sdSph(q-vec3(0,.5,.76),.045)','#8B1E2B'],['sdSph(q-vec3(0,.2,.8),.045)','#8B1E2B'],['sdSph(q-vec3(0,-.1,.8),.045)','#8B1E2B']],
-tang:[['SHELL(-q.y-.5)','#D01C1C'],['sdRC(aq,vec3(0.),vec3(.12,-.42,.05),.27,.23)','#D01C1C'],['sdTor(q-vec3(0,.85,.08),vec2(.44,.07))','#FFD23F'],['sdSph(q-vec3(0,.6,.76),.05)','#FFD23F'],['sdSph(q-vec3(0,.3,.8),.05)','#FFD23F'],['sdSph(q-vec3(0,0.,.8),.05)','#FFD23F'],['sdSph(q-vec3(.4,.4,.68),.07)','#FFD23F'],['sdSph(q-vec3(.4,.0,.72),.07)','#FFD23F']],
-canarinha:[['SHELL(-q.y-.4)','#FFD84A'],['sdRC(aq,vec3(0.),vec3(.12,-.42,.05),.27,.23)','#FFD84A'],['sdTor(q-vec3(0,.85,.08),vec2(.45,.07))','#1C9A4B'],['sdEll(q-vec3(.28,.4,.72),vec3(.1,.1,.03))','#2D5BB8'],['SHELL2(q.y+.4)','#2D5BB8']],
+happi:[['SHELL(-q.y-.55)','#2C5FB5'],['sdRC(aq,vec3(0.),vec3(.15,-.8,.1),.32,.24)','#2C5FB5'],['SHELL3(max(abs(q.x-.1)-.07,-q.y-.55))','#FFFFFF'],['SHELL2(abs(q.y+.15)-.09)','#1f1f24']],
+mountie:[['SHELL(-q.y-.5)','#C8102E'],['sdRC(aq,vec3(0.),vec3(.15,-.8,.1),.31,.24)','#C8102E'],['sdTor(q-vec3(0,.85,.08),vec2(.45,.07))','#1a1a1a'],['SHELL2(abs(q.y+.05)-.07)','#5a3a1a'],['sdBox(q-vec3(0,-.05,.76),vec3(.1,.08,.03),.02)','#FFD23F'],['sdSph(q-vec3(0,.4,.76),.04)','#FFD23F'],['sdSph(q-vec3(0,.2,.78),.04)','#FFD23F']],
+tartan:[['SHELL(-q.y-.45)','#FFFFFF'],['sdRC(aq,vec3(0.),vec3(.15,-.8,.1),.31,.24)','#FFFFFF'],['sdCC(q-vec3(0,-.62,0),.34,1.0,.82)','PAT'],['SHELL3(abs(q.x+q.y*.8-.5)-.1)','PAT']],
+sherwani:[['SHELL(-q.y-.75)','#E8802B'],['sdRC(aq,vec3(0.),vec3(.15,-.8,.1),.31,.24)','#E8802B'],['SHELL3(max(abs(q.x-.1)-.06,-q.y-.75))','#8B1E2B'],['sdTor(q-vec3(0,.85,.08),vec2(.45,.07))','#FFD23F'],['sdSph(q-vec3(0,.5,.76),.045)','#8B1E2B'],['sdSph(q-vec3(0,.2,.8),.045)','#8B1E2B'],['sdSph(q-vec3(0,-.1,.8),.045)','#8B1E2B']],
+tang:[['SHELL(-q.y-.5)','#D01C1C'],['sdRC(aq,vec3(0.),vec3(.15,-.8,.1),.31,.24)','#D01C1C'],['sdTor(q-vec3(0,.85,.08),vec2(.44,.07))','#FFD23F'],['sdSph(q-vec3(0,.6,.76),.05)','#FFD23F'],['sdSph(q-vec3(0,.3,.8),.05)','#FFD23F'],['sdSph(q-vec3(0,0.,.8),.05)','#FFD23F'],['sdSph(q-vec3(.4,.4,.68),.07)','#FFD23F'],['sdSph(q-vec3(.4,.0,.72),.07)','#FFD23F']],
+canarinha:[['SHELL(-q.y-.4)','#FFD84A'],['sdRC(aq,vec3(0.),vec3(.15,-.8,.1),.31,.24)','#FFD84A'],['sdTor(q-vec3(0,.85,.08),vec2(.45,.07))','#1C9A4B'],['sdEll(q-vec3(.28,.4,.72),vec3(.1,.1,.03))','#2D5BB8'],['SHELL2(q.y+.4)','#2D5BB8']],
 collar:[['sdTor(q-vec3(0,.78,.1),vec2(.5,.14))','#E5B83E'],['sdTor(q-vec3(0,.7,.1),vec2(.6,.07))','#2E7DD6'],['sdTor(q-vec3(0,.6,.1),vec2(.68,.05))','#C8102E'],['sdSph(q-vec3(0,.62,.76),.06)','#C8102E'],['sdSph(q-vec3(.3,.58,.7),.06)','#2E7DD6']],
 toga:[['SHELL(-q.y-.6)','#F8F4EA'],['SHELL3(abs(q.x*.8+q.y*.7-.2)-.12)','#F2E6C8'],['sdSph(q-vec3(.5,.7,.3),.08)','#FFD23F']]
 });
@@ -6984,7 +6984,7 @@ function p3Gen(skin){
 function HOLDARM(hold){
   var s='r=opU(r,vec2(sdRC(aq,vec3(0.),vec3(.16,-.95,.12)*(1.+.4*gTuck),.28+.04*gTuck,.15)'+(hold?'':'')+',7.));';
   if(hold)s='r=opU(r,vec2(max(sdRC(aq,vec3(0.),vec3(.16,-.95,.12)*(1.+.4*gTuck),.28+.04*gTuck,.15),p.x+.05),7.));r=opU(r,vec2(max(sdEll(aq-vec3(.17,-1.0,.12),vec3(.1,.3,.1)),p.x+.05),8.));'+
-   'r=opU(r,vec2(max(sdCap(p,vec3(.66*FX,.46,.04),vec3(.66*FX,.02+.5*gProp,.46),.21),-p.x-.05),7.));r=opU(r,vec2(max(sdCap(p,vec3(.66*FX,.02+.5*gProp,.46),vec3(.5,-.05+gProp,.88),.17),-p.x-.05),7.));r=opU(r,vec2(max(sdEll(p-vec3(.5,-.05+gProp,.9),vec3(.14,.2,.12)),-p.x-.05),8.));';
+   'r=opU(r,vec2(max(sdCap(p,vec3(.66*FX,.46,.04),vec3(.74*FX,.0+.5*gProp,.4),.23),-p.x-.05),7.));r=opU(r,vec2(max(sdCap(p,vec3(.8*FX,.0+.5*gProp,.4),vec3(.52,-.06+gProp,.84),.19),-p.x-.05),7.));r=opU(r,vec2(max(sdEll(p-vec3(.48,-.06+gProp,.88),vec3(.24,.26,.16)),-p.x-.05),8.));';
   else s+='r=opU(r,vec2(sdEll(aq-vec3(.17,-1.0,.12),vec3(.1,.3,.1)),8.));';
   s='if(uFly>.5){vec3 w=q-vec3(.4*FX,.55,.02);w.xy=rot(-gFl)*w.xy;w.xz=rot(gSw)*w.xz;r=opU(r,vec2(sdEll(w-vec3(.72,.02,-.08),vec3(.78,.08,.34)),7.));for(int j=0;j<6;j++){float fj=float(j);vec3 c=w-vec3(.3+.2*fj,0.,-.42-.03*fj);c.xz=rot(.05*fj)*c.xz;r=opU(r,vec2(sdEll(c,vec3(.115,.05,.3-.015*fj)),7.));}for(int j=0;j<7;j++){float fj=float(j);vec3 c=w-vec3(1.4,0.,0.);c.xz=rot(-.02+.2*fj)*c.xz;c.x-=.55-.025*fj;r=opU(r,vec2(sdEll(c,vec3(.6-.025*fj,.045,.14)),fj<3.?8.:7.));}for(int j=0;j<4;j++){float fj=float(j);vec3 c=q-vec3(0.,-.35,-.4);c.xz=rot(-.2*fj)*c.xz;c.z+=.85;r=opU(r,vec2(sdEll(c,vec3(.21,.05,.85-.05*fj)),9.));}aq=vec3(w.z,-w.x*.45,w.y);}else{'+s+'}';
   return s;
@@ -7057,7 +7057,7 @@ function p3Make(s,f,cb){
   o=P3S[key]={cbs:[cb]};
   var ci=-1,pc=skinParse(s);for(var z=0;z<DEX_C.length;z++)if(DEX_C[z][0]===pc.c){ci=z;break}
   if(P3STATIC&&ci>=0&&location.protocol!=='file:'){
-    var u='sprites/'+ci+'-'+pc.i+(f?'f':'')+'.webp?v=52',im=new Image();
+    var u='sprites/'+ci+'-'+pc.i+(f?'f':'')+'.webp?v=53',im=new Image();
     im.onload=function(){o.url=u;var c=o.cbs;o.cbs=[];c.forEach(function(g){try{g(u)}catch(e){}})};
     im.onerror=function(){P3Q.push([s,f,key]);p3Pump()};im.src=u;return;
   }
