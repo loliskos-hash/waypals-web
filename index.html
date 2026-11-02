@@ -3943,7 +3943,7 @@ function avatarEditor(host,st){
   function opts(full){
     var h='',en=st.lang==='en';
     if(tab==='face'){
-      h+=tx('bd',['Mann','Frau','Divers'],'Körper');if(full.bd===2)h+=tx('bu',['Nein',_t('Ja')],'Oberweite');h+=sw('skin',AV_SKIN,'Haut');
+      h+=tx('bd',['Mann','Frau','Divers'],'Körper');h+=sw('skin',AV_SKIN,'Haut');
       if(st.photo)h+='<p class="hint">'+(en?'Your photo is the face. Remove the photo to design eyes and mouth.':'Dein Foto ist das Gesicht. Ohne Foto kannst du Augen und Mund gestalten.')+'</p>';
       else h+=tx('ey',AV_EYES,'Augen')+sw('ec',AV_EYEC,'Augenfarbe')+tx('br',AV_BROWS,'Augenbrauen')+tx('mo',AV_MOUTHS,'Mund')+tx('no',AV_NOSE,'Nase')+tx('fk',['Nein',_t('Ja')],'Sommersprossen');
     }else if(tab==='hair'){
@@ -7531,7 +7531,7 @@ P3_PRE,
 ' vec3 m=vec3(abs(p.x),p.y,p.z);float sx=p.x<0.?-1.:1.;',
 /* Torso */
 ' vec3 T=vec3(0.,.08+gBob,0.);',
-' float tor=sdEll(p-T,vec3(.56,.8,.37));tor=smin(tor,sdEll(p-vec3(0.,-.5,0.),vec3(.5,.42,.34)),.24);if(uD.w>1.5){tor=smin(tor,sdEll(vec3(abs(p.x),p.y,p.z)-vec3(.18,.15+gBob,.285),vec3(.175,.16,.165)),.09);}',
+' float tor=sdEll(p-T,vec3(.56,.8,.37));tor=smin(tor,sdEll(p-vec3(0.,-.5,0.),vec3(.5,.42,.34)),.24);',
 ' float tm=3.;if((cost>.5&&cost<1.5)||(cost>4.5&&cost<5.5)||(cost>8.5&&cost<9.5))tm=4.;if(cost>5.5&&cost<6.5)tm=10.;',
 ' r=opU(r,vec2(tor,tm));',
 /* Beine */
@@ -7788,7 +7788,7 @@ function f3Uni(a){
   var tcc=tc.c,tcd=tc.d;if(cost===2){tcc='#F7F1E6';tcd='#E3DCCD'}var cp=COST_PAL[cost];if(cp){var pq=cp[(a.tc||0)%cp.length];tcc=pq[0];tcd=pq[1];acc=pq[2]}
   var hc=hk.c,hd=hk.d;if(a.ha===3){hc='#EDD7A0';hd='#C9A867'}
   return {skin:AV_SKIN[a.skin],hair:AV_HAIRC[a.hc],topc:tcc,topd:tcd,pants:pants,eye:AV_EYEC[a.ec]||AV_EYEC[0],hatc:hc,hatd:hd,acc:acc,bp:AV_BP[a.bc]||AV_BP[0],
-    A:[a.hair,top,a.ey,a.br],B:[a.mo,a.no,a.be,a.ha],C:[cost,a.gl,a.ac,a.bt],D:[sleeve,leg,wide,(a.fk?1:0)+((a.bd===1||(a.bd===2&&a.bu))?2:0)]};
+    A:[a.hair,top,a.ey,a.br],B:[a.mo,a.no,a.be,a.ha],C:[cost,a.gl,a.ac,a.bt],D:[sleeve,leg,wide,a.fk?1:0]};
 }
 function f3Init(){
   if(F3.prog||F3.fail)return !F3.fail;
