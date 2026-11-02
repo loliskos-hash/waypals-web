@@ -313,6 +313,9 @@ textarea.ruled:focus{box-shadow:none}
 .stamps{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 10px}
 .stamp{margin:0;display:grid;gap:4px;justify-items:center;text-align:center;padding:10px 6px;border-radius:16px;background:var(--sheet);border:1.5px solid var(--line)}
 .stampsvg{width:100%;max-width:170px;height:auto;opacity:.92}
+.wishf{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 14px}.wishf input{flex:1 1 140px;min-width:0;font:inherit;padding:8px 10px;border-radius:12px;border:1.5px solid var(--line);background:var(--sheet);color:var(--ink)}
+.wishl{list-style:none;margin:0;padding:0;display:grid;gap:8px}.wishl li{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:14px;background:var(--sheet);border:1.5px solid var(--line)}.wishl li>div{flex:1;min-width:0;display:grid;gap:2px}.wishl small{color:var(--pen)}.wishl .wck{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:var(--line);font-size:14px}.wishl li.done .wck{background:#2E8B57;color:#fff}.wishl li.done b{text-decoration:line-through;text-decoration-thickness:1.5px}
+.herecard{display:flex;gap:12px;align-items:flex-start;padding:12px 14px;margin:0 0 14px;border-radius:16px;background:linear-gradient(135deg,rgba(46,139,87,.14),rgba(46,139,87,.04));border:1.5px solid rgba(46,139,87,.35)}.herecard .hci{font-size:22px}.herecard>div{display:grid;gap:4px}.herecard small{color:var(--pen)}
 .stamp .stampsvg{animation:stampIn .42s cubic-bezier(.3,1.5,.5,1) both;animation-delay:calc(var(--i,0)*70ms)}
 .stamp.new .stampsvg{animation:stampNew .8s cubic-bezier(.3,1.6,.5,1) both;animation-delay:calc(var(--i,0)*70ms + .25s)}
 .stamp.new{position:relative}.stamp.new::after{content:'NEU';position:absolute;top:6px;right:8px;font:700 10px/1 var(--f-ui);letter-spacing:.08em;color:#fff;background:#B0413E;border-radius:6px;padding:3px 5px;animation:stampTag .3s ease both;animation-delay:calc(var(--i,0)*70ms + .9s)}
@@ -4318,7 +4321,7 @@ function Globe(opts){
 /* ---------- Speicher ---------- */
 var LS_KEY='wegmarken-v1';
 var S={tab:'map',mapMode:'met',mapSel:null,q:'',tag:'',sort:'new'};
-function normPost(o){return {pub:o.pub&&typeof o.pub==='object'?o.pub:{},me:o.me||null,pigeons:Array.isArray(o.pigeons)?o.pigeons:[],trips:Array.isArray(o.trips)?o.trips:[],posts:Array.isArray(o.posts)?o.posts:[],diet:o.diet&&typeof o.diet==='object'?o.diet:{},profile:o.profile&&typeof o.profile==='object'?o.profile:null,loft:o.loft&&typeof o.loft==='object'?o.loft:null,plus:o.plus&&typeof o.plus==='object'?o.plus:{},username:typeof o.username==='string'?o.username:''}}
+function normPost(o){return {pub:o.pub&&typeof o.pub==='object'?o.pub:{},me:o.me||null,pigeons:Array.isArray(o.pigeons)?o.pigeons:[],trips:Array.isArray(o.trips)?o.trips:[],posts:Array.isArray(o.posts)?o.posts:[],diet:o.diet&&typeof o.diet==='object'?o.diet:{},profile:o.profile&&typeof o.profile==='object'?o.profile:null,loft:o.loft&&typeof o.loft==='object'?o.loft:null,wish:Array.isArray(o.wish)?o.wish:[],plus:o.plus&&typeof o.plus==='object'?o.plus:{},username:typeof o.username==='string'?o.username:''}}
 var store={
   friends:[],mode:'pending',col:null,post:{me:null,pigeons:[],trips:[],posts:[],diet:{},profile:null},
   loadLocal:function(){try{var raw=localStorage.getItem(LS_KEY);if(raw){var a=JSON.parse(raw);if(Array.isArray(a))return a}}catch(e){}return []},
@@ -6587,20 +6590,68 @@ function isStandalone(){try{return window.matchMedia('(display-mode: standalone)
 function installApp(){if(instEv){var ev=instEv;instEv=null;ev.prompt();try{ev.userChoice.then(function(){renderMain()})}catch(e){}return}var ios=/iphone|ipad|ipod/i.test(navigator.userAgent);toast(ios?L('Tippe unten auf Teilen und dann "Zum Home-Bildschirm".','Tap Share, then "Add to Home Screen".'):L('Öffne das Browser-Menü (drei Punkte) und wähle "App installieren" bzw. "Zum Startbildschirm".','Open the browser menu (three dots) and choose "Install app" or "Add to Home screen".'))}
 function mainAct(gx){
   if(gx==='install'){installApp();return true}
-  var m={flock:function(){openFlock()},questlab:function(){openQuestLab()},challenges:openChallenges,trips:openTrips,rules:openRules,passport:openPassport,recap:openRecap,bdays:openBirthdays,profile:openProfile,uname:openUsername,goalgo:function(){S.tab='me';renderMain()},dex:openDex,achv:openAchievements,meetups:function(){openMeetups()},claim:function(){claimGoal();renderMain()}};
+  var m={wish:openWish,flock:function(){openFlock()},questlab:function(){openQuestLab()},challenges:openChallenges,trips:openTrips,rules:openRules,passport:openPassport,recap:openRecap,bdays:openBirthdays,profile:openProfile,uname:openUsername,goalgo:function(){S.tab='me';renderMain()},dex:openDex,achv:openAchievements,meetups:function(){openMeetups()},claim:function(){claimGoal();renderMain()}};
   if(m[gx]){m[gx]();return true}
   if(gx==='daily'){var dc=dailyChallenge();if(dc)openPost(dc);return true}
   if(gx==='tfind'){var rd=eggState().eggs.filter(function(e){return e.ready<=Date.now()});if(rd.length){eggHatch(rd[0].id);renderMain()}else openChallenges();return true}
   return false;
+}
+/* ---------- Reisewunschliste und Freund im selben Land ---------- */
+function wishList(){var w=store.post.wish;if(!Array.isArray(w))w=store.post.wish=[];return w}
+function ctryOfFriend(f){return f.country||countryOfPlace(f.place||'',f.lat,f.lon)}
+function openWish(){
+  var el=openSheet('','wish');
+  function paint(){
+    var w=wishList(),pd=passportData(),been=pd.countries.map(function(c){return c.name}),home=myCountry(),names=COUNTRIES.map(function(c){return c.name}).sort(function(a,b){return cn(a).localeCompare(cn(b))});
+    var h='<div class="sbar"><button type="button" class="btn ghost" data-act="close">'+ic('back')+L('Zurück','Back')+'</button></div><h2 class="stitle">'+L('Reisewunschliste','Travel wish list')+'</h2>'+
+      '<p class="hint">'+L('Wo willst du noch hin? Wenn du dort jemanden triffst oder eine Reise einträgst, wird der Wunsch abgehakt. Wir zeigen dir auch, welche Freunde das Land schon kennen.','Where do you still want to go? When you meet someone there or add a trip, the wish gets ticked off. We also show which friends already know the country.')+'</p>'+
+      '<form class="wishf" data-wf><input list="wish-dl" name="c" required placeholder="'+esc(L('Land, z. B. Japan','Country, e.g. Japan'))+'" aria-label="'+esc(L('Land','Country'))+'"><datalist id="wish-dl">'+names.map(function(n){return '<option value="'+esc(cn(n))+'">'}).join('')+'</datalist><input name="n" maxlength="60" placeholder="'+esc(L('Notiz (optional)','Note (optional)'))+'" aria-label="'+esc(L('Notiz','Note'))+'"><button type="submit" class="btn pri sm">'+L('Hinzufügen','Add')+'</button></form>';
+    if(!w.length)h+='<p class="hint">'+L('Noch leer. Trag dein erstes Traumziel ein.','Still empty. Add your first dream destination.')+'</p>';
+    else h+='<ul class="wishl">'+w.map(function(x){
+      var done=been.indexOf(x.c)>=0||x.c===home,fr=allFriends().filter(function(f){return !f.example&&ctryOfFriend(f)===x.c}).map(function(f){return first(f.name)});
+      return '<li class="'+(done?'done':'')+'"><span class="wck" aria-hidden="true">'+(done?'✓':'✈')+'</span><div><b>'+esc(cn(x.c))+'</b>'+(x.n?'<small>'+esc(x.n)+'</small>':'')+(fr.length?'<small class="wfr">☺ '+LT("Kennt sich aus: {0}","Knows it: {0}",[esc(fr.slice(0,3).join(', '))+(fr.length>3?' +'+(fr.length-3):'')])+'</small>':'')+(done?'<small class="wfr">'+L('Geschafft!','Done!')+'</small>':'')+'</div><button type="button" class="btn ghost sm" data-wdel="'+esc(x.id)+'" aria-label="'+esc(L('Entfernen','Remove'))+'">×</button></li>'}).join('')+'</ul>';
+    $('.sheet-in',el).innerHTML=h;
+  }
+  paint();
+  el.addEventListener('submit',function(e){
+    var f=e.target.closest('[data-wf]');if(!f)return;e.preventDefault();
+    var v=String(f.elements.c.value||'').trim(),hit=null;COUNTRIES.forEach(function(c){if(!hit&&(NORM(c.name)===NORM(v)||NORM(cn(c.name))===NORM(v)))hit=c.name});
+    if(!hit){toast(L('Dieses Land kenne ich nicht. Wähle eins aus der Liste.','I do not know this country. Pick one from the list.'));return}
+    if(wishList().some(function(x){return x.c===hit})){toast(L('Steht schon auf deiner Liste.','Already on your list.'));return}
+    wishList().push({id:'w'+Date.now().toString(36),c:hit,n:String(f.elements.n.value||'').trim().slice(0,60),at:todayISO()});store.savePost();paint();
+  });
+  el.addEventListener('click',function(e){
+    var d=e.target.closest('[data-wdel]');if(d){var id=d.getAttribute('data-wdel');store.post.wish=wishList().filter(function(x){return x.id!==id});store.savePost();paint();return}
+    if(e.target.closest('[data-act=close]'))closeSheet(el);
+  });
+}
+function hereFriends(){
+  var t=todayISO(),act=function(tr){return tr.from<=t&&tr.to>=t},home=myCountry();
+  var mt=tripsAll().filter(function(tr){return tr.who==='me'&&act(tr)})[0],myC=mt?countryOfPlace(mt.dest.name,mt.dest.lat,mt.dest.lon):home,meAway=!!mt&&myC!==home,out=[];
+  if(!myC)return out;
+  store.friends.forEach(function(f){
+    if(f.example)return;var ft=[];try{ft=tripsAllOf(f.id).filter(act)}catch(e){}
+    var fc='',fAway=false;
+    if(ft.length){fc=countryOfPlace(ft[0].dest.name,ft[0].dest.lat,ft[0].dest.lon);fAway=true}
+    else{var p=palOf(f);if(p&&p.home)fc=countryOfPlace(p.home.name||'',p.home.lat,p.home.lon)}
+    if(fc&&fc===myC&&(meAway||fAway))out.push({f:f,away:fAway,place:ft.length?ft[0].dest.name:''});
+  });
+  return out.length?{c:myC,list:out}:null;
+}
+function hereHTML(){
+  var h=null;try{h=hereFriends()}catch(e){}if(!h)return '';
+  var nm=h.list.map(function(x){return first(x.f.name)}),txt=nm.length===1?LT("{0} ist gerade auch in {1}!","{0} is in {1} right now too!",[esc(nm[0]),esc(cn(h.c))]):LT("{0} sind gerade auch in {1}!","{0} are in {1} right now too!",[esc(nm.slice(0,-1).join(', ')+' '+L('und','and')+' '+nm[nm.length-1]),esc(cn(h.c))]);
+  return '<section class="herecard"><span class="hci" aria-hidden="true">📍</span><div><b>'+txt+'</b><small>'+L('Vielleicht klappt ein Treffen?','Maybe you can meet up?')+'</small><div class="btnrow">'+h.list.slice(0,3).map(function(x){return '<button type="button" class="btn sm" data-open="'+esc(x.f.id)+'">'+esc(first(x.f.name))+'</button>'}).join('')+'</div></div></section>';
 }
 function exploreTab(){
   var wrap=document.createElement('section');wrap.className='people tabpage';
   var fut=tripsAll().filter(function(tr){return tr.who==='me'&&tr.to>=todayISO()}).sort(function(a,b){return a.from<b.from?-1:1})[0];
   var fb=0;try{fb=fbItems(14,30).length}catch(e){}
   var bd=birthdayList().filter(function(b){return !b.f.example})[0];
-  wrap.innerHTML='<div class="phead"><h2 class="h2">'+L('Entdecken','Explore')+'</h2></div>'+todayHTML()+
+  wrap.innerHTML='<div class="phead"><h2 class="h2">'+L('Entdecken','Explore')+'</h2></div>'+hereHTML()+todayHTML()+
     tileGroup(L('Unterwegs','On the road'),[
       tile('trips','plane',L('Reisen','Trips'),fut?esc(fut.dest.name)+' · '+esc(fmtDM(fut.from)):L('Eigene und fremde Reisen eintragen','Add your own and your friends\u2019 trips')),
+      tile('wish','star',L('Wunschliste','Wish list'),(function(){var n=wishList().length;return n?LT("Traumziele: {0}","Dream destinations: {0}",[n]):L('Wo willst du noch hin?','Where do you want to go?')})()),
       tile('recap','map',L('Rückblick','Recap'),L('Dein Reisejahr auf einen Blick','Your travel year at a glance')),
       tile('flash','mail','Flashbacks',fb?LT("Erinnerungen: {0}","Memories: {0}",[fb]):L('Erinnerungen von früher','Memories from the past'))])+
     tileGroup(L('Mit Freunden','With friends'),[
@@ -6610,7 +6661,7 @@ function exploreTab(){
       tile('circle','pin',L('Kreis','Circle'),circleOn()?L('Verbunden','Connected'):L('Freunde verknüpfen, Challenges schicken','Link friends, send challenges')),
       tile('bdays','pin',L('Geburtstage','Birthdays'),bd?esc(first(bd.f.name))+' '+inDays(bd.d):L('Noch keine eingetragen','None added yet'))]);
   main.replaceChildren(wrap);
-  wrap.addEventListener('click',function(e){var a=e.target.closest('[data-act]');if(a)mainAct(a.getAttribute('data-act'))});
+  wrap.addEventListener('click',function(e){var o=e.target.closest('[data-open]');if(o){openDetail(o.getAttribute('data-open'));return}var a=e.target.closest('[data-act]');if(a)mainAct(a.getAttribute('data-act'))});
 }
 function qprefHTML(){
   var th=PREF.theme==='light'||PREF.theme==='dark'?PREF.theme:'auto',LG=[['de','Deutsch'],['en','English'],['es','Español'],['fr','Français'],['it','Italiano'],['pt','Português'],['sq','Shqip'],['ar','العربية']];
