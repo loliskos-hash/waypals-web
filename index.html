@@ -11,7 +11,9 @@
 <meta property="og:url" content="https://loliskos-hash.github.io/waypals-web/">
 <meta name="twitter:card" content="summary">
 <meta name="theme-color" content="#FFF8EE">
-<link rel="manifest" href="manifest.webmanifest">
+<link rel="manifest" href="manifest.webmanifest" id="mfst">
+<script>/* Untere Android-Leiste = theme_color des Manifests: passend zu Stil und Hell/Dunkel wählen */
+function wpMfst(){try{var p=JSON.parse(localStorage.getItem('waypals-pref')||'{}')||{},st=/^(minimal|notebook)$/.test(p.style)?p.style:'bunt',dk=p.theme==='dark'||(p.theme!=='light'&&matchMedia('(prefers-color-scheme: dark)').matches),f=(st==='bunt'&&!dk)?'manifest.webmanifest':'manifest-'+st+'-'+(dk?'dark':'light')+'.webmanifest',l=document.getElementById('mfst');if(l&&l.getAttribute('href')!==f)l.setAttribute('href',f)}catch(e){}}wpMfst();</script>
 <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -7184,7 +7186,7 @@ function renderMain(){
   $$('.tab').forEach(function(b){if(b.getAttribute('data-tab')===S.tab)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current')});
   setBar();
 }
-function setBar(){var m=document.querySelector('meta[name="theme-color"]');if(!m)return;var c=(S.tab==='map'&&!layer.children.length)?'#070A22':getComputedStyle(document.documentElement).getPropertyValue('--paper').trim();if(c&&m.content!==c)m.content=c}
+function setBar(){if(window.wpMfst)wpMfst();var m=document.querySelector('meta[name="theme-color"]');if(!m)return;var c=(S.tab==='map'&&!layer.children.length)?'#070A22':getComputedStyle(document.documentElement).getPropertyValue('--paper').trim();if(c&&m.content!==c)m.content=c}
 try{new MutationObserver(setBar).observe(layer,{childList:true});new MutationObserver(setBar).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme','data-style']});window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change',setBar)}catch(e){}
 var repaints=[];
 function onChange(){
