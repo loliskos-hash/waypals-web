@@ -4347,7 +4347,7 @@ var store={
   savePost:function(){
     try{localStorage.setItem('wegmarken-post-v1',JSON.stringify(this.post))}catch(e){}
     onChange();
-    if(!this.col)return Promise.resolve();
+    if(!this.col||!this.postReady)return Promise.resolve();
     return this.col.doc('_post').set(JSON.parse(JSON.stringify(this.post))).catch(function(){toast(_t('Die Post konnte nicht im Konto gespeichert werden.'))});
   },
   removePostItem:function(id){this.post.posts=(this.post.posts||[]).filter(function(p){return p.id!==id});this.savePost()},
@@ -4356,6 +4356,9 @@ var store={
     var self=this;this.friends=this.loadLocal();this.post=this.loadPost();
     var c=window.claude;
     if(!c||!c.use){this.mode='local';onChange();return}
+    function lsJ(k){try{var r=localStorage.getItem(k);return r?JSON.parse(r):null}catch(e){return null}}
+    function lsW(k,v){try{v==null?localStorage.removeItem(k):localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+    function hasPost(p){return !!(p&&(p.me||p.profile||(p.pigeons&&p.pigeons.length)||(p.trips&&p.trips.length)||(p.posts&&p.posts.length)||(p.loft&&p.loft.owned&&Object.keys(p.loft.owned).length)))}
     Promise.all([c.use('db'),c.use('user')]).then(function(r){
       var db=r[0],user=r[1];
       return (user?user.id():Promise.resolve(null)).then(function(id){
@@ -4363,13 +4366,35 @@ var store={
           self.col=db.collection('data/users/'+id);self.mode='cloud';circle.start(db,id);
           var prevOwner=null;try{prevOwner=localStorage.getItem('wegmarken-owner')}catch(e){}
           var foreign=!!(prevOwner&&prevOwner!==id);
-          if(foreign){self.post=normPost({});self.friends=[];try{localStorage.setItem('wegmarken-post-v1',JSON.stringify(self.post));localStorage.setItem(LS_KEY,'[]')}catch(e){}}
+          /* Anderes Konto auf diesem Gerät: Daten des vorigen Kontos nie löschen, sondern beiseitelegen */
+          if(foreign){
+            if(self.friends.length||hasPost(self.post))lsW('wegmarken-backup-'+prevOwner,{friends:self.friends,post:self.post,at:Date.now()});
+            self.post=normPost({});self.friends=[];try{localStorage.setItem('wegmarken-post-v1',JSON.stringify(self.post));localStorage.setItem(LS_KEY,'[]')}catch(e){}
+          }
+          /* Früher beiseitegelegte Daten dieses Kontos wieder dazunehmen */
+          var bkKey='wegmarken-backup-'+id,bk=lsJ(bkKey);
+          if(bk&&Array.isArray(bk.friends)){var have={};self.friends.forEach(function(f){have[f.id]=1});bk.friends.forEach(function(f){if(f&&f.id&&!have[f.id])self.friends.push(f)})}
+          if(bk&&bk.post&&!hasPost(self.post))self.post=normPost(bk.post);
           try{localStorage.setItem('wegmarken-owner',id)}catch(e){}
+          var synKey='wegmarken-synced-'+id,synced=lsJ(synKey)||{},merged=false,postDone=false;
           self.col.onSnapshot(function(snap){
-            self.friends=snap.docs.filter(function(d){return d.id!=='_post'}).map(function(d){return Object.assign({},d.data(),{id:d.id})});
+            var cache=!!(snap.metadata&&snap.metadata.fromCache);
+            var cloud=snap.docs.filter(function(d){return d.id!=='_post'}).map(function(d){return Object.assign({},d.data(),{id:d.id})});
+            var inCloud={};cloud.forEach(function(f){inCloud[f.id]=1});
+            /* Nur lokal vorhandene Einträge: nie still verwerfen. Weg nur, wenn sie schon einmal im Konto waren (also anderswo gelöscht wurden). */
+            var localOnly=self.friends.filter(function(f){return f&&f.id&&!f.example&&!inCloud[f.id]});
+            var keep=cache?localOnly:localOnly.filter(function(f){return !synced[f.id]});
+            if(!cache){
+              if(!merged){merged=true;keep.forEach(function(f){var d=JSON.parse(JSON.stringify(f));delete d.id;self.col.doc(f.id).set(d).catch(function(){})});lsW(bkKey,null)}
+              synced={};cloud.forEach(function(f){synced[f.id]=1});lsW(synKey,synced);
+            }
+            self.friends=cloud.concat(keep);
             var pd=snap.docs.find(function(d){return d.id==='_post'});
-            if(pd){var po=pd.data();if(po){self.post=normPost(po);try{localStorage.setItem('wegmarken-post-v1',JSON.stringify(self.post))}catch(e){}}}
-            else if(!foreign&&(self.post.pigeons.length||self.post.me||self.post.trips.length||self.post.posts.length)){self.savePost()}
+            if(pd){var po=pd.data();if(po){
+              if(!postDone&&!cache&&!prevOwner&&hasPost(self.post)&&JSON.stringify(self.post)!==JSON.stringify(normPost(po)))lsW('wegmarken-post-backup',{post:self.post,at:Date.now()});
+              if(!cache){postDone=true;self.postReady=true}
+              self.post=normPost(po);try{localStorage.setItem('wegmarken-post-v1',JSON.stringify(self.post))}catch(e){}}}
+            else if(!cache&&!postDone){postDone=true;self.postReady=true;self.savePost()}
             self.saveLocal();onChange();
           },function(){self.mode='local';self.col=null;onChange()});
         }else{self.mode='local'}
