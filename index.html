@@ -285,7 +285,7 @@ textarea.ruled:focus{box-shadow:none}
 .chk{display:flex;flex-wrap:wrap;gap:8px 16px}.chk label{display:flex;align-items:center;gap:8px;min-height:40px}
 .avtabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}.avdet .avprev{margin-top:8px}
 .dove.gold svg{filter:drop-shadow(0 0 5px rgba(255,214,90,.95)) drop-shadow(0 2px 3px rgba(0,0,0,.35))}
-.tab.dot{position:relative}.tab.dot::after{content:'';position:absolute;top:5px;left:calc(50% + 8px);width:8px;height:8px;border-radius:50%;background:var(--pin);box-shadow:0 0 0 2px var(--paper)}.phbt{display:flex;gap:4px;align-items:center;flex:none}.people .phead .h2{white-space:nowrap}.frbox{margin:4px 0 14px;padding:12px 14px;border:1.5px solid var(--line);border-radius:18px;background:var(--sheet)}.frbox .who{margin:0 0 6px}.frrow{display:flex;align-items:center;gap:10px;padding:8px 0;flex-wrap:wrap}.frrow+.frrow{border-top:1px solid var(--line)}.frrow .av{width:44px;height:44px;flex:none}.frtx{flex:1 1 150px;min-width:0;display:grid}.frtx b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.frtx small{color:var(--muted)}.frbt{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}.frmore{margin:0 0 12px;color:var(--muted);font-size:14px}.frmore summary{cursor:pointer;padding:4px 0}.mecard{margin:0 0 12px}.mecard .unprev{margin:4px 0 0}.mefig{background:none;border:0;padding:0;display:grid;justify-items:center;gap:2px;color:var(--pen);font-size:12px}.mename{background:none;border:0;padding:0;text-align:left;display:grid;color:inherit;min-width:0}.mename small{color:var(--muted)}.banner.soft{display:flex;gap:8px;align-items:flex-start}
+.tab.dot{position:relative}.tab.dot::after{content:'';position:absolute;top:5px;left:calc(50% + 8px);width:8px;height:8px;border-radius:50%;background:var(--pin);box-shadow:0 0 0 2px var(--paper)}.phbt{display:flex;gap:4px;align-items:center;flex:none}.people .phead .h2{white-space:nowrap}.frbox{margin:4px 0 14px;padding:12px 14px;border:1.5px solid var(--line);border-radius:18px;background:var(--sheet)}.frbox .who{margin:0 0 6px}.frrow{display:flex;align-items:center;gap:10px;padding:8px 0;flex-wrap:wrap}.frrow+.frrow{border-top:1px solid var(--line)}.frrow .av{width:44px;height:44px;flex:none}.frtx{flex:1 1 150px;min-width:0;display:grid}.frtx b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.frtx small{color:var(--muted)}.frbt{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}.frmore{margin:0 0 12px;color:var(--muted);font-size:14px}.frmore summary{cursor:pointer;padding:4px 0}.mecard{margin:0 0 12px}.mecard .unprev{margin:4px 0 0}.mefig{background:none;border:0;padding:0;display:grid;justify-items:center;gap:2px;color:var(--pen);font-size:12px}.avflip{display:block;width:72px;height:72px;perspective:360px}.avflip>i{display:block;position:relative;width:100%;height:100%;transform-style:preserve-3d;animation:avflip 10s ease-in-out infinite}.avflip .avf,.avflip .avb{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden}.avflip .avb{transform:rotateY(180deg)}.avflip .av{width:72px;height:72px}@keyframes avflip{0%,42%{transform:rotateY(0)}50%,92%{transform:rotateY(180deg)}100%{transform:rotateY(360deg)}}@media (prefers-reduced-motion:reduce){.avflip>i{animation:none}.avflip .avb{display:none}}.mephoto{width:72px;height:72px;display:grid;place-items:center;object-fit:cover;border-radius:50%}.mename{background:none;border:0;padding:0;text-align:left;display:grid;color:inherit;min-width:0}.mename small{color:var(--muted)}.banner.soft{display:flex;gap:8px;align-items:flex-start}
 .sugg .osm{font-size:11px;color:var(--muted);padding:4px 12px;text-align:right}
 .rprow{display:flex;justify-content:flex-end;margin-top:6px}.rpt{color:var(--muted)!important;font-size:12px}.rplist{display:grid;gap:6px;margin:4px 0 12px}.rpopt{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1.5px solid var(--line);border-radius:14px;background:var(--sheet);cursor:pointer}.rpopt input{width:18px;height:18px;margin:0;flex:none;accent-color:var(--pen)}.rpopt:has(input:checked){border-color:var(--pen)}
 .unin{display:flex;align-items:center;gap:4px;border-bottom:1.5px solid var(--line)}.unin:focus-within{border-color:var(--pen)}.unin i{font-style:normal;color:var(--muted);font-size:18px}.unin input{flex:1;min-width:0;border:0!important;box-shadow:none!important}.unst{min-height:1.3em;margin:4px 0 0;font-size:14px;color:var(--muted)}.unst.ok{color:var(--ok)}.unst.bad{color:var(--danger)}.unbig{font-family:var(--f-serif);font-size:34px;font-weight:600;text-align:center;margin:6px 0 2px;word-break:break-all}.unlink{margin:0;font-size:12px;color:var(--muted);word-break:break-all;text-align:center}.unprev{display:flex;align-items:center;gap:14px;margin:8px 0 14px}.unprev .av{width:72px;height:72px;flex:none}.unname{font-family:var(--f-serif);font-size:26px;font-weight:600}
@@ -4956,10 +4956,14 @@ function frPreviewBtns(d){
   if(out)return '<p class="hint">'+L('Anfrage gesendet. Sobald sie angenommen ist, seid ihr verbunden.','Request sent. Once it is accepted, you are connected.')+'</p><div class="btnrow"><button type="button" class="btn ghost sm" data-fr="wd" data-id="'+esc(out.id)+'">'+L('Zurückziehen','Withdraw')+'</button></div>';
   return '<div class="btnrow"><button type="button" class="btn pri" data-act="fr-send">'+L('Freundschaftsanfrage senden','Send friend request')+'</button></div>';
 }
+function meAvatarHTML(pr,nm){
+  if(pr.photo&&pr.av&&!F3.fail)return '<span class="avflip"><i><span class="avf">'+avatar({name:nm,photo:pr.photo})+'</span><span class="avb">'+avatar({name:nm,av:pr.av})+'</span></i></span>';
+  return avatar({name:nm,photo:pr.photo||'',av:pr.av||null});
+}
 function meCardHTML(){
   var pr=store.post.profile||{},Lv=levelOf(xpMe().total),n=unMine(),nm=pr.name||myCircleName()||L('Dein Name','Your name');
   return '<section class="mecard"><p class="who">'+L('So sehen dich deine Freunde','How your friends see you')+'</p><div class="unprev">'+
-    '<button type="button" class="mefig" data-act="profile" aria-label="'+esc(L('Figur bearbeiten','Edit figure'))+'">'+avatar({name:nm,av:pr.av||null})+(pr.av?'':'<small>'+L('Figur erstellen','Create figure')+'</small>')+'</button>'+
+    '<button type="button" class="mefig" data-act="profile" aria-label="'+esc(L('Figur bearbeiten','Edit figure'))+'">'+meAvatarHTML(pr,nm)+(pr.av?'':'<small>'+L('Figur erstellen','Create figure')+'</small>')+'</button>'+
     '<button type="button" class="mename" data-act="uname"><b class="unname">'+esc(nm)+'</b><small>'+(n?'@'+esc(n):L('Benutzernamen wählen','Choose a username'))+' · Level '+Lv.level+(Lv.title?': '+esc(Lv.title):'')+'</small></button></div></section>';
 }
 /* ---------- Melden (Personen und Inhalte) ---------- */
@@ -6161,7 +6165,7 @@ function openProfile(){
   var p=Object.assign({veg:!!myDiet().veg,noAlc:!!myDiet().noAlc},myProfile());
   var el=openSheet('<div class="sbar"><button type="button" class="btn ghost" data-act="close">'+ic('back')+_t('Zurück</button><button type="button" class="btn pri" data-act="save">Speichern</button></div><h2 class="stitle">Mein Profil</h2>')+
     _t('<p class="hint">Was sich nie ändert: einmal eintragen, dann kann jede Person, die Waypals hat, es per QR-Code von deinem Handy übernehmen. Das Foto wird nicht mitgeschickt, deine Figur schon. Nur du siehst dein Profil.</p>')+
-    '<form class="form" novalidate autocomplete="off">'+fld(_t('Name'),'name',p.name,'class="hand-input"')+fld(_t('Spitzname'),'nick',p.nick,'')+fld(_t('Instagram'),'insta',p.insta?('@'+p.insta):'','placeholder="@name" autocapitalize="none" autocorrect="off"')+fld(_t('Handynummer'),'phone',p.phone,'type="tel" placeholder="+49 …"')+fld(_t('Geburtstag'),'birthday',p.birthday,'type="date"')+
+    '<form class="form" novalidate autocomplete="off"><div class="photoblock"><div data-ph></div><div class="pcol"><label class="btn" for="me-cam">'+ic('cam')+_t('Selfie aufnehmen')+'</label><input id="me-cam" type="file" accept="image/*" capture="user" hidden><label class="btn sm" for="me-gal">'+_t('Aus Galerie')+'</label><input id="me-gal" type="file" accept="image/*" hidden><button type="button" class="btn ghost sm" data-act="ph-del" hidden>'+_t('Foto entfernen')+'</button></div></div>'+fld(_t('Name'),'name',p.name,'class="hand-input"')+fld(_t('Spitzname'),'nick',p.nick,'')+fld(_t('Instagram'),'insta',p.insta?('@'+p.insta):'','placeholder="@name" autocapitalize="none" autocorrect="off"')+fld(_t('Handynummer'),'phone',p.phone,'type="tel" placeholder="+49 …"')+fld(_t('Geburtstag'),'birthday',p.birthday,'type="date"')+
     '<div data-pp="home"></div>'+fld(_t('Sprachen'),'langs',p.langs,'')+fld(_t('Was trinkst du gern?'),'drink',p.drink,'')+fld(_t('Lieblingsessen'),'food',p.food,'')+
     '<div class="chk"><label><input type="checkbox" name="veg"'+(p.veg?' checked':'')+_t('> ich esse vegetarisch</label><label><input type="checkbox" name="noAlc"')+(p.noAlc?' checked':'')+_t('> ich trinke keinen Alkohol</label></div>')+
     _t('<details class="avdet"><summary>Meine Figur</summary><div data-av></div></details><p class="err" role="alert" hidden></p></form>')+
@@ -6169,20 +6173,25 @@ function openProfile(){
   var home=placePicker($('[data-pp=home]',el),{label:_t('Wo wohnst du?'),text:p.home,lat:p.homeLat,lon:p.homeLon,tz:p.homeTz,placeholder:_t('Stadt'),pinText:_t('Ort gefunden')});
   var avEd=avatarEditor($('[data-av]',el),{av:p.av||null,name:p.name,photo:'',lang:APP_LANG==='de'?'de':'en',countryFn:function(){try{var h=home.get();return h.country||countryOf(h.text)}catch(e){return ''}}});
   $('[name=name]',el).addEventListener('input',function(){avEd.set({name:$('[name=name]',el).value.trim()})});
+  var photo=p.photo||'',photoP=null;
+  function paintPh(){$('[data-ph]',el).innerHTML=photo?'<img class="av mephoto" src="'+esc(photo)+'" alt="">':'<span class="av ph mephoto" aria-hidden="true">'+ic('cam')+'</span>';$('[data-act=ph-del]',el).hidden=!photo}
+  paintPh();
+  [$('#me-cam',el),$('#me-gal',el)].forEach(function(inp){inp.addEventListener('change',function(e){var file=e.target.files&&e.target.files[0];if(!file)return;photoP=readPhoto(file).then(function(u){photo=u;paintPh()}).catch(function(){toast(_t('Das Foto konnte nicht gelesen werden.'))});e.target.value=''})});
   function collect(){
     var fd=new FormData($('form',el)),h=home.get();
-    return {name:String(fd.get('name')||'').trim(),nick:String(fd.get('nick')||'').trim(),insta:cleanInsta(fd.get('insta')),phone:String(fd.get('phone')||'').trim(),birthday:String(fd.get('birthday')||''),home:h.text,homeLat:h.lat,homeLon:h.lon,homeTz:h.tz||'',langs:String(fd.get('langs')||'').trim(),drink:String(fd.get('drink')||'').trim(),food:String(fd.get('food')||'').trim(),veg:!!fd.get('veg'),noAlc:!!fd.get('noAlc'),av:avEd.get()};
+    return {name:String(fd.get('name')||'').trim(),nick:String(fd.get('nick')||'').trim(),insta:cleanInsta(fd.get('insta')),phone:String(fd.get('phone')||'').trim(),birthday:String(fd.get('birthday')||''),home:h.text,homeLat:h.lat,homeLon:h.lon,homeTz:h.tz||'',langs:String(fd.get('langs')||'').trim(),drink:String(fd.get('drink')||'').trim(),food:String(fd.get('food')||'').trim(),veg:!!fd.get('veg'),noAlc:!!fd.get('noAlc'),av:avEd.get(),photo:photo||''};
   }
   function save(){
-    var pr=collect();if(!pr.name){var er=$('.err',el);er.hidden=false;er.textContent=_t('Bitte trag deinen Namen ein.');return null}
+    var pr=collect();if(!pr.name){var er=$('.err',el),ni=$('[name=name]',el);er.hidden=false;er.textContent=_t('Bitte trag deinen Namen ein.');toast(_t('Bitte trag deinen Namen ein.'));try{ni.scrollIntoView({block:'center',behavior:'smooth'});ni.focus({preventScroll:true})}catch(x){}return null}
     store.post.profile=pr;store.post.diet={veg:pr.veg,noAlc:pr.noAlc};
     if(!store.post.me&&pr.homeLat!=null)store.post.me={name:pr.home,lat:pr.homeLat,lon:pr.homeLon,tz:pr.homeTz};
-    store.savePost();return pr;
+    store.savePost();if(S.tab==='me')renderMain();return pr;
   }
   el.addEventListener('click',function(e){
     var a=e.target.closest('[data-act]');if(!a)return;var act=a.getAttribute('data-act');
     if(act==='close')closeSheet(el);
-    else if(act==='save'){if(save()){closeSheet(el);toast(_t('Profil gespeichert'))}}
+    else if(act==='ph-del'){photo='';paintPh()}
+    else if(act==='save'){Promise.resolve(photoP).then(function(){if(save()){closeSheet(el);toast(_t('Profil gespeichert'))}})}
     else if(act==='share'){var pr=save();if(pr){closeSheet(el);openShareSheet(_t('Mein Profil'),_t('Die andere Person scannt den Code mit der normalen Handy-Kamera. Der Link öffnet Waypals und füllt ihr Formular mit deinen Angaben vor. Ohne Waypals kann sie den Code über „Code einfügen" übernehmen.'),makeCode(packPerson(pr)))}}
   });
 }
@@ -7073,7 +7082,7 @@ function todayHTML(){
 var P3={gl:null,cv:null,progs:{},cache:{},queue:[],busy:false,fail:false,W:192,H:240,F:16};
 var P3_PRE=[
 'precision highp float;',
-'#define WPV 70',
+'#define WPV 71',
 'uniform vec2 uRes;uniform float uT,uFly,uYaw;',
 'const float TAU=6.2831853;',
 'float gBob,gHead,gBlink,gWag,gWing,gProp,gAura,gTuck,gArm,gBr,gFl,gSw;',
@@ -7477,7 +7486,7 @@ function p3Live(box,skin,w,h){
 var F3={prog:null,fail:false,reg:{},sheet:{},q:[],run:false};
 var F3_FS=[
 'precision highp float;',
-'#define WPV 70',
+'#define WPV 71',
 'uniform vec4 uCam;',
 'uniform vec3 uSkin,uHair,uTopC,uTopD,uPants,uEye,uHatC,uHatD,uAcc,uBP;',
 'uniform vec4 uA,uB,uC,uD;',
@@ -7630,12 +7639,12 @@ P3_PRE,
 ' if(be>.5&&be<1.5){float st=smoothstep(-.15,-.45,uv.y)*smoothstep(.9,.5,abs(uv.x));c=mix(c,uHair,.3*st);}',
 ' vec2 pe=vec2(abs(uv.x)-.34,uv.y-.04);float bl=gBlink;',
 ' float side=uv.x>0.?1.:0.;',
-' if(ey<.5){float d=eEll(pe,vec2(.125,.17*bl));c=mix(c,DK,smoothstep(.04,-.04,d));c=mix(c,vec3(1.),smoothstep(.02,-.02,length(pe-vec2(.04,.07*bl))-.035)*step(.5,bl));}',
+' if(ey<.5){float d=eEll(pe,vec2(.125,.17*bl));c=mix(c,mix(DK,uEye,.85),smoothstep(.04,-.04,d));c=mix(c,DK,smoothstep(.03,-.03,eEll(pe-vec2(0.,-.01),vec2(.06,.08*bl))));c=mix(c,vec3(1.),smoothstep(.02,-.02,length(pe-vec2(.04,.07*bl))-.035)*step(.5,bl));}',
 ' else if(ey<1.5){float d=abs(length(pe-vec2(0.,-.09))-.13)-.026;float ar=step(-.06,pe.y);c=mix(c,DK,smoothstep(.015,-.015,d)*ar);}',
 ' else if(ey<2.5){float d=eEll(pe,vec2(.17,.22*bl));c=mix(c,vec3(.97),smoothstep(.04,-.04,d));float di=eEll(pe-vec2(0.,-.01),vec2(.12,.16*bl));c=mix(c,uEye,smoothstep(.04,-.04,di));c=mix(c,DK,smoothstep(.04,-.04,eEll(pe,vec2(.065,.085*bl))));c=mix(c,vec3(1.),smoothstep(.02,-.02,length(pe-vec2(.05,.09))-.035)*step(.5,bl));}',
-' else if(ey<3.5){float d=eEll(pe,vec2(.11,.1));float lid=step(0.,pe.y);c=mix(c,DK,smoothstep(.04,-.04,d)*(1.-lid));c=mix(c,DK,smoothstep(.02,-.02,abs(pe.y)-.014)*step(abs(pe.x),.12));}',
+' else if(ey<3.5){float d=eEll(pe,vec2(.11,.1));float lid=step(0.,pe.y);c=mix(c,mix(DK,uEye,.85),smoothstep(.04,-.04,d)*(1.-lid));c=mix(c,DK,smoothstep(.02,-.02,abs(pe.y)-.014)*step(abs(pe.x),.12));}',
 ' else if(ey<4.5){c=mix(c,DK,smoothstep(.02,-.02,length(pe)-.05));}',
-' else{float d=eEll(pe,vec2(.1,.13*bl));float wink=abs(length(pe-vec2(0.,-.09))-.13)-.026;c=mix(c,DK,smoothstep(.04,-.04,d)*(1.-side));c=mix(c,DK,smoothstep(.015,-.015,wink)*step(-.06,pe.y)*side);}',
+' else{float d=eEll(pe,vec2(.1,.13*bl));float wink=abs(length(pe-vec2(0.,-.09))-.13)-.026;c=mix(c,mix(DK,uEye,.85),smoothstep(.04,-.04,d)*(1.-side));c=mix(c,DK,smoothstep(.03,-.03,eEll(pe-vec2(0.,-.01),vec2(.05,.065*bl)))*(1.-side));c=mix(c,DK,smoothstep(.015,-.015,wink)*step(-.06,pe.y)*side);}',
 ' if(br<2.5){vec2 pb=vec2(abs(uv.x)-.34,uv.y-.27);float ln;',
 '  if(br<.5)ln=abs(pb.y-.03*(1.-pow(pb.x/.14,2.)))-.022;else if(br<1.5)ln=abs(pb.y-.07-.05*(1.-pow(pb.x/.14,2.)))-.022;else ln=abs(pb.y-pb.x*.55-.0)-.026;',
 '  c=mix(c,uHair*.85,smoothstep(.02,-.02,ln)*step(abs(pb.x),.145));}',
