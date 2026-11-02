@@ -9245,10 +9245,11 @@ function openGuest(prep){
     '<div style="display:flex;justify-content:center">'+holdBtn('','sm').replace('<span class="lbl">','<span class="lbl" data-t="cancel">')+'</div>','fsheet lock guest');
   var form=$('form',el),err=$('.err',el),pad_=sigPad($('.sigwrap canvas',el)),drw=drawBlock($('[data-draw]',el),[]);
   // Einladungslink auf einem Handy mit eigenem Profil: Name, Figur, Foto, Wohnort und Ernährung vorausfüllen (änderbar).
-  var pr0=store.post.profile,dr=prep.draft||(prep.remote&&pr0&&pr0.name?Object.assign({},pr0,{veg:pr0.veg||!!myDiet().veg,noAlc:pr0.noAlc||!!myDiet().noAlc,photo:''}):null),mine=dr;
+  var pr0=store.post.profile,dr=prep.draft||(prep.remote&&pr0&&pr0.name?Object.assign({},pr0,{veg:pr0.veg||!!myDiet().veg,noAlc:pr0.noAlc||!!myDiet().noAlc,face:false}):null),mine=dr;
   var hasBook=prep.remote&&(!!dr||!!mine||!!window.WAYPALS_AUTH||store.friends.some(function(x){return !x.example}));
-  if(mine&&mine.photo)photo=mine.photo;
-  var avG=avatarEditor($('[data-av]',el),{av:mine&&mine.av?mine.av:null,name:mine?mine.name:'',photo:photo,lang:lang==='de'?'de':'en',countryFn:function(){try{var hh=pp.get();return hh.country||countryOf(hh.text)}catch(e){return ''}}});
+  // Profilfoto kommt ins Polaroid, wird aber nicht zum Gesicht der Figur (erst ein hier neu gewähltes Foto)
+  var face=!(mine&&mine.face===false);if(mine&&mine.photo)photo=mine.photo;
+  var avG=avatarEditor($('[data-av]',el),{av:mine&&mine.av?mine.av:null,name:mine?mine.name:'',photo:face?photo:'',lang:lang==='de'?'de':'en',countryFn:function(){try{var hh=pp.get();return hh.country||countryOf(hh.text)}catch(e){return ''}}});
   var pp=placePicker($('[data-pp=home]',el),{labelKey:'home',phKey:'homePh',label:T[lang].home,placeholder:T[lang].homePh,map:false,quiet:true,text:mine?mine.home||'':'',lat:mine?mine.homeLat:null,lon:mine?mine.homeLon:null,tz:mine?mine.homeTz||'':''});
   if(mine){$('[name=name]',el).value=mine.name;if(mine.veg)$('[name=veg]',el).checked=true;if(mine.noAlc)$('[name=noAlc]',el).checked=true;var rb0=$('[data-remote]',el);if(rb0&&!prep.draft)rb0.insertAdjacentHTML('afterend','<p class="hint" data-mine></p>');GUEST_TXT.forEach(function(k){var n=$('[name='+k+']',el);if(n&&dr[k])n.value=dr[k]})}
   if(hasBook)$('[data-t=done]',el).insertAdjacentHTML('afterend','<button type="button" class="btn ghost" data-act="g-later" style="width:100%;margin-top:10px" data-later></button>');
@@ -9266,8 +9267,8 @@ function openGuest(prep){
     if(!err.hidden)err.textContent=T[lang].needName;
   }
   function paintPhoto(){$('[data-ph]',el).innerHTML='<div class="polaroid sm">'+(photo?'<img src="'+esc(photo)+'" alt="">':'<div class="ph">?</div>')+'</div>'}
-  var _gp=paintPhoto;paintPhoto=function(){_gp();avG.set({photo:photo})};
-  el.addEventListener('click',function(ev){if(ev.target.closest('[data-act=nophoto]')){photo='';paintPhoto()}if(ev.target.closest('[data-act=rclose]'))closeSheet(el);if(ev.target.closest('[data-act=r-join]')){closeSheet(el);unLogin('')}if(ev.target.closest('[data-act=g-later]')){var fd0=new FormData(form),d0={av:avG.get(),photo:photo},h0=pp.get();GUEST_TXT.forEach(function(k){d0[k]=String(fd0.get(k)||'')});d0.veg=!!fd0.get('veg');d0.noAlc=!!fd0.get('noAlc');d0.home=h0.text;d0.homeLat=h0.lat;d0.homeLon=h0.lon;d0.homeTz=h0.tz||'';
+  var _gp=paintPhoto;paintPhoto=function(){_gp();avG.set({photo:face?photo:''})};
+  el.addEventListener('click',function(ev){if(ev.target.closest('[data-act=nophoto]')){photo='';paintPhoto()}if(ev.target.closest('[data-act=rclose]'))closeSheet(el);if(ev.target.closest('[data-act=r-join]')){closeSheet(el);unLogin('')}if(ev.target.closest('[data-act=g-later]')){var fd0=new FormData(form),d0={av:avG.get(),photo:photo,face:face},h0=pp.get();GUEST_TXT.forEach(function(k){d0[k]=String(fd0.get(k)||'')});d0.veg=!!fd0.get('veg');d0.noAlc=!!fd0.get('noAlc');d0.home=h0.text;d0.homeLat=h0.lat;d0.homeLon=h0.lon;d0.homeTz=h0.tz||'';
     var e0=invEntry(prep,{p:{place:prep.place,lat:prep.lat,lon:prep.lon,country:prep.country,metDate:prep.metDate,lang:lang,from:prep.from,u:prep.u||''},d:d0});closeSheet(el);
     toast(LT('Gespeichert. Bei {0} in deinem Freundebuch kannst du jederzeit weitermachen.','Saved. Continue any time at {0} in your friend book.',[e0.name]));return}
   if(ev.target.closest('[data-act=g-login]')){try{sessionStorage.setItem('waypals-wantlogin','1')}catch(e){}unLogin(lastInvite)}});
@@ -9278,7 +9279,7 @@ function openGuest(prep){
     var l=e.target.closest('[data-lang]');if(l){lang=l.getAttribute('data-lang');applyLang();return}
     if(e.target.closest('[data-act=sigclear]'))pad_.clear();
   });
-  [$('#g-photo',el),$('#g-photo2',el)].forEach(function(inp){inp.addEventListener('change',function(e){var file=e.target.files&&e.target.files[0];if(!file)return;photoP=readPhoto(file).then(function(u){photo=u;paintPhoto()}).catch(function(){})})});
+  [$('#g-photo',el),$('#g-photo2',el)].forEach(function(inp){inp.addEventListener('change',function(e){var file=e.target.files&&e.target.files[0];if(!file)return;photoP=readPhoto(file).then(function(u){photo=u;face=true;paintPhoto()}).catch(function(){})})});
   bindHold($('.hold',el),1200,function(){closeSheet(el)});
   form.addEventListener('submit',function(e){
     e.preventDefault();var fd=new FormData(form),name=String(fd.get('name')||'').trim();
