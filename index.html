@@ -3968,7 +3968,7 @@ function figSVG2D(m,id,o){
 var AV_EN={Statur:'Build',schlank:'slim','kräftig':'broad','Körper':'Body',Mann:'Man',Frau:'Woman',Divers:'Non-binary',Oberweite:'Bust',Pferdeschwanz:'Ponytail',Seitenscheitel:'Side parting',Stachelhaar:'Spiky',Bob:'Bob','Lange Wellen':'Long waves','Lange Locken':'Long curls',Undercut:'Undercut',Halbglatze:'Receding',Zwei:'Two','Zwei Dutts':'Space buns',Flechtzopf:'Braid',Rastas:'Dreadlocks','Low Taper':'Low taper','Buzz Cut':'Buzz cut','French Crop':'French crop','Locken-Taper':'Curly taper',Schulterlang:'Shoulder length','Zurückgegelt':'Slick back','Scheitel-Fade':'Side part fade','Männerdutt':'Man bun',Fransig:'Textured fringe','Crew Cut':'Crew cut',Mittelscheitel:'Curtains','Wolf Cut':'Wolf cut',Pixie:'Pixie',Haut:'Skin',Frisur:'Hair style',Haarfarbe:'Hair colour',Oberteil:'Top',Farbe:'Colour',Hose:'Trousers',Hosenfarbe:'Trouser colour',Kurz:'Short',Lang:'Long',Locken:'Curly',Dutt:'Bun',Glatze:'Bald',Wellig:'Wavy','T-Shirt':'T-shirt',Hoodie:'Hoodie',Jacke:'Jacket',
   Gesicht:'Face',Haare:'Hair',Kleidung:'Clothes',Extras:'Extras',Augen:'Eyes',Augenfarbe:'Eye colour',Augenbrauen:'Eyebrows',Mund:'Mouth',Nase:'Nose',Sommersprossen:'Freckles',Bart:'Beard',Kopfbedeckung:'Headwear',Hutfarbe:'Hat colour',Brille:'Glasses',Rucksack:'Backpack',Rucksackfarbe:'Backpack colour',
   Rund:'Round','Lächelnd':'Smiling','Groß':'Big','Müde':'Sleepy',Punkte:'Dots',Zwinkern:'Wink',Normal:'Normal',Hoch:'Raised',Streng:'Stern',Keine:'None',Kein:'None',Offen:'Open',Sanft:'Soft',Grinsen:'Grin',Neutral:'Neutral',Staunen:'Wow',Zunge:'Tongue',Schief:'Smirk',Klein:'Small',Nein:'No',Ja:'Yes',
-  Stoppeln:'Stubble',Vollbart:'Full beard',Schnurrbart:'Moustache',Ziegenbart:'Goatee','Kinn + Schnurr':'Goatee + moustache','Langer Bart':'Long beard',Piloten:'Aviators',Katzenauge:'Cat eye',Schmuck:'Jewellery',Ohrstecker:'Studs',Creolen:'Hoops',Kette:'Necklace','Creolen + Kette':'Hoops + necklace',Pony:'Bob',Zöpfe:'Pigtails',Afro:'Afro',Irokese:'Mohawk',Tanktop:'Tank top',Pullover:'Sweater',Hemd:'Shirt',Kleid:'Dress',Cap:'Cap','Mütze':'Beanie',Strohhut:'Straw hat',Eckig:'Square',Sonne:'Sunglasses','Zufällig':'Surprise me',Landestracht:'Traditional outfit',Dirndl:'Dirndl',Lederhose:'Lederhosen',Kimono:'Kimono',Poncho:'Poncho',Sari:'Sari',Kilt:'Kilt',Dschellaba:'Djellaba',Dashiki:'Dashiki',Hanbok:'Hanbok',Flamenco:'Flamenco',Qipao:'Qipao',Hawaiihemd:'Aloha shirt',Sombrero:'Sombrero',Chullo:'Chullo','Typisch für':'Typical for'};
+  Stoppeln:'Stubble',Vollbart:'Full beard',Schnurrbart:'Moustache',Ziegenbart:'Goatee','Kinn + Schnurr':'Goatee + moustache','Langer Bart':'Long beard',Piloten:'Aviators',Katzenauge:'Cat eye',Schmuck:'Jewellery',Schuhe:'Shoes','Sneaker weiß':'White sneakers','Sneaker bunt':'Colour sneakers',Stiefel:'Boots',Tattoo:'Tattoo',Armband:'Band','Ärmel':'Sleeve',Herz:'Heart',Ohrstecker:'Studs',Creolen:'Hoops',Kette:'Necklace','Creolen + Kette':'Hoops + necklace',Pony:'Bob',Zöpfe:'Pigtails',Afro:'Afro',Irokese:'Mohawk',Tanktop:'Tank top',Pullover:'Sweater',Hemd:'Shirt',Kleid:'Dress',Cap:'Cap','Mütze':'Beanie',Strohhut:'Straw hat',Eckig:'Square',Sonne:'Sunglasses','Zufällig':'Surprise me',Landestracht:'Traditional outfit',Dirndl:'Dirndl',Lederhose:'Lederhosen',Kimono:'Kimono',Poncho:'Poncho',Sari:'Sari',Kilt:'Kilt',Dschellaba:'Djellaba',Dashiki:'Dashiki',Hanbok:'Hanbok',Flamenco:'Flamenco',Qipao:'Qipao',Hawaiihemd:'Aloha shirt',Sombrero:'Sombrero',Chullo:'Chullo','Typisch für':'Typical for'};
 function avatarEditor(host,st){
   var tab='face',lv=null;
   function tr(x){return st.lang==='en'&&AV_EN[x]?AV_EN[x]:x}
@@ -3991,10 +3991,11 @@ function avatarEditor(host,st){
       if(!full.cl)h+=tx('top',AV_TOPS,'Oberteil');
       h+=sw('tc',full.cl&&COST_PAL[full.cl]?COST_PAL[full.cl].map(function(c){return c[0]}):AV_TOPC.map(function(c){return c.c}),'Farbe');
       if(!full.cl&&full.top!==6)h+=tx('bt',['Lang','Kurz'],'Hose')+sw('pants',AV_PANTS,'Hosenfarbe');
+      h+=tx('sh',['Schuhe','Sneaker weiß','Sneaker bunt','Stiefel'],'Schuhe');
       h+=tx('ha',AV_HATS,'Kopfbedeckung');
       if(full.ha)h+=sw('hk',AV_TOPC.map(function(c){return c.c}),'Hutfarbe');
     }else{
-      h+=tx('gl',AV_GLASS,'Brille')+tx('jw',AV_JEWEL,'Schmuck')+tx('ac',['Nein',_t('Ja')],'Rucksack');
+      h+=tx('gl',AV_GLASS,'Brille')+tx('jw',AV_JEWEL,'Schmuck')+tx('tt',['Kein','Armband','Ärmel','Herz'],'Tattoo')+tx('ac',['Nein',_t('Ja')],'Rucksack');
       if(full.ac)h+=sw('bc',AV_BP,'Rucksackfarbe');
     }
     return h;
@@ -4015,7 +4016,7 @@ function avatarEditor(host,st){
   host.addEventListener('input',function(e){var w=e.target.closest('[data-avwd]');if(!w)return;st.av=avFull(st.av,st.name);st.av.wd=[1,2,0,3,4][+w.value]||0;var fm={name:st.name||'?',photo:st.photo,av:avFull(st.av,st.name)};if(lv&&lv.el&&lv.el.isConnected)lv.set(fm);else{var pv=$('.avprev',host);pv.innerHTML=figSVG2D(fm,'ed'+Math.random().toString(36).slice(2,6))}});
   host.addEventListener('click',function(e){
     var t=e.target.closest('[data-avt]');if(t){tab=t.getAttribute('data-avt');paint();return}
-    if(e.target.closest('[data-avrand]')){var ob=avFull(st.av,st.name);st.av={bd:ob.bd,bu:ob.bu,skin:rnd(6),hair:rnd(AV_HAIRS.length),hc:rnd(8),top:rnd(AV_TOPS.length),tc:rnd(AV_TOPC.length),pants:rnd(AV_PANTS.length),bt:rnd(2),ey:rnd(AV_EYES.length),ec:rnd(AV_EYEC.length),br:rnd(AV_BROWS.length),mo:rnd(AV_MOUTHS.length),no:rnd(3),fk:rnd(3)===0?1:0,be:rnd(5)===0?1+rnd(AV_BEARD.length-1):0,gl:rnd(3)===0?1+rnd(AV_GLASS.length-1):0,jw:rnd(4)===0?1+rnd(AV_JEWEL.length-1):0,ha:rnd(3)===0?1+rnd(3):0,hk:rnd(AV_TOPC.length),ac:rnd(3)===0?1:0,bc:rnd(AV_BP.length),cl:rnd(4)===0?1+rnd(12):0};paint();return}
+    if(e.target.closest('[data-avrand]')){var ob=avFull(st.av,st.name);st.av={bd:ob.bd,bu:ob.bu,skin:rnd(6),hair:rnd(AV_HAIRS.length),hc:rnd(8),top:rnd(AV_TOPS.length),tc:rnd(AV_TOPC.length),pants:rnd(AV_PANTS.length),bt:rnd(2),ey:rnd(AV_EYES.length),ec:rnd(AV_EYEC.length),br:rnd(AV_BROWS.length),mo:rnd(AV_MOUTHS.length),no:rnd(3),fk:rnd(3)===0?1:0,be:rnd(5)===0?1+rnd(AV_BEARD.length-1):0,gl:rnd(3)===0?1+rnd(AV_GLASS.length-1):0,jw:rnd(4)===0?1+rnd(AV_JEWEL.length-1):0,sh:rnd(4),tt:rnd(5)===0?1+rnd(3):0,ha:rnd(3)===0?1+rnd(3):0,hk:rnd(AV_TOPC.length),ac:rnd(3)===0?1:0,bc:rnd(AV_BP.length),cl:rnd(4)===0?1+rnd(12):0};paint();return}
     var ct=e.target.closest('[data-avcost]');if(ct){st.av=avFull(st.av,st.name);st.av.cl=+ct.getAttribute('data-avcost');var hh=+ct.getAttribute('data-avhat');if(hh)st.av.ha=hh;paint();return}
     var b=e.target.closest('[data-k]');if(!b)return;st.av=avFull(st.av,st.name);st.av[b.getAttribute('data-k')]=+b.getAttribute('data-v');paint();
   });
@@ -7877,7 +7878,7 @@ function todayHTML(){
 var P3={gl:null,cv:null,progs:{},cache:{},queue:[],busy:false,fail:false,W:192,H:240,F:16};
 var P3_PRE=[
 'precision highp float;',
-'#define WPV 90',
+'#define WPV 93',
 'uniform vec2 uRes;uniform float uT,uFly,uYaw;',
 'const float TAU=6.2831853;',
 'float gBob,gHead,gBlink,gWag,gWing,gProp,gAura,gTuck,gArm,gBr,gFl,gSw;',
@@ -8281,13 +8282,13 @@ function p3Live(box,skin,w,h){
 var F3={prog:null,fail:false,reg:{},sheet:{},q:[],run:false};
 var F3_FS=[
 'precision highp float;',
-'#define WPV 90',
+'#define WPV 93',
 'uniform vec4 uCam;',
 'uniform vec3 uSkin,uHair,uTopC,uTopD,uPants,uEye,uHatC,uHatD,uAcc,uBP;',
 'uniform vec4 uA,uB,uC,uD;',
 P3_PRE,
 'vec2 opU(vec2 a,vec2 b){return a.x<b.x?a:b;}',
-'float gNod;vec3 gQ;',
+'float gNod;vec3 gQ;float gBW;',
 'float rob(vec3 p,float y0,float y1,float r0,float r1){return max(max(sdRC(p,vec3(0.,y0,0.),vec3(0.,y1,0.),r0,r1),y1-p.y),p.y-y0-.1);}',
 'float hShell(vec3 q){return sdEll(q-vec3(0.,.05,-.02),vec3(.93,.95,.91));}',
 'float hLong(vec3 q,float len,float amp,float fr){',
@@ -8302,7 +8303,7 @@ P3_PRE,
 'vec2 map(vec3 p){',
 ' p=ry(p,-uYaw);',
 ' vec2 r=vec2(1e5,0.);',
-' float hair=uA.x,top=uA.y,mouthS=uB.x,noseS=uB.y,beard=uB.z,hat=uB.w,cost=uC.x,glass=uC.y,bp=mod(uC.z,2.),jw=floor(uC.z*.5+.01),bt=uC.w;',
+' float hair=uA.x,top=uA.y,mouthS=uB.x,noseS=uB.y,beard=uB.z,hat=uB.w,cost=uC.x,glass=uC.y,bp=mod(uC.z,2.),jw=floor(uC.z*.5+.01),bt=mod(uC.w,2.),shoe=floor(uC.w*.5+.01);',
 ' float sleeve=uD.x,legMode=uD.y,wide=uD.z;',
 ' vec3 H=vec3(0.,1.38+gBob*1.4,0.);',
 ' vec3 q=p-H;q=rx(q,gNod);gQ=q;',
@@ -8313,7 +8314,7 @@ P3_PRE,
 ' hd=min(hd,sdEll(vec3(abs(q.x)-.83,q.y+.02,q.z),vec3(.08,.17,.1)));',
 ' r=vec2(hd,1.);',
 ' r=opU(r,vec2(sdCap(p,vec3(0.,.55,0.),vec3(0.,.98+gBob,0.),.2),1.));',
-' float bwi=floor(uD.w*.5+.01);float bw=bwi<.5?1.:(bwi<1.5?.84:(bwi<2.5?.92:(bwi<3.5?1.1:1.2)));p=vec3(p.x/bw,p.y,p.z/bw);',
+' float bwi=floor(mod(uD.w,16.)*.5+.01);float bw=bwi<.5?1.:(bwi<1.5?.84:(bwi<2.5?.92:(bwi<3.5?1.1:1.2)));p=vec3(p.x/bw,p.y,p.z/bw);gBW=bw;',
 ' vec3 m=vec3(abs(p.x),p.y,p.z);float sx=p.x<0.?-1.:1.;',
 /* Torso */
 ' vec3 T=vec3(0.,.08+gBob,0.);',
@@ -8326,7 +8327,9 @@ P3_PRE,
 ' if(legMode<.5)r=opU(r,vec2(lg,5.));',
 ' else if(legMode<1.5){r=opU(r,vec2(lg,5.));r=opU(r,vec2(lgs,1.));}',
 ' else r=opU(r,vec2(sdCap(m,vec3(.24,-.55,0.),vec3(.25,-1.5,.02),.13),1.));',
-' r=opU(r,vec2(sdEll(m-vec3(.25,-1.62,.12),vec3(.16,.1,.26)),6.));r=opU(r,vec2(sdEll(m-vec3(.25,-1.56,.04),vec3(.145,.1,.15)),6.));',
+' float smt=shoe<.5?6.:(shoe<1.5?10.:(shoe<2.5?3.:17.));r=opU(r,vec2(sdEll(m-vec3(.25,-1.62,.12),vec3(.16,.1,.26)),smt));r=opU(r,vec2(sdEll(m-vec3(.25,-1.56,.04),vec3(.145,.1,.15)),smt));',
+' if(shoe>.5&&shoe<2.5){r=opU(r,vec2(sdEll(m-vec3(.25,-1.69,.13),vec3(.175,.045,.28)),10.));if(shoe<1.5)r=opU(r,vec2(max(sdEll(m-vec3(.25,-1.61,.12),vec3(.168,.104,.27)),abs(m.y+1.6+.25*(m.z-.12))-.018),3.));}',
+' if(shoe>2.5){r=opU(r,vec2(sdCap(m,vec3(.25,-1.58,.03),vec3(.25,-1.3,.02),.16),17.));r=opU(r,vec2(sdEll(m-vec3(.25,-1.7,.12),vec3(.17,.035,.27)),6.));}',
 /* Arme */
 ' float sw=gArm*sx;vec3 sh=vec3(.6,.52+gBob,0.);vec3 hn=vec3(.8,-.4,.1+.12*sw);',
 ' vec3 mm=vec3(m.x,m.y,p.z);',
@@ -8581,6 +8584,7 @@ P3_PRE,
 '  }',
 '  if(mt>2.5&&mt<3.5&&uA.y>1.5&&uA.y<2.5&&uC.x<.5)alb=mix(alb,uTopD,.9*(1.-smoothstep(.0,.035,abs(pm.x))));',
 '  if(mt<1.5){float hh=length(hq/vec3(.9,.95,.88));if(hq.z>.1&&hh<1.1&&hq.y>-.78)alb=face(alb,vec2(hq.x/.84,hq.y/.88));}',
+'  if(mt<1.5&&uD.w>15.5){float tt=floor(uD.w/16.+.01);vec3 ap=vec3(abs(pm.x)/gBW,pm.y,pm.z/gBW);vec3 s0=vec3(.6,.52+gBob,0.),s1=vec3(.8,-.4,.1);vec3 sd=s1-s0;float ta=clamp(dot(ap-s0,sd)/dot(sd,sd),0.,1.);float dr=length(ap-s0-sd*ta);if(ap.x>.5&&dr<.2){float ink=0.;if(tt<1.5)ink=max(max(step(abs(ta-.62),.012),step(abs(ta-.74),.012)),step(abs(ta-.68-.025*sin(ap.z*60.+ap.y*20.)),.01));else if(tt<2.5)ink=step(.75,abs(sin(ta*34.+3.*sin(ap.z*16.+ta*9.))))*step(.12,ta)*step(ta,.86);else{vec2 hc=vec2((ap.x-s0.x-sd.x*ta)/.06,(.67-ta)/.06+.2);hc.x=abs(hc.x);float hk=hc.x*hc.x+hc.y*hc.y-1.;float hh=hk*hk*hk-hc.x*hc.x*hc.y*hc.y*hc.y;ink=step(hh,0.)*step(.0,ap.z);}alb=mix(alb,vec3(.16,.2,.3),.75*ink);if(tt>2.5&&ink>.5)alb=vec3(.72,.16,.2);}}',
 '  if(mt>1.5&&mt<2.5){float ang=atan(hq.x,hq.z);alb*=.94+.06*sin(ang*14.+hq.y*3.);if(uA.x>20.5&&uA.x<31.5&&abs(uA.x-26.)>.5&&abs(uA.x-29.)>.5&&hq.y<.5)alb=mix(uSkin*.94,alb,smoothstep(-.45,.42,hq.y));}',
 '  vec3 L=normalize(vec3(-.5,.8,.7));float dif=clamp(dot(n,L)*.82+.18,0.,1.);float sh=shadow(p+n*.01,L);float ao=occl(p,n);',
 '  vec3 amb=mix(vec3(.52,.48,.6),vec3(.97,.98,1.),.5+.5*n.y);',
@@ -8604,7 +8608,7 @@ function f3Uni(a){
   var tcc=tc.c,tcd=tc.d;if(cost===2){tcc='#F7F1E6';tcd='#E3DCCD'}var cp=COST_PAL[cost];if(cp){var pq=cp[(a.tc||0)%cp.length];tcc=pq[0];tcd=pq[1];acc=pq[2]}
   var hc=hk.c,hd=hk.d;if(a.ha===3){hc='#EDD7A0';hd='#C9A867'}
   return {skin:AV_SKIN[a.skin],hair:AV_HAIRC[a.hc],topc:tcc,topd:tcd,pants:pants,eye:AV_EYEC[a.ec]||AV_EYEC[0],hatc:hc,hatd:hd,acc:acc,bp:AV_BP[a.bc]||AV_BP[0],
-    A:[a.hair,top,a.ey,a.br],B:[a.mo,a.no,a.be,a.ha],C:[cost,a.gl,(a.ac?1:0)+2*(a.jw||0),a.bt],D:[sleeve,leg,wide,(a.fk?1:0)+2*(a.wd||0)]};
+    A:[a.hair,top,a.ey,a.br],B:[a.mo,a.no,a.be,a.ha],C:[cost,a.gl,(a.ac?1:0)+2*(a.jw||0),(a.bt?1:0)+2*(a.sh||0)],D:[sleeve,leg,wide,(a.fk?1:0)+2*(a.wd||0)+16*(a.tt||0)]};
 }
 function f3Init(){
   if(F3.prog||F3.fail)return !F3.fail;
