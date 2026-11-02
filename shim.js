@@ -17,13 +17,13 @@
       set: function (d) { return ref.set(d) },
       update: function (d) { return ref.update(d) },
       delete: function () { return ref.delete() },
-      onSnapshot: function (ok, err) { return ref.onSnapshot(ok, err) }
+      onSnapshot: function (a, b, c) { return (a && typeof a === 'object') ? ref.onSnapshot(a, b, c) : ref.onSnapshot(a, b) }
     };
   }
   function wrapCol(ref) {
     return {
       doc: function (id) { return wrapDoc(ref.doc(id)) },
-      onSnapshot: function (ok, err) { return ref.onSnapshot(ok, err) },
+      onSnapshot: function (a, b, c) { return (a && typeof a === 'object') ? ref.onSnapshot(a, b, c) : ref.onSnapshot(a, b) },
       get: function () { return ref.get() },
       where: function (f, op, v) { return wrapCol(ref.where(f, op, v)) }
     };
