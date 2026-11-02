@@ -73,6 +73,7 @@
       .then(function () { return fs.collection('quests').where('to', '==', uid).get().then(function (s) { return Promise.all(s.docs.map(function (d) { return d.ref.delete() })) }).catch(function () {}) })
       .then(function () { return fs.collection('usernames').where('uid', '==', uid).get().then(function (s) { return Promise.all(s.docs.map(function (d) { return d.ref.delete() })) }).catch(function () {}) })
       .then(function () { return Promise.all(['from', 'to'].map(function (k) { return fs.collection('friendRequests').where(k, '==', uid).get().then(function (s) { return Promise.all(s.docs.map(function (d) { return d.ref.delete() })) }).catch(function () {}) })) })
+      .then(function () { return fs.doc('blocks/' + uid).delete().catch(function () {}) })
       .then(function () { return user.delete() })
       .then(function () { try { localStorage.clear() } catch (e) {} setTimeout(function () { location.reload() }, 800) });
   }
