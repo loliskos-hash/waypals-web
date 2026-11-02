@@ -38,7 +38,9 @@
   var inApp = /Instagram|FBAN|FBAV|FB_IAB|FBIOS|Messenger|musical_ly|Bytedance|TikTok|Snapchat|Line\//i.test(navigator.userAgent || '');
   var iosDev = /iPhone|iPad|iPod/.test(navigator.userAgent || '');
   // Einladungslink (#w-i…): Gäste tragen sich ohne Konto ein, also kein Anmeldebildschirm davor.
-  var guestLink = /w-i[A-Za-z0-9_-]{8,}/.test(location.hash || '');
+  // Ausnahme: Gast hat im Formular „Anmelden“ getippt.
+  var wantLogin = false; try { wantLogin = sessionStorage.getItem('waypals-wantlogin') === '1'; sessionStorage.removeItem('waypals-wantlogin') } catch (e) {}
+  var guestLink = !wantLogin && /w-i[A-Za-z0-9_-]{8,}/.test(location.hash || '');
 
   function loginScreen() {
     var o = document.createElement('div');
