@@ -9515,7 +9515,7 @@ renderMain();
   (function w(){if(store.mode!=='pending'||document.getElementById('wp-login')||Date.now()-t0>12000){if(window.wpStep)wpStep(5);setTimeout(function(){s.classList.add('sp-done');setTimeout(function(){if(s.parentNode)s.remove()},450)},250);return}setTimeout(w,120)})()})();
 translateStatic(document.getElementById('app')||document.body);store.init();
 window.__wpBoot=1;setTimeout(checkHash,900);window.addEventListener('hashchange',checkHash);
-setTimeout(checkArrivals,1500);setTimeout(function(){(window.requestIdleCallback||setTimeout)(f3Warm)},3000);setTimeout(maybeIntro,2200);setTimeout(circleTick,2500);setTimeout(birthdayToast,4500);setTimeout(flashbackCheck,6000);
+setTimeout(checkArrivals,3500);setTimeout(function(){(window.requestIdleCallback||setTimeout)(f3Warm,{timeout:4000})},5500);setTimeout(maybeIntro,3000);setTimeout(birthdayToast,6500);setTimeout(flashbackCheck,8500);
 setInterval(function(){checkArrivals();if(S.tab==='map'&&!S.mapSel)paintMapInfo();syncMap()},30000);
 })();
 </script>
