@@ -5291,7 +5291,7 @@ function circleCardHTML(f){
   var p=palOf(f);
   if(p)return palCardHTML(p,f);
   if(f.uid)return '<div class="rprow">'+rpBtn('user',f.uid,'friend/'+f.uid,f.name)+blkBtns({uid:f.uid,name:f.name,user:f.uname||''},frIsFriend(f.uid))+'</div>';
-  return _t('<section class="tell"><h3 class="who">Waypals-Kreis</h3><p class="hint">Hat ')+esc(first(f.name))+_t(' Waypals auch? Schick eine Freundschaftsanfrage über den Benutzernamen, dann siehst du Level und Reisen und kannst Challenges per Taube schicken.</p><div><button type="button" class="btn sm" data-act="fr-add">Freund hinzufügen</button></div></section>');
+  return '<section class="tell"><h3 class="who">'+_t('Waypals-Kreis')+'</h3><p class="hint">'+_t('Waypals auch? Schick eine Freundschaftsanfrage über den Benutzernamen, dann siehst du Level und Reisen und kannst Challenges per Taube schicken.')+'</p><div><button type="button" class="btn sm" data-act="fr-add">'+_t('Freund hinzufügen')+'</button></div></section>';
 }
 function questCardHTML(q,role){
   var st=qState(q),who=role==='to'?'von '+esc(q.fromName||'?'):'an '+esc(q.toName||'?');
