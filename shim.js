@@ -42,7 +42,8 @@
   var wantLogin = false; try { wantLogin = sessionStorage.getItem('waypals-wantlogin') === '1'; sessionStorage.removeItem('waypals-wantlogin') } catch (e) {}
   var startHref = location.href;
   var codeLink = /w-p[A-Za-z0-9_-]{8,}/.test(location.hash || '');
-  var guestLink = !wantLogin && /w-i[A-Za-z0-9_-]{8,}/.test(location.hash || '');
+  // Antwort-Links (#w-p…) zeigen die Antwort auch ohne Anmeldung; anmelden lässt sich dann im Fenster selbst
+  var guestLink = !wantLogin && /w-[ip][A-Za-z0-9_-]{8,}/.test(location.hash || '');
 
   function loginScreen() {
     var o = document.createElement('div');
