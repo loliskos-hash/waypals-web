@@ -7531,7 +7531,7 @@ P3_PRE,
 ' vec3 m=vec3(abs(p.x),p.y,p.z);float sx=p.x<0.?-1.:1.;',
 /* Torso */
 ' vec3 T=vec3(0.,.08+gBob,0.);',
-' float tor=sdEll(p-T,vec3(.56,.8,.37));tor=smin(tor,sdEll(p-vec3(0.,-.5,0.),vec3(.5,.42,.34)),.24);if(uD.w>1.5){tor=smin(tor,sdEll(vec3(abs(p.x),p.y,p.z)-vec3(.18,.3+gBob,.27),vec3(.175,.16,.165)),.09);}',
+' float tor=sdEll(p-T,vec3(.56,.8,.37));tor=smin(tor,sdEll(p-vec3(0.,-.5,0.),vec3(.5,.42,.34)),.24);if(uD.w>1.5){tor=smin(tor,sdEll(vec3(abs(p.x),p.y,p.z)-vec3(.18,.15+gBob,.285),vec3(.175,.16,.165)),.09);}',
 ' float tm=3.;if((cost>.5&&cost<1.5)||(cost>4.5&&cost<5.5)||(cost>8.5&&cost<9.5))tm=4.;if(cost>5.5&&cost<6.5)tm=10.;',
 ' r=opU(r,vec2(tor,tm));',
 /* Beine */
