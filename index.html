@@ -263,6 +263,7 @@ textarea.ruled:focus{box-shadow:none}
 .hold .lbl{position:relative}
 .dz{display:flex;gap:10px;flex-wrap:wrap;align-items:center;padding-top:8px}
 .sigsvg{display:block;width:min(240px,70%);color:var(--pen)}
+.form .locked{opacity:.6;background:var(--line)}
 
 /* Gastmodus */
 .guest .sheet-in{max-width:560px}
@@ -3900,7 +3901,7 @@ function avDefaults(name){
 }
 function avFull(av,name){return Object.assign(avDefaults(name),av||{})}
 try{if(PREF.d3==='0'||(navigator.deviceMemory&&navigator.deviceMemory<=2)||(navigator.hardwareConcurrency&&navigator.hardwareConcurrency<=2))F3.fail=true}catch(e){}
-function figSVG(m,id,o){if(!F3.fail&&!(m&&m.photo)&&!(o&&o.flat))return f3Wrap(m,id,o);return figSVG2D(m,id,o)}
+function figSVG(m,id,o){if(m&&m.photo)m=Object.assign({},m,{photo:''});if(!F3.fail&&!(m&&m.photo)&&!(o&&o.flat))return f3Wrap(m,id,o);return figSVG2D(m,id,o)}
 function figSVG2D(m,id,o){
   o=o||{};var a=avFull(m.av,m.name);if(a.hair>9)a=Object.assign({},a,{hair:[0,0,0,6,5,5,0,4,3,7,8,0,0,0,0,0][a.hair-10]||0});var sk=AV_SKIN[a.skin],hc=AV_HAIRC[a.hc],TC=AV_TOPC[a.tc]||AV_TOPC[0],tc=TC.c,tcD=TC.d,pc=AV_PANTS[a.pants]||AV_PANTS[0],DK='#2D2A3E',LIP='#8C2F3C';
   var u='f'+id,P='';
@@ -5772,7 +5773,7 @@ function bookHTML(f){
   if(f.motto)h+=card(LT("Mottos von {0}","{0}’s motto",[fn]),f.motto);
   if(f.dream)h+=card(LT("Davon träumt {0}","{0}’s dream",[fn]),f.dream);
   if(f.draw&&f.draw.s&&f.draw.s.length)h+='<div class="bookcard"><p class="who">'+LT("Das hat {0} für dich gemalt","What {0} drew for you",[fn])+'</p><figure class="drawfig">'+drawSvg(f.draw)+(f.draw.t?'<figcaption class="hand">'+esc(f.draw.t)+'</figcaption>':'')+'</figure></div>';
-  if(!f.example)h+='<div class="btnrow"><button type="button" class="btn sm" data-act="draw-for">'+ic('edit')+(f.draw&&f.draw.s&&f.draw.s.length?L('Zeichnung ändern','Edit drawing'):LT("Lass {0} etwas malen","Let {0} draw something",[fn]))+'</button></div>';
+  if(!f.example&&!(f.lockKeys&&f.lockKeys.indexOf('draw')>=0))h+='<div class="btnrow"><button type="button" class="btn sm" data-act="draw-for">'+ic('edit')+(f.draw&&f.draw.s&&f.draw.s.length?L('Zeichnung ändern','Edit drawing'):LT("Lass {0} etwas malen","Let {0} draw something",[fn]))+'</button></div>';
   return '<section class="tell"><h3 class="who">'+L('Freundebuch-Seite','Friend book page')+'</h3>'+(h||'<p class="hint">'+LT("Noch leer. Trag ein, was du an {0} magst, oder lass {0} dir etwas malen.","Still empty. Add what you like about {0}, or let {0} draw something for you.",[fn])+'</p>')+'</section>';
 }
 function openDrawSheet(f){
@@ -7102,6 +7103,7 @@ function packPerson(f,opt){
   if(f.veg)o.v=1;if(f.noAlc)o.m=1;
   if(f.av)o.g=avPack(f.av);
   if(opt.story&&f.theirStory)o.s=f.theirStory.slice(0,240);
+  if(opt.story&&f.sig)o.sg=String(f.sig).slice(0,9000);if(opt.story&&f.draw&&f.draw.s&&f.draw.s.length)o.dw={s:f.draw.s.slice(0,120),t:f.draw.t||''};
   if(opt.story){if(f.likeTheirs)o.lk=f.likeTheirs.slice(0,200);if(f.motto)o.mt=f.motto.slice(0,80);if(f.dream)o.dr=f.dream.slice(0,80)}
   if(opt.place&&f.place)o.pl=[f.place,f.lat!=null?r2(f.lat):null,f.lon!=null?r2(f.lon):null,f.country||''];
   if(opt.place&&f.metDate)o.dt=f.metDate;
@@ -7112,6 +7114,8 @@ function unpackPerson(o){
   if(o.g)f.av=avUnpack(o.g);
   if(o.s)f.theirStory=o.s;
   if(o.lk)f.likeTheirs=o.lk;if(o.mt)f.motto=o.mt;if(o.dr)f.dream=o.dr;
+  if(typeof o.sg==='string'&&/^[ML0-9 .-]+$/.test(o.sg))f.sig=o.sg;
+  if(o.dw&&Array.isArray(o.dw.s)){var ds=o.dw.s.filter(function(x){return x&&typeof x.d==='string'&&/^[ML0-9 .,-]+$/.test(x.d)&&/^#[0-9a-fA-F]{3,8}$/.test(x.c||'')}).map(function(x){return {d:x.d,c:x.c,w:+x.w||3}});if(ds.length)f.draw={s:ds,t:String(o.dw.t||'').slice(0,60),by:'friend'}}
   if(o.pl){f.place=o.pl[0]||'';f.lat=o.pl[1];f.lon=o.pl[2];f.country=o.pl[3]||''}
   if(o.dt)f.metDate=o.dt;
   return f;
@@ -7207,10 +7211,11 @@ function handleCode(o,n,opt){
   el.addEventListener('click',function(e){
     var a=e.target.closest('[data-act]');if(!a)return;var act=a.getAttribute('data-act');
     if(act==='close')closeSheet(el);
-    else if(act==='take'){closeSheet(el);f.byFriend=true;if(opt&&opt.fromUid)f.uid=opt.fromUid;if(opt&&opt.onTake)opt.onTake();openForm(null,f)}
+    else if(act==='take'){closeSheet(el);f.byFriend=true;if(opt&&opt.fromUid)f.uid=opt.fromUid;var pc=opt&&opt.pics||{},okP=function(u){return typeof u==='string'&&/^data:image\/(jpeg|png|webp);base64,/.test(u)};if(okP(pc.p))f.photo=pc.p;if(okP(pc.t))f.album=[{id:uid(),src:pc.t,at:Date.now(),date:todayISO()}];f.lockKeys=LOCK_KEYS.filter(function(k){var v=f[k];return k==='av'?!!v:v!=null&&v!==''&&v!==false});if(opt&&opt.onTake)opt.onTake();openForm(null,f)}
     else if(act==='code-login'){try{sessionStorage.setItem('waypals-wantlogin','1')}catch(x){}unLogin(lastCode)}
   });
 }
+var LOCK_KEYS=['name','nick','photo','av','insta','phone','birthday','home','homeLat','homeLon','homeTz','langs','drink','food','veg','noAlc','theirStory','likeTheirs','motto','dream','sig','draw'];
 function openReply(f,prep,lang){
   var T2=function(de,en){return invLang(lang,de,en)},code=makeCode(packPerson(f,{story:true,place:true}));
   return '<div class="thanks">'+ic('check')+'<h2 class="gtitle">'+T2('Fertig!','Done!')+'</h2><p class="hint">'+T2('Schick diesen Code an {0} zurück. Zeig den QR-Code oder schick den Link per Nachricht.','Send this code back to {0}. Show them the QR code or send the link by message.').replace('{0}',prep.from||T2('deine Bekanntschaft','your friend'))+'</p>'+shareBox(code,lang,invLang(lang,'Fertig, ich hab mich in dein Freundebuch eingetragen! 📖 Öffne den Link, dann bin ich drin.','Done, I wrote myself into your friend book! 📖 Open the link and I am in.')+(f.name?' – '+f.name:''))+'<p class="hint">'+T2('Deine Angaben bleiben auf deinem Handy, bis du den Code schickst.','Your answers stay on your phone until you send the code.')+'</p>'+
@@ -7406,19 +7411,24 @@ function openForm(existing,draft){
       (cs==='sealed'?_t('<p class="hint">Die Kapsel ist versiegelt. Du kannst nur das Öffnungsdatum ändern.</p>'):area(_t('Nachricht fürs Wiedersehen'),'cap_text',(d.capsule&&d.capsule.text)||'',_t('Bleibt versiegelt, bis ihr euch wiederseht.')))+
       fld('An diesem Datum öffnen (optional)','cap_on',(d.capsule&&d.capsule.openOn)||'','type="date"')+'</section>'+
     '<p class="err" role="alert" hidden></p></form>','fsheet');
-  var form=$('form',el),err=$('.err',el);
+  var form=$('form',el),err=$('.err',el),lk=Array.isArray(d.lockKeys)?d.lockKeys:[];
   function paintPhoto(){$('[data-ph]',el).innerHTML='<div class="polaroid sm">'+(photo?'<img src="'+esc(photo)+'" alt="">':'<div class="ph">'+esc(($('[name=name]',el).value||'?').trim().charAt(0).toUpperCase()||'?')+'</div>')+'</div>'}
   paintPhoto();
   if(d.figSync&&d.uid){var avh=$('[data-av]',el);avh=avh&&(avh.closest('details')||avh);if(avh){avh.insertAdjacentHTML('beforebegin','<p class="hint figown">'+LT('Diese Figur hat {0} selbst gebaut. Sie ändert sich mit, wenn {0} sie ändert.','{0} built this figure. It changes when {0} changes it.',[esc(first(d.name))])+'</p>');avh.hidden=true}}
-  var avEd=d.figSync&&d.uid?{get:function(){return d.av},set:function(){}}:avatarEditor($('[data-av]',el),{av:d.av||null,name:d.name,photo:photo,lang:APP_LANG==='de'?'de':'en',countryFn:function(){try{var hh0=ppHome.get();return hh0.country||countryOf(hh0.text)}catch(e){return ''}}});
-  var _pp=paintPhoto;paintPhoto=function(){_pp();avEd.set({photo:photo})};
+  var avEd=d.figSync&&d.uid?{get:function(){return d.av},set:function(){}}:avatarEditor($('[data-av]',el),{av:d.av||null,name:d.name,photo:'',lang:APP_LANG==='de'?'de':'en',countryFn:function(){try{var hh0=ppHome.get();return hh0.country||countryOf(hh0.text)}catch(e){return ''}}});
+  
   $('[name=name]',el).addEventListener('input',function(){if(!photo)paintPhoto();avEd.set({name:$('[name=name]',el).value.trim()})});
   [$('#photo-in',el),$('#photo-cam',el)].forEach(function(inp){inp.addEventListener('change',function(e){
     var file=e.target.files&&e.target.files[0];if(!file)return;
     photoP=readPhoto(file).then(function(u){photo=u;paintPhoto()}).catch(function(){toast(_t('Das Foto konnte nicht gelesen werden.'))});
   })});
+  if(lk.length){lk.forEach(function(k){$$('[name='+k+']',el).forEach(function(n){if(n.type==='checkbox')n.disabled=true;else n.readOnly=true;n.classList.add('locked')})});
+    if(lk.indexOf('photo')>=0){var pc0=$('.photoblock .pcol',el);if(pc0)pc0.hidden=true}
+    if(lk.indexOf('av')>=0&&!(d.figSync&&d.uid)){var av0=$('[data-av]',el);av0=av0&&(av0.closest('details')||av0);if(av0)av0.hidden=true}
+    $('.form',el).insertAdjacentHTML('afterbegin','<p class="banner">'+LT('Was {0} selbst eingetragen hat, ist grau und kann nicht geändert werden. Deine eigene Story, Notizen und Tags kannst du ergänzen.','What {0} filled in is grey and cannot be changed. You can add your own story, notes and tags.',[esc(first(d.name))])+'</p>')}
   var ppMet=placePicker($('[data-pp=met]',el),{label:_t('Wo habt ihr euch kennengelernt?'),text:d.place,lat:d.lat,lon:d.lon,country:d.country,placeholder:_t('Stadt oder Ort')});
   var ppHome=placePicker($('[data-pp=home]',el),{label:_t('Wo wohnt die Person?'),text:d.home,lat:d.homeLat,lon:d.homeLon,tz:d.homeTz,placeholder:_t('Stadt'),pinText:_t('Wohnort gefunden'),noPinText:_t('Ohne Zeitzone und Linie auf der Karte. Wähle einen Vorschlag, wenn du beides willst.')});
+  if(lk.indexOf('home')>=0)$$('[data-pp=home] input,[data-pp=home] button',el).forEach(function(n){n.disabled=true});
   function paintTags(){
     var all=PRESET_TAGS.slice();tags.forEach(function(t){if(all.indexOf(t)<0)all.push(t)});
     $('[data-tagchips]',el).innerHTML=all.map(function(t){return '<button type="button" class="cb" data-tag="'+esc(t)+'" aria-pressed="'+(tags.indexOf(t)>=0)+'">'+esc(t)+'</button>'}).join('');
@@ -7462,6 +7472,7 @@ function openForm(existing,draft){
         likeMine:String(fd.get('likeMine')||'').trim(),likeTheirs:String(fd.get('likeTheirs')||'').trim(),motto:String(fd.get('motto')||'').trim(),dream:String(fd.get('dream')||'').trim(),
         tags:tags,notes:String(fd.get('notes')||'').trim(),capsule:capsule,createdAt:existing?existing.createdAt:Date.now()
       });
+      lk.forEach(function(k){f[k]=d[k]});
       store.save(f);closeSheet(el);toast(_t('Gespeichert'));
       if(isNew)openDetail(f.id);
     });
@@ -9273,12 +9284,12 @@ function openGuestPrep(){
 }
 var GUEST_TXT=['name','nick','insta','phone','birthday','langs','drink','food','story','bring','like','motto','dream','drawt','cap'];
 /* Antwort direkt zustellen (replies/{id}): Gast ist angemeldet, Absender-uid aus dem Link (w) oder über den Benutzernamen (u) */
-function repSend(prep,f){
+function repSend(prep,f,tog){
   if(!circleOn()||!circle.db||!circle.me||(!prep.w&&!prep.u))return Promise.resolve(false);
   var code=makeCode(packPerson(f,{story:true,place:true}));
   return (prep.w?Promise.resolve({uid:prep.w}):unLookup(prep.u)).then(function(x){
     if(!x||!x.uid||x.uid===circle.me)return false;
-    return circle.db.doc('replies/'+circle.me+'_'+Date.now().toString(36)).set({from:circle.me,to:x.uid,fromName:String(f.name||'').slice(0,60),code:code,at:Date.now()}).then(function(){return true});
+    return circle.db.doc('replies/'+circle.me+'_'+Date.now().toString(36)).set(Object.assign({from:circle.me,to:x.uid,fromName:String(f.name||'').slice(0,60),code:code,at:Date.now()},(f.photo||tog)?{pics:{p:f.photo||'',t:tog||''}}:{})).then(function(){return true});
   }).catch(function(){return false});
 }
 var rep_={list:[],shown:{}};
@@ -9292,7 +9303,7 @@ function repNext(){
   var del=function(){try{circle.db.doc('replies/'+r.id).delete()}catch(e){}};
   if(!o||o.t!=='p'){del();return}
   toast(LT('Neue Antwort von {0}.','New reply from {0}.',[first(r.fromName||'')||'?']));
-  handleCode(o,0,{onTake:del,fromUid:r.from});
+  handleCode(o,0,{onTake:del,fromUid:r.from,pics:r.pics});
 }
 /* Einladung beantworten: Absender ins eigene Freundebuch übernehmen, Entwurf am Eintrag merken, per Benutzername verbinden */
 function invEntry(prep,draft,tog,story){
@@ -9300,7 +9311,7 @@ function invEntry(prep,draft,tog,story){
   if(!f)f=store.friends.find(function(x){return x.invKey===key});
   var n=f?Object.assign({},f):{id:uid(),name:prep.from||L('Einladung','Invitation'),place:prep.place||'',lat:prep.lat,lon:prep.lon,country:prep.country||'',metDate:prep.metDate||todayISO(),story:'',tags:[],notes:'',createdAt:Date.now(),invKey:key};
   if(draft)n.replyDraft=draft;else delete n.replyDraft;
-  if(tog)n.photo=tog;
+  if(tog){n.photo=tog;var al=Array.isArray(n.album)?n.album:[];if(!al.some(function(x){return x.src===tog}))n.album=al.concat([{id:uid(),src:tog,at:Date.now(),date:todayISO()}])}
   if(story&&!n.story)n.story=story;
   if(prep.u&&!n.uname)n.uname=prep.u;
   store.save(n);invLink(n);return n;
@@ -9350,7 +9361,7 @@ function openGuest(prep){
   var pr0=store.post.profile,dr=prep.draft||(prep.remote&&pr0&&pr0.name?Object.assign({},pr0,{veg:pr0.veg||!!myDiet().veg,noAlc:pr0.noAlc||!!myDiet().noAlc,face:false}):null),mine=dr;
   var hasBook=prep.remote&&(!!dr||!!mine||!!window.WAYPALS_AUTH||store.friends.some(function(x){return !x.example}));
   // Profilfoto kommt ins Polaroid, wird aber nicht zum Gesicht der Figur (erst ein hier neu gewähltes Foto)
-  var face=!(mine&&mine.face===false);if(mine&&mine.photo)photo=mine.photo;
+  var face=false;if(mine&&mine.photo)photo=mine.photo;
   var avG=avatarEditor($('[data-av]',el),{av:mine&&mine.av?mine.av:null,name:mine?mine.name:'',photo:face?photo:'',lang:lang==='de'?'de':'en',countryFn:function(){try{var hh=pp.get();return hh.country||countryOf(hh.text)}catch(e){return ''}}});
   var pp=placePicker($('[data-pp=home]',el),{labelKey:'home',phKey:'homePh',label:T[lang].home,placeholder:T[lang].homePh,map:false,quiet:true,text:mine?mine.home||'':'',lat:mine?mine.homeLat:null,lon:mine?mine.homeLon:null,tz:mine?mine.homeTz||'':''});
   if(mine){$('[name=name]',el).value=mine.name;if(mine.veg)$('[name=veg]',el).checked=true;if(mine.noAlc)$('[name=noAlc]',el).checked=true;var rb0=$('[data-remote]',el);if(rb0&&!prep.draft)rb0.insertAdjacentHTML('afterend','<p class="hint" data-mine></p>');GUEST_TXT.forEach(function(k){var n=$('[name='+k+']',el);if(n&&dr[k])n.value=dr[k]})}
@@ -9388,7 +9399,7 @@ function openGuest(prep){
     var l=e.target.closest('[data-lang]');if(l){lang=l.getAttribute('data-lang');applyLang();return}
     if(e.target.closest('[data-act=sigclear]'))pad_.clear();
   });
-  [$('#g-photo',el),$('#g-photo2',el)].forEach(function(inp){inp.addEventListener('change',function(e){var file=e.target.files&&e.target.files[0];if(!file)return;photoP=readPhoto(file).then(function(u){photo=u;face=true;paintPhoto()}).catch(function(){})})});
+  [$('#g-photo',el),$('#g-photo2',el)].forEach(function(inp){inp.addEventListener('change',function(e){var file=e.target.files&&e.target.files[0];if(!file)return;photoP=readPhoto(file).then(function(u){photo=u;paintPhoto()}).catch(function(){})})});
   bindHold($('.hold',el),1200,function(){closeSheet(el)});
   form.addEventListener('submit',function(e){
     e.preventDefault();var fd=new FormData(form),name=String(fd.get('name')||'').trim();
@@ -9403,7 +9414,7 @@ function openGuest(prep){
         capsule:cap?{text:cap,openOn:'',openedAt:'',by:'friend'}:null};
       if(prep.remote&&hasBook)invEntry(prep,null,tog,f.theirStory);
       if(prep.remote){$('.sheet-in',el).innerHTML=openReply(f,prep,lang)+'<div class="btnrow"><button type="button" class="btn ghost" data-act="rclose">'+(lang!=='de'?'Close':_t('Schließen'))+'</button></div>';
-        repSend(prep,f).then(function(ok){if(!ok)return;var t=$('.thanks .hint',el);if(t)t.insertAdjacentHTML('beforebegin','<p class="banner">'+ic('check')+' '+esc(invLang(lang,'Deine Antwort ist schon bei {0} in Waypals angekommen. Den Code brauchst du nur, falls es dort nicht erscheint.','Your reply has already arrived in {0}\'s Waypals. You only need the code if it does not show up there.').replace('{0}',prep.from||invLang(lang,'deiner Bekanntschaft','your friend')))+'</p>')});return}
+        repSend(prep,f,tog).then(function(ok){if(!ok)return;var t=$('.thanks .hint',el);if(t)t.insertAdjacentHTML('beforebegin','<p class="banner">'+ic('check')+' '+esc(invLang(lang,'Deine Antwort ist schon bei {0} in Waypals angekommen. Den Code brauchst du nur, falls es dort nicht erscheint.','Your reply has already arrived in {0}\'s Waypals. You only need the code if it does not show up there.').replace('{0}',prep.from||invLang(lang,'deiner Bekanntschaft','your friend')))+'</p>')});return}
       store.save(f);
       $('.sheet-in',el).innerHTML='<div class="thanks">'+ic('check')+'<h2 class="gtitle" data-t="thanks"></h2><p class="hint" data-t="thanks2"></p>'+holdBtn('','').replace('<span class="lbl">','<span class="lbl" data-t="back">')+'</div>';
       applyLang();
