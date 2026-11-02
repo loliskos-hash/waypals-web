@@ -34,6 +34,12 @@
     tx: function (fn) { return fs.runTransaction(function (t) { return fn(t, function (p) { return fs.doc(p) }) }) }
   };
 
+  // In-App-Browser (Instagram, Facebook, Messenger, TikTok, Snapchat, LINE): Google sperrt dort die Anmeldung.
+  var inApp = /Instagram|FBAN|FBAV|FB_IAB|FBIOS|Messenger|musical_ly|Bytedance|TikTok|Snapchat|Line\//i.test(navigator.userAgent || '');
+  var iosDev = /iPhone|iPad|iPod/.test(navigator.userAgent || '');
+  // Einladungslink (#w-i…): Gäste tragen sich ohne Konto ein, also kein Anmeldebildschirm davor.
+  var guestLink = /w-i[A-Za-z0-9_-]{8,}/.test(location.hash || '');
+
   function loginScreen() {
     var o = document.createElement('div');
     o.id = 'wp-login';
@@ -45,6 +51,7 @@
       '<p style="margin:0;color:#6F6A85">' + T('Dein Freundebuch für unterwegs. Melde dich an, damit deine Einträge gespeichert werden und auf all deinen Geräten da sind.', 'Your friend book for the road. Sign in so your entries are saved and available on all your devices.') + '</p>' +
       '<button id="wp-g" style="padding:14px;border-radius:14px;border:0;background:#0B7F78;color:#fff;font:700 16px Nunito,system-ui,sans-serif;cursor:pointer">' + T('Mit Google anmelden', 'Sign in with Google') + '</button>' +
       '<button id="wp-l" style="padding:12px;border-radius:14px;border:2px solid #EADFCF;background:transparent;color:inherit;font:600 15px Nunito,system-ui,sans-serif;cursor:pointer">' + T('Ohne Konto fortfahren (nur auf diesem Gerät)', 'Continue without account (this device only)') + '</button>' +
+      (inApp ? '<p style="margin:0;padding:10px 12px;border-radius:12px;background:#FFF1C9;color:#2D2A3E;font-size:14px">' + T('Google erlaubt die Anmeldung nicht im Browser dieser App. Tippe oben rechts auf ••• und wähle „' + (iosDev ? 'In Safari öffnen' : 'Im Browser öffnen') + '“ (oder „In externem Browser öffnen“).', 'Google does not allow signing in inside this app\'s browser. Tap ••• at the top right and choose “' + (iosDev ? 'Open in Safari' : 'Open in browser') + '” (or “Open in external browser”).') + '</p>' : '') +
       '<p id="wp-err" style="margin:0;color:#B3261E;min-height:1em" role="alert"></p>' +
       '<p style="margin:0;font-size:12px;color:#6F6A85">' + T('Mit der Anmeldung stimmst du der Verarbeitung deiner Daten laut ', 'By signing in you agree to the processing of your data as described in the ') + '<a href="datenschutz.html" style="color:inherit">' + T('Datenschutzerklärung', 'privacy policy') + '</a>' + T(' zu.', '.') + '</p></div>';
     document.body.appendChild(o);
@@ -52,7 +59,7 @@
       var p = new fb.auth.GoogleAuthProvider();
       auth.signInWithPopup(p).catch(function (e) {
         if (e && (e.code === 'auth/popup-blocked' || e.code === 'auth/operation-not-supported-in-this-environment')) return auth.signInWithRedirect(p);
-        o.querySelector('#wp-err').textContent = T('Anmeldung fehlgeschlagen. Bitte nochmal versuchen.', 'Sign-in failed. Please try again.');
+        o.querySelector('#wp-err').textContent = inApp ? T('Anmeldung hier nicht möglich. Öffne die Seite im Browser (••• oben rechts).', 'Sign-in is not possible here. Open the page in your browser (••• at the top right).') : T('Anmeldung fehlgeschlagen. Bitte nochmal versuchen.', 'Sign-in failed. Please try again.');
       });
     };
     o.querySelector('#wp-l').onclick = function () { lsSet(LOCALKEY, '1'); o.remove(); resolveReady(null) };
@@ -95,7 +102,7 @@
         };
         if (overlay) { overlay.remove(); overlay = null }
         resolveReady(u);
-      } else if (lsGet(LOCALKEY)) {
+      } else if (lsGet(LOCALKEY) || guestLink) {
         window.WAYPALS_AUTH = null; resolveReady(null);
       } else if (!overlay) {
         var mk = function () { overlay = loginScreen() };
