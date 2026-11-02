@@ -3713,7 +3713,10 @@ function todayISO(){var d=new Date();return d.getFullYear()+'-'+pad(d.getMonth()
 function fmtDate(iso){var m=/^(\d{4})-(\d{2})-(\d{2})/.exec(iso||'');if(!m)return '';try{return new Intl.DateTimeFormat(APP_LOC,{day:'numeric',month:'long',year:'numeric'}).format(new Date(+m[1],+m[2]-1,+m[3]))}catch(e){return iso}}
 function fmtDM(iso){var m=/^(\d{4})-(\d{2})-(\d{2})/.exec(iso||'');if(!m)return '';try{return new Intl.DateTimeFormat(APP_LOC,{day:'numeric',month:'long'}).format(new Date(2000,+m[2]-1,+m[3]))}catch(e){return iso}}
 function daysToBirthday(iso){var m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(iso||'');if(!m)return null;var t=new Date(),today=new Date(t.getFullYear(),t.getMonth(),t.getDate());var next=new Date(t.getFullYear(),+m[2]-1,+m[3]);if(next<today)next=new Date(t.getFullYear()+1,+m[2]-1,+m[3]);return Math.round((next-today)/86400000)}
-function inDays(n){return n===0?_t('heute'):n===1?_t('morgen'):'in '+n+_t(' Tagen')}
+var TW={de:['Reise','Reisen','Tag','Tage','etwa {0} km','etwa {0} km von zu Hause','vorbei','in {0} Tagen'],en:['trip','trips','day','days','about {0} km','about {0} km from home','over','in {0} days'],es:['viaje','viajes','día','días','unos {0} km','a unos {0} km de casa','terminado','en {0} días'],fr:['voyage','voyages','jour','jours','environ {0} km','à environ {0} km de chez toi','terminé','dans {0} jours'],it:['viaggio','viaggi','giorno','giorni','circa {0} km','a circa {0} km da casa','finito','tra {0} giorni'],pt:['viagem','viagens','dia','dias','cerca de {0} km','a cerca de {0} km de casa','terminada','em {0} dias'],sq:['udhëtim','udhëtime','ditë','ditë','rreth {0} km','rreth {0} km nga shtëpia','përfunduar','pas {0} ditësh'],ar:['رحلة','رحلات','يوم','أيام','حوالي {0} كم','حوالي {0} كم من المنزل','انتهت','بعد {0} أيام']};
+function tw(i,n){var a=TW[APP_LANG]||TW.en;return a[i].replace('{0}',n==null?'':n)}
+function nDays(n){return n+' '+tw(n===1?2:3)}
+function inDays(n){return n===0?_t('heute'):n===1?_t('morgen'):tw(7,n)}
 function localTime(tz){if(!tz)return null;try{var now=new Date();var t=new Intl.DateTimeFormat(APP_LOC,{timeZone:tz,weekday:'short',hour:'2-digit',minute:'2-digit'}).format(now);var h=parseInt(new Intl.DateTimeFormat('en-GB',{timeZone:tz,hour:'numeric',hourCycle:'h23'}).format(now),10);return {text:t,late:(h>=23||h<7)}}catch(e){return null}}
 function cleanInsta(s){s=String(s||'').trim();s=s.replace(/^https?:\/\/(www\.)?instagram\.com\//i,'').replace(/[\/?#].*$/,'').replace(/^@/,'');return s.replace(/[^A-Za-z0-9._]/g,'')}
 function hue(s){var h=0;for(var i=0;i<s.length;i++)h=(h*31+s.charCodeAt(i))%360;return h}
@@ -3814,7 +3817,7 @@ function stopLine(p,now){
 function pigeonTier(L){return L<3?0:L<5?1:L<7?2:3}
 function myPigeon(){var L=levelOf(xpMe().total).level;return {level:L,kmh:pigeonKmh(L),tier:pigeonTier(L),name:PIGEON_NAMES[pigeonTier(L)]}}
 function haversine(a,b){var R=6371,dLa=(b.lat-a.lat)*D2R,dLo=(b.lon-a.lon)*D2R,h=Math.sin(dLa/2)*Math.sin(dLa/2)+Math.cos(a.lat*D2R)*Math.cos(b.lat*D2R)*Math.sin(dLo/2)*Math.sin(dLo/2);return 2*R*Math.asin(Math.min(1,Math.sqrt(h)))}
-function fmtDur(ms){var m=Math.max(0,Math.round(ms/60000)),d=Math.floor(m/1440),h=Math.floor(m%1440/60),mi=m%60;if(d>0)return d+(d===1?' Tag ':_t(' Tage '))+h+_t(' Std.');if(h>0)return h+_t(' Std. ')+mi+_t(' Min.');return Math.max(1,mi)+_t(' Min.')}
+function fmtDur(ms){var m=Math.max(0,Math.round(ms/60000)),d=Math.floor(m/1440),h=Math.floor(m%1440/60),mi=m%60;if(d>0)return nDays(d)+' '+h+_t(' Std.');if(h>0)return h+_t(' Std. ')+mi+_t(' Min.');return Math.max(1,mi)+_t(' Min.')}
 function fmtWhen(ms){try{return new Intl.DateTimeFormat(APP_LOC,{weekday:'short',day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}).format(new Date(ms))}catch(e){return ''}}
 
 var CITIES=CITY_RAW.trim().split('\n').map(function(l){var p=l.split('|');return {name:p[0],country:p[1],lat:+p[2],lon:+p[3],tz:p[4]||'',pop:+p[5]||0,alt:p[6]||'',cap:p[7]==='1'}});
@@ -4710,7 +4713,7 @@ function recapHTML(y){
   var L=[];
   if(people.length)L.push(_t('Du hast ')+people.length+(people.length===1?_t(' neuen Menschen'):_t(' neue Menschen'))+_t(' kennengelernt')+(top&&cnt[top]>1?_t(', die meisten davon in ')+top+' ('+cnt[top]+').':'.'));
   if(nc.length)L.push(_t('Neue Länder: ')+nc.map(function(c){return cn(c.name)}).join(', ')+'.');
-  if(far&&far.km>200)L.push(_t('Am weitesten weg von zu Hause warst du in ')+far.place+' (etwa '+Math.round(far.km).toLocaleString(APP_LOC)+' km).');
+  if(far&&far.km>200)L.push(_t('Am weitesten weg von zu Hause warst du in ')+far.place+' ('+tw(4,Math.round(far.km).toLocaleString(APP_LOC))+').');
   if(ch.length)L.push(ch.length+(ch.length===1?' Challenge':' Challenges')+_t(' geschafft und dafür ')+xp+_t(' XP bekommen.'));
   h+=L.length?'<ul class="recap">'+L.map(function(s){return '<li>'+esc(s)+'</li>'}).join('')+'</ul>':_t('<p class="hint">In diesem Zeitraum ist noch nichts eingetragen.</p>');
   h+='<div class="btnrow"><button type="button" class="btn pri sm" data-act="share-recap">'+ic('copy')+_t('Als Bild teilen</button></div>');
@@ -5863,9 +5866,9 @@ function tripStatsHTML(){
   var top=Object.keys(pl).map(function(k){return pl[k]}).sort(function(a,b){return b.n-a.n||b.d-a.d})[0];
   if(!tr.length)return _t('<p class="hint">Sobald du Reisen einträgst, siehst du hier deine Reise-Statistik.</p>');
   var L=[];
-  if(top)L.push(_t('Am häufigsten warst du in ')+top.name+' ('+top.n+(top.n===1?_t(' Reise'):_t(' Reisen'))+', '+top.d+(top.d===1?' Tag':_t(' Tage'))+').');
-  if(longest&&longest.d>1)L.push(_t('Längste Reise: ')+longest.name+' ('+longest.d+' Tage).');
-  if(far&&far.km>200)L.push(_t('Weiteste Reise: ')+far.name+' (etwa '+Math.round(far.km).toLocaleString(APP_LOC)+' km von zu Hause).');
+  if(top)L.push(_t('Am häufigsten warst du in ')+top.name+' ('+top.n+' '+tw(top.n===1?0:1)+', '+nDays(top.d)+').');
+  if(longest&&longest.d>1)L.push(_t('Längste Reise: ')+longest.name+' ('+nDays(longest.d)+').');
+  if(far&&far.km>200)L.push(_t('Weiteste Reise: ')+far.name+' ('+tw(5,Math.round(far.km).toLocaleString(APP_LOC))+').');
   return '<div class="stiles"><div><b>'+tr.length+'</b><span>'+(tr.length===1?_t('Reise'):_t('Reisen'))+'</span></div><div><b>'+Object.keys(cs).length+'</b><span>'+(Object.keys(cs).length===1?_t('Land'):_t('Länder'))+'</span></div><div><b>'+Object.keys(pl).length+_t('</b><span>Orte</span></div><div><b>')+days+_t('</b><span>Reisetage</span></div></div>')+(L.length?'<ul class="stats2">'+L.map(function(s){return '<li>'+esc(s)+'</li>'}).join('')+'</ul>':'');
 }
 function tripsHTML(){
@@ -5879,7 +5882,7 @@ function tripsHTML(){
   h+=_t('<section class="tell"><h3 class="who">Wiedersehens-Chancen</h3>')+(rd.length?'<div class="pg">'+rd.map(function(r){return '<button type="button" class="pgi tripi radar" data-open="'+esc(r.f.id)+'"><b>'+ic('pin')+' '+esc(r.place)+'</b><small>'+esc(fmtRange(r.from,r.to))+'</small><span>'+esc(r.why)+'</span></button>'}).join('')+'</div>':_t('<p class="hint">Trag deine nächsten Reisen ein. Sobald dein Ziel in der Nähe von jemandem aus deinem Buch liegt, steht es hier.</p>'))+'</section>';
   if(soon.length)h+=_t('<section class="tell"><h3 class="who">Bald auf Reisen</h3><div class="pg">')+soon.map(function(x){return tripCard(x[0],x[1])}).join('')+'</div></section>';
   var mine=tripsAllOf('me').slice().reverse();
-  h+=_t('<section class="tell"><h3 class="who">Meine Reisen</h3>')+(mine.length?'<div class="pg">'+mine.map(function(t){return tripCard(null,t,isActive(t,today)?_t('gerade dort'):t.to<today?'vorbei':'')}).join('')+'</div>':_t('<p class="hint">Noch keine Reise. Du kannst auch vergangene Reisen eintragen, zum Beispiel „war vom 3. bis 17. März in Peru".</p>'))+'</section>';
+  h+=_t('<section class="tell"><h3 class="who">Meine Reisen</h3>')+(mine.length?'<div class="pg">'+mine.map(function(t){return tripCard(null,t,isActive(t,today)?_t('gerade dort'):t.to<today?tw(6):'')}).join('')+'</div>':_t('<p class="hint">Noch keine Reise. Du kannst auch vergangene Reisen eintragen, zum Beispiel „war vom 3. bis 17. März in Peru".</p>'))+'</section>';
   return h;
 }
 function openTrips(){
