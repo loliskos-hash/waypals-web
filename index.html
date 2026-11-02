@@ -22,22 +22,18 @@ function wpMfst(){try{var p=JSON.parse(localStorage.getItem('waypals-pref')||'{}
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <link rel="stylesheet" href="fonts.css">
 <style>html,body{margin:0;min-height:100%}body{padding:env(safe-area-inset-top,0) env(safe-area-inset-right,0) env(safe-area-inset-bottom,0) env(safe-area-inset-left,0);font-size:14px;font-family:system-ui,sans-serif;background:#FFF8EE}img{max-width:100%}[hidden]{display:none!important}</style>
-<script src="firebase-config.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
 </head><body>
-<script src="shim.js"></script>
 <script>
-/* Startwächter: Fehler sammeln; falls die App nach 7 s nicht gestartet ist, Hinweis statt Standbild */
+/* Startwächter: Fehler sammeln; falls die App 7 s nach dem Laden der Seite nicht gestartet ist, Hinweis statt Standbild */
 (function(){var E=window.__wpErr=[];
 addEventListener('error',function(e){E.push(String(e.message||'Fehler')+(e.lineno?' @'+e.lineno+':'+(e.colno||0):''))});
 addEventListener('unhandledrejection',function(e){try{E.push('Promise: '+String(e.reason&&e.reason.message||e.reason))}catch(x){}});
-setTimeout(function(){if(window.__wpBoot)return;var sp=document.getElementById('splash');if(sp)sp.remove();
+function chk(){if(window.__wpBoot)return;var sp=document.getElementById('splash');if(sp)sp.remove();
 var de=/^de/i.test(navigator.language||''),ua=navigator.userAgent||'',iab=/Instagram|FBAN|FBAV|FB_IAB|musical_ly|TikTok|Snapchat|Line\//i.test(ua);
 var d=document.createElement('div');d.style.cssText='position:fixed;inset:0;z-index:100001;display:flex;align-items:center;justify-content:center;padding:24px;background:#FFF8EE;color:#2D2A3E;font-family:system-ui,sans-serif;text-align:center';
 d.innerHTML='<div style="max-width:340px;display:grid;gap:12px"><b style="font-size:20px">Waypals</b><p style="margin:0">'+(de?'Waypals startet hier nicht richtig.':'Waypals does not start properly here.')+' '+(iab?(de?'Tippe oben rechts auf ••• und wähle „In Safari öffnen“ bzw. „Im Browser öffnen“.':'Tap ••• at the top right and choose “Open in Safari” or “Open in browser”.'):(de?'Bitte lade die Seite neu.':'Please reload the page.'))+'</p><button type="button" style="padding:12px;border-radius:14px;border:0;background:#0B7F78;color:#fff;font-weight:700" onclick="location.reload()">'+(de?'Neu laden':'Reload')+'</button><small style="color:#6F6A85;word-break:break-word">'+(E.length?E.slice(0,3).join(' | ').replace(/</g,'&lt;'):'(keine Fehlermeldung)')+'</small></div>';
-document.body.appendChild(d)},7000)})();
+document.body.appendChild(d)}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',function(){setTimeout(chk,7000)});else setTimeout(chk,7000)})();
 </script>
 
 
@@ -419,7 +415,12 @@ label.chk{display:flex!important;flex-direction:row!important;gap:12px;align-ite
 .mtt{display:grid;gap:1px;min-width:0;flex:1}.mtt b{font-weight:700}.mtt small{color:var(--muted);font-size:.82rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .mtc{color:var(--muted);font-size:1.4rem;line-height:1}
 .daily{margin:0}
-#splash{position:fixed;inset:0;z-index:100000;display:grid;place-items:center;background:var(--paper);color:var(--ink);text-align:center;animation:spOut .5s ease 2.9s forwards}
+#splash{position:fixed;inset:0;z-index:100000;display:grid;place-items:center;background:var(--paper);color:var(--ink);text-align:center;transition:opacity .4s ease,visibility .4s ease}
+#splash.sp-done{opacity:0;visibility:hidden}
+.sp-prog{width:min(240px,70vw);margin-top:22px;display:grid;gap:7px}
+.sp-track{height:4px;border-radius:4px;background:var(--line);overflow:hidden}
+.sp-track i{display:block;height:100%;width:0;background:var(--pen);border-radius:4px;transition:width .25s ease}
+.sp-meta{display:flex;justify-content:space-between;gap:12px;font:500 .8rem var(--f-ui);color:var(--muted)}
 .sp-in{display:grid;justify-items:center;gap:10px}
 .sp-pin{width:44px;height:44px;animation:spDrop .7s cubic-bezier(.3,1.5,.5,1) .1s both;filter:drop-shadow(0 6px 6px rgba(0,0,0,.18))}
 .sp-name{display:flex;font-size:3rem;font-weight:900;letter-spacing:-.03em;line-height:1}
@@ -431,7 +432,7 @@ label.chk{display:flex!important;flex-direction:row!important;gap:12px;align-ite
 @keyframes spBy{from{opacity:0;letter-spacing:.3em}to{opacity:1;letter-spacing:.02em}}
 @keyframes spLine{from{transform:scaleX(0)}to{transform:none}}
 @keyframes spOut{to{opacity:0;visibility:hidden}}
-@media (prefers-reduced-motion:reduce){#splash{animation-duration:.01s;animation-delay:1.2s}.sp-pin,.sp-name span,.sp-by,.sp-by i{animation:none}}
+@media (prefers-reduced-motion:reduce){.sp-pin,.sp-name span,.sp-by,.sp-by i{animation:none}}
 .dailycard{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:12px 14px;margin-bottom:10px;border:1.5px solid var(--line);border-radius:18px;background:linear-gradient(135deg,#fff3c4,#ffe0cc);color:#2b2540;font:inherit;cursor:pointer;animation:dcPulse 2.4s ease-in-out infinite}.dailycard.done{background:var(--sheet);animation:none;opacity:.85}.dc-i{font-size:1.7rem}.dc-t{display:grid;gap:2px}.dc-t small{opacity:.75}@keyframes dcPulse{50%{box-shadow:0 0 0 5px rgba(255,170,60,.25)}}.row2{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}.row2 .btn{flex:1 1 140px}.goalcard{display:grid;gap:12px;padding:16px;border-radius:20px;background:linear-gradient(135deg,var(--pen-soft),var(--sheet));border:1.5px solid var(--line)}
 .gtop{display:flex;align-items:center;gap:14px}.gring{width:68px;height:68px;flex:none}.gnum{font-weight:800;font-size:15px;fill:var(--ink)}
 .gsub{margin:2px 0 0;color:var(--muted);font-size:.92rem}.flame{display:inline-flex;align-items:center;gap:4px;color:var(--pen);font-weight:700}.flame .ic{width:18px;height:18px}
@@ -538,7 +539,23 @@ h3{font-family:var(--f-serif);font-weight:700;letter-spacing:.01em}
 body{letter-spacing:.005em}
 </style>
 
-<div id="splash" role="presentation"><div class="sp-in"><svg class="sp-pin" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s7-6.2 7-12a7 7 0 1 0-14 0c0 5.8 7 12 7 12Z" fill="#FF6B5B"/><circle cx="12" cy="10" r="2.6" fill="#FFF8EE"/></svg><div class="sp-name"><span style="--i:0">W</span><span style="--i:1">a</span><span style="--i:2">y</span><span style="--i:3">p</span><span style="--i:4">a</span><span style="--i:5">l</span><span style="--i:6">s</span></div><div class="sp-by"><i></i><span>by Ludeldoo</span><i></i></div></div></div>
+<div id="splash" role="presentation"><div class="sp-in"><svg class="sp-pin" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s7-6.2 7-12a7 7 0 1 0-14 0c0 5.8 7 12 7 12Z" fill="#FF6B5B"/><circle cx="12" cy="10" r="2.6" fill="#FFF8EE"/></svg><div class="sp-name"><span style="--i:0">W</span><span style="--i:1">a</span><span style="--i:2">y</span><span style="--i:3">p</span><span style="--i:4">a</span><span style="--i:5">l</span><span style="--i:6">s</span></div><div class="sp-by"><i></i><span>by Ludeldoo</span><i></i></div><div class="sp-prog" aria-live="polite"><div class="sp-track"><i id="sp-b"></i></div><div class="sp-meta"><span id="sp-l"></span><span id="sp-p"></span></div></div></div></div>
+<script>
+/* Ladebalken mit echten Schritten: 1 Seite, 2 Firebase geladen, 3 App-Code lädt, 4 App läuft / Konto, 5 fertig */
+(function(){var de=true;try{var pf=JSON.parse(localStorage.getItem('waypals-pref')||'{}');de=pf.lang?pf.lang==='de':/^de/i.test(navigator.language||'')}catch(e){}
+var S={1:[6,'Waypals wird geladen …','Loading Waypals …',38],2:[40,'Verbindung wird vorbereitet …','Preparing connection …',48],3:[50,'App wird geladen …','Loading app …',86],4:[88,'Konto wird verbunden …','Connecting account …',97],5:[100,'Fertig','Done',100]},P=0,T=0;
+function draw(){var b=document.getElementById('sp-b'),p=document.getElementById('sp-p');if(b)b.style.width=P.toFixed(1)+'%';if(p)p.textContent=Math.round(P)+' %'}
+window.wpStep=function(n){var s=S[n];if(!s)return;P=Math.max(P,s[0]);T=s[3];var l=document.getElementById('sp-l');if(l)l.textContent=de?s[1]:s[2];draw()};
+var iv=setInterval(function(){if(P<T){P+=Math.max(.05,(T-P)*.035);if(P>T)P=T;draw()}if(P>=100)clearInterval(iv)},120);
+wpStep(1)})();
+</script>
+<script src="firebase-config.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<script>window.wpStep&&wpStep(2)</script>
+<script src="shim.js"></script>
+<script>window.wpStep&&wpStep(3)</script>
 <div id="app">
   <header class="top">
     <div>
@@ -9386,7 +9403,8 @@ function openGuest(prep){
 
 /* ---------- Start ---------- */
 renderMain();
-(function(){var s=document.getElementById('splash');if(s){s.addEventListener('click',function(){s.remove()});setTimeout(function(){if(s.parentNode)s.remove()},3600)}})();
+(function(){var s=document.getElementById('splash');if(!s)return;s.addEventListener('click',function(){s.remove()});if(window.wpStep)wpStep(4);var t0=Date.now();
+  (function w(){if(store.mode!=='pending'||document.getElementById('wp-login')||Date.now()-t0>12000){if(window.wpStep)wpStep(5);setTimeout(function(){s.classList.add('sp-done');setTimeout(function(){if(s.parentNode)s.remove()},450)},250);return}setTimeout(w,120)})()})();
 translateStatic(document.getElementById('app')||document.body);store.init();
 window.__wpBoot=1;setTimeout(checkHash,900);window.addEventListener('hashchange',checkHash);
 setTimeout(checkArrivals,1500);setTimeout(function(){(window.requestIdleCallback||setTimeout)(f3Warm)},3000);setTimeout(maybeIntro,2200);setTimeout(circleTick,2500);setTimeout(birthdayToast,4500);setTimeout(flashbackCheck,6000);
