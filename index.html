@@ -320,6 +320,8 @@ textarea.ruled:focus{box-shadow:none}
 .rkk{margin:4px 0 12px}.rankl{list-style:none;margin:0 0 12px;padding:0;display:grid;gap:8px}.rankl li{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:14px;background:var(--sheet);border:1.5px solid var(--line)}.rankl li.me{border-color:var(--accent,#0F7B6C);box-shadow:0 0 0 1px var(--accent,#0F7B6C) inset}.rankl .av{width:40px;height:40px;flex:none}.rankl b{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.rankl b small{font-weight:400;color:var(--pen)}.rkn{width:30px;text-align:center;font-weight:700;font-size:16px}.rkv{font-weight:700;color:var(--ink);white-space:nowrap}
 .wishf{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 14px}.wishf input{flex:1 1 140px;min-width:0;font:inherit;padding:8px 10px;border-radius:12px;border:1.5px solid var(--line);background:var(--sheet);color:var(--ink)}
 .wishl{list-style:none;margin:0;padding:0;display:grid;gap:8px}.wishl li{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:14px;background:var(--sheet);border:1.5px solid var(--line)}.wishl li>div{flex:1;min-width:0;display:grid;gap:2px}.wishl small{color:var(--pen)}.wishl .wck{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:var(--line);font-size:14px}.wishl li.done .wck{background:#2E8B57;color:#fff}.wishl li.done b{text-decoration:line-through;text-decoration-thickness:1.5px}
+.form label.chk.tchk{display:flex!important;flex-direction:row;gap:10px;align-items:center;margin:4px 0}.form label.chk.tchk>span{font-weight:500;text-transform:none;letter-spacing:0;font-size:15px;color:var(--ink)}.form label.chk.tchk input{flex:none;width:22px;height:22px;margin:0}
+.herecard.goc{background:linear-gradient(135deg,rgba(70,110,170,.14),rgba(70,110,170,.04));border-color:rgba(70,110,170,.35)}.gol{list-style:none;margin:2px 0 0;padding:0;display:grid;gap:6px}.goi{all:unset;cursor:pointer;display:grid;gap:1px}.goi b{font-weight:600}.goi small{color:var(--pen)}.gonew{font-style:normal;font-size:11px;padding:1px 6px;border-radius:8px;background:#466eaa;color:#fff;margin-left:4px}
 .herecard{display:flex;gap:12px;align-items:flex-start;padding:12px 14px;margin:0 0 14px;border-radius:16px;background:linear-gradient(135deg,rgba(46,139,87,.14),rgba(46,139,87,.04));border:1.5px solid rgba(46,139,87,.35)}.herecard .hci{font-size:22px}.herecard>div{display:grid;gap:4px}.herecard small{color:var(--pen)}
 .stamp .stampsvg{animation:stampIn .42s cubic-bezier(.3,1.5,.5,1) both;animation-delay:calc(var(--i,0)*70ms)}
 .stamp.new .stampsvg{animation:stampNew .8s cubic-bezier(.3,1.6,.5,1) both;animation-delay:calc(var(--i,0)*70ms + .25s)}
@@ -4606,6 +4608,7 @@ function tripsAll(){return (store.post.trips||[]).concat(store.friends.length?[]
 function tripsAllOf(who){return tripsAll().concat(typeof remoteTripsOf==='function'?remoteTripsOf(who):[]).filter(function(t){return t.who===who}).sort(function(a,b){return a.from<b.from?-1:a.from>b.from?1:0})}
 function isActive(t,d){d=d||todayISO();return t.from<=d&&d<=t.to}
 function activeTrip(who){var d=todayISO(),r=null;tripsAllOf(who).forEach(function(t){if(isActive(t,d))r=t});return r}
+function tripWhen(t){return t.vague?L('ca. ','approx. ')+fmtRange(t.from,t.to)+' '+L('(noch unsicher)','(not sure yet)'):fmtRange(t.from,t.to)}
 function fmtRange(a,b){if(a===b)return fmtDate(a);return fmtDM(a)+' bis '+fmtDate(b)}
 function overlap(a,b){var f=a.from>b.from?a.from:b.from,t=a.to<b.to?a.to:b.to;return f<=t?[f,t]:null}
 function radar(){
@@ -4760,11 +4763,10 @@ function myPublic(){
     wk:(function(){try{return wkGain()}catch(e){return null}})(),rk:(function(){try{return {m:rkGain('m'),y:rkGain('y')}}catch(e){return null}})(),
     pgs:dexBirds().slice(0,10).map(function(b){return {skin:b.skin,name:b.name,kmh:DEX_RAR[skinParse(b.skin).i].kmh}}),
     recent:(store.post.posts||[]).slice(-8).reverse().map(function(p){return {t:p.title,xp:p.xp,d:p.date,x:String(p.text||'').slice(0,160)}}),loc:!!pub.loc};
-  if(pub.loc){
-    if(me)o.home={name:me.name||'',lat:me.lat,lon:me.lon};
-    var cut=new Date(Date.now()-365*864e5),cs=cut.getFullYear()+'-'+pad(cut.getMonth()+1)+'-'+pad(cut.getDate());
-    o.trips=(store.post.trips||[]).filter(function(t){return t.who==='me'&&t.to>=cs}).slice(-20).map(function(t){return {id:t.id,dest:t.dest,from:t.from,to:t.to,kind:t.kind||''}});
-  }
+  if(pub.loc&&me)o.home={name:me.name||'',lat:me.lat,lon:me.lon};
+  var cut=new Date(Date.now()-365*864e5),cs=cut.getFullYear()+'-'+pad(cut.getMonth()+1)+'-'+pad(cut.getDate());
+  var tl=(store.post.trips||[]).filter(function(t){return t.who==='me'&&t.to>=cs&&(pub.loc||t.tell)}).slice(-20).map(function(t){return {id:t.id,dest:t.dest,from:t.from,to:t.to,kind:t.kind||'',vague:!!t.vague,tell:!!t.tell}});
+  if(tl.length)o.trips=tl;
   return o;
 }
 function circlePublish(force){
@@ -5203,7 +5205,7 @@ function circleTick(){
 function remoteTripsOf(fid){
   var f=store.friends.find(function(x){return x.id===fid}),p=palOf(f);
   if(!p||!p.trips)return [];
-  return p.trips.map(function(t){return {id:'r-'+fid+'-'+t.id,who:fid,dest:t.dest,from:t.from,to:t.to,kind:t.kind,note:'',remote:true}});
+  return p.trips.map(function(t){return {id:'r-'+fid+'-'+t.id,who:fid,dest:t.dest,from:t.from,to:t.to,kind:t.kind,vague:!!t.vague,tell:!!t.tell,note:'',remote:true}});
 }
 function palCardHTML(p,f){
   var rec=(p.recent||[]).slice(0,4).map(function(r){return '<li><b>'+esc(r.t)+'</b> <span class="xpb">+'+(r.xp||0)+' XP</span>'+(r.x?'<small>'+esc(r.x)+'</small>':'')+'</li>'}).join('');
@@ -5840,7 +5842,7 @@ function flashbackCheck(){
 }
 
 function tripCard(F,t,extra){
-  return '<button type="button" class="pgi tripi" '+(F?'data-open="'+esc(F.id)+'"':'data-act="edit-trip" data-id="'+esc(t.id)+'"')+'><b>'+(F?esc(first(F.name))+' · ':'')+esc(t.dest.name)+'</b><small>'+esc(fmtRange(t.from,t.to))+(t.kind==='work'?_t(' · Arbeit'):'')+(t.note?' · '+esc(t.note):'')+(extra?' · '+esc(extra):'')+'</small></button>';
+  return '<button type="button" class="pgi tripi" '+(F?'data-open="'+esc(F.id)+'"':'data-act="edit-trip" data-id="'+esc(t.id)+'"')+'><b>'+(F?esc(first(F.name))+' · ':'')+esc(t.dest.name)+'</b><small>'+esc(tripWhen(t))+(t.kind==='work'?_t(' · Arbeit'):'')+(t.note?' · '+esc(t.note):'')+(extra?' · '+esc(extra):'')+'</small></button>';
 }
 function tripStatsHTML(){
   var today=todayISO(),home=myCountry(),me=store.post.me,tr=tripsAllOf('me').filter(function(x){return x.from<=today}),cs={},pl={},days=0,longest=null,far=null;
@@ -5898,7 +5900,7 @@ function openTripForm(who,trip){
   if(who&&who!=='me'){var ff=fr.find(function(x){return x.id===who});sel=_t('<p class="hint">Reise von <b>')+esc(ff?ff.name:'?')+'</b></p>'}
   else sel=_t('<label class="fl"><span>Wer reist?</span><select name="who"><option value="me">Ich</option>')+fr.map(function(f){return '<option value="'+esc(f.id)+'"'+(d.who===f.id?' selected':'')+'>'+esc(f.name)+'</option>'}).join('')+'</select></label>';
   var el=openSheet('<div class="sbar"><button type="button" class="btn ghost" data-act="close">'+ic('back')+_t('Abbrechen</button><button type="button" class="btn pri" data-act="save">Speichern</button></div><h2 class="stitle">')+(trip?_t('Reise bearbeiten'):_t('Reise eintragen'))+'</h2>'+
-    '<form class="form" novalidate autocomplete="off">'+sel+'<div data-pp="dest"></div>'+fld(L('Von','From'),'from',d.from,'type="date"')+fld(L('Bis','To'),'to',d.to,'type="date"')+'<label class="fl"><span>'+L('Art','Type')+'</span><select name="kind"><option value="trip"'+(d.kind==='work'?'':' selected')+'>'+L('Reise oder Urlaub','Trip or vacation')+'</option><option value="work"'+(d.kind==='work'?' selected':'')+'>'+L('Arbeiten oder Leben dort','Work or live there')+' (+'+XP_WORK+' XP)</option></select></label>'+fld(L('Notiz (optional)','Note (optional)'),'note',d.note,'placeholder="'+L('z. B. Surfurlaub, Besuch bei Familie','e.g. surf trip, visiting family')+'"')+'<p class="err" role="alert" hidden></p></form>'+
+    '<form class="form" novalidate autocomplete="off">'+sel+'<div data-pp="dest"></div>'+fld(L('Von','From'),'from',d.from,'type="date"')+fld(L('Bis','To'),'to',d.to,'type="date"')+'<label class="fl"><span>'+L('Art','Type')+'</span><select name="kind"><option value="trip"'+(d.kind==='work'?'':' selected')+'>'+L('Reise oder Urlaub','Trip or vacation')+'</option><option value="work"'+(d.kind==='work'?' selected':'')+'>'+L('Arbeiten oder Leben dort','Work or live there')+' (+'+XP_WORK+' XP)</option></select></label>'+'<label class="chk tchk"><input type="checkbox" name="vague"'+(d.vague?' checked':'')+'> <span>'+L('Datum noch unsicher (ungefähr)','Dates not sure yet (approximate)')+'</span></label>'+((d.who||'me')==='me'?'<label class="chk tchk"><input type="checkbox" name="tell"'+(trip?(d.tell?' checked':''):' checked')+'> <span>'+L('Meinen Freunden im Kreis Bescheid geben','Let my friends in the circle know')+'</span></label>':'')+fld(L('Notiz (optional)','Note (optional)'),'note',d.note,'placeholder="'+L('z. B. Surfurlaub, Besuch bei Familie','e.g. surf trip, visiting family')+'"')+'<p class="err" role="alert" hidden></p></form>'+
     (trip?_t('<div class="dz"><button type="button" class="btn danger" data-act="del">Reise löschen</button></div>'):''),'fsheet');
   var pp=placePicker($('[data-pp=dest]',el),{label:_t('Wohin?'),text:d.dest?d.dest.name:'',lat:d.dest?d.dest.lat:null,lon:d.dest?d.dest.lon:null,tz:d.dest?d.dest.tz:'',placeholder:_t('Stadt oder Ort'),pinText:_t('Ziel gefunden'),noPinText:_t('Wähle einen Vorschlag oder markiere den Ort auf der Karte.')});
   var err=$('.err',el);
@@ -5916,8 +5918,9 @@ function openTripForm(who,trip){
       if(to<from){var x=from;from=to;to=x}
       var whoSel=$('[name=who]',el),w=whoSel?whoSel.value:(who||'me');
       var rec={id:trip?trip.id:uid(),who:w,dest:{name:s.text,lat:s.lat,lon:s.lon,tz:s.tz||''},from:from,to:to,kind:$('[name=kind]',el).value==='work'?'work':'trip',note:($('[name=note]',el).value||'').trim()};
+      if($('[name=vague]',el).checked)rec.vague=true;var tc=$('[name=tell]',el);if(tc&&tc.checked&&w==='me')rec.tell=true;
       store.post.trips=(store.post.trips||[]).filter(function(t){return t.id!==rec.id}).concat(rec);
-      store.savePost();closeSheet(el);toast(_t('Reise gespeichert'));
+      store.savePost();closeSheet(el);toast(rec.tell&&circleOn()&&pubCfg().on?L('Reise gespeichert. Deine Freunde sehen sie jetzt.','Trip saved. Your friends can see it now.'):_t('Reise gespeichert'));try{circlePublish()}catch(e){}
     }
   });
 }
@@ -6702,6 +6705,22 @@ function hereHTML(){
   var nm=h.list.map(function(x){return first(x.f.name)}),txt=nm.length===1?LT("{0} ist gerade auch in {1}!","{0} is in {1} right now too!",[esc(nm[0]),esc(cn(h.c))]):LT("{0} sind gerade auch in {1}!","{0} are in {1} right now too!",[esc(nm.slice(0,-1).join(', ')+' '+L('und','and')+' '+nm[nm.length-1]),esc(cn(h.c))]);
   return '<section class="herecard"><span class="hci" aria-hidden="true">📍</span><div><b>'+txt+'</b><small>'+L('Vielleicht klappt ein Treffen?','Maybe you can meet up?')+'</small><div class="btnrow">'+h.list.slice(0,3).map(function(x){return '<button type="button" class="btn sm" data-open="'+esc(x.f.id)+'">'+esc(first(x.f.name))+'</button>'}).join('')+'</div></div></section>';
 }
+/* ---------- Reise-Ankündigungen von Freunden ---------- */
+function goSeen(){try{return JSON.parse(localStorage.getItem('waypals-tripseen')||'[]')}catch(e){return []}}
+function goFriends(){
+  var t=todayISO(),lim=new Date(Date.now()+180*864e5),ls=lim.getFullYear()+'-'+pad(lim.getMonth()+1)+'-'+pad(lim.getDate()),out=[];
+  store.friends.forEach(function(f){if(f.example||(typeof isBlocked==='function'&&f.uid&&isBlocked(f.uid)))return;remoteTripsOf(f.id).forEach(function(tr){if(tr.to>=t&&tr.from<=ls)out.push({f:f,t:tr})})});
+  return out.sort(function(a,b){return a.t.from<b.t.from?-1:1});
+}
+function goHTML(){
+  var g=[];try{g=goFriends()}catch(e){}if(!g.length)return '';
+  var seen=goSeen(),t=todayISO();
+  var li=g.slice(0,4).map(function(x){var isN=seen.indexOf(x.t.id)<0,c=countryOfPlace(x.t.dest.name,x.t.dest.lat,x.t.dest.lon)||'',pl=x.t.dest.name+(c&&x.t.dest.name.indexOf(cn(c))<0?', '+cn(c):'');
+    var txt=x.t.from<=t?LT("{0} ist gerade in {1}","{0} is in {1} right now",[esc(first(x.f.name)),esc(pl)]):x.t.vague?LT("{0} reist vielleicht nach {1}","{0} might travel to {1}",[esc(first(x.f.name)),esc(pl)]):LT("{0} reist nach {1}","{0} is travelling to {1}",[esc(first(x.f.name)),esc(pl)]);
+    return '<li><button type="button" class="goi" data-open="'+esc(x.f.id)+'"><b>'+txt+(isN?' <em class="gonew">'+L('Neu','New')+'</em>':'')+'</b><small>'+esc(tripWhen(x.t))+'</small></button></li>'}).join('');
+  setTimeout(function(){try{localStorage.setItem('waypals-tripseen',JSON.stringify(goSeen().concat(g.map(function(x){return x.t.id})).filter(function(v,i,a){return a.indexOf(v)===i}).slice(-200)))}catch(e){}},4000);
+  return '<section class="herecard goc"><span class="hci" aria-hidden="true">✈️</span><div><b>'+L('Deine Freunde sind bald unterwegs','Your friends are travelling soon')+'</b><ul class="gol">'+li+'</ul>'+(g.length>4?'<button type="button" class="btn ghost sm" data-act="trips">'+LT("Alle {0} Reisen","All {0} trips",[g.length])+'</button>':'')+'</div></section>';
+}
 /* ---------- Wochen-Ranking ---------- */
 function wkISO(){var d=weekStart();return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())}
 function wkGain(){
@@ -6787,7 +6806,7 @@ function exploreTab(){
   var fut=tripsAll().filter(function(tr){return tr.who==='me'&&tr.to>=todayISO()}).sort(function(a,b){return a.from<b.from?-1:1})[0];
   var fb=0;try{fb=fbItems(14,30).length}catch(e){}
   var bd=birthdayList().filter(function(b){return !b.f.example})[0];
-  wrap.innerHTML='<div class="phead"><h2 class="h2">'+L('Entdecken','Explore')+'</h2></div>'+festCardHTML()+hereHTML()+todayHTML()+
+  wrap.innerHTML='<div class="phead"><h2 class="h2">'+L('Entdecken','Explore')+'</h2></div>'+festCardHTML()+hereHTML()+goHTML()+todayHTML()+
     tileGroup(L('Unterwegs','On the road'),[
       tile('trips','plane',L('Reisen','Trips'),fut?esc(fut.dest.name)+' · '+esc(fmtDM(fut.from)):L('Eigene und fremde Reisen eintragen','Add your own and your friends\u2019 trips')),
       tile('wish','star',L('Wunschliste','Wish list'),(function(){var n=wishList().length;return n?LT("Traumziele: {0}","Dream destinations: {0}",[n]):L('Wo willst du noch hin?','Where do you want to go?')})()),
