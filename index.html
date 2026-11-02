@@ -311,6 +311,14 @@ textarea.ruled:focus{box-shadow:none}
 .stamps{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 10px}
 .stamp{margin:0;display:grid;gap:4px;justify-items:center;text-align:center;padding:10px 6px;border-radius:16px;background:var(--sheet);border:1.5px solid var(--line)}
 .stampsvg{width:100%;max-width:170px;height:auto;opacity:.92}
+.stamp .stampsvg{animation:stampIn .42s cubic-bezier(.3,1.5,.5,1) both;animation-delay:calc(var(--i,0)*70ms)}
+.stamp.new .stampsvg{animation:stampNew .8s cubic-bezier(.3,1.6,.5,1) both;animation-delay:calc(var(--i,0)*70ms + .25s)}
+.stamp.new{position:relative}.stamp.new::after{content:'NEU';position:absolute;top:6px;right:8px;font:700 10px/1 var(--f-ui);letter-spacing:.08em;color:#fff;background:#B0413E;border-radius:6px;padding:3px 5px;animation:stampTag .3s ease both;animation-delay:calc(var(--i,0)*70ms + .9s)}
+@keyframes stampIn{0%{scale:1.5;opacity:0}70%{scale:.96;opacity:.92}100%{scale:1;opacity:.92}}
+@keyframes stampNew{0%{scale:2.4;opacity:0;filter:blur(2px)}55%{scale:.9;opacity:1;filter:none}75%{scale:1.04}100%{scale:1;opacity:.92}}
+@keyframes stampTag{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+.qpref{display:flex;flex-wrap:nowrap;align-items:center;gap:8px;margin:-4px 0 14px}.qth{display:flex;gap:6px;flex-wrap:wrap}.qth .cb{font-size:12.5px;padding:6px 10px}.qlg{display:inline-flex;align-items:center;gap:6px;margin-left:auto}.qlg select{font:inherit;font-size:12.5px;padding:6px 4px;max-width:96px;border-radius:10px;border:1.5px solid var(--line);background:var(--sheet);color:var(--ink)}
+.dxnf{display:flex;gap:6px;margin-top:6px}.dxnf input{flex:1;min-width:0;font:inherit;padding:6px 8px;border-radius:10px;border:1.5px solid var(--line);background:var(--sheet);color:var(--ink)}.dxnm{margin-top:4px}
 .stamp figcaption{font-size:.78rem;color:var(--muted);overflow-wrap:anywhere}
 .badges{display:flex;flex-wrap:wrap;gap:8px}
 .badge{padding:6px 12px;border-radius:999px;border:1.5px dashed var(--line);color:var(--muted);font-weight:700;font-size:.85rem}
@@ -4643,15 +4651,15 @@ function stampSVG(name,date){
     '<text x="70" y="84" text-anchor="middle" font-size="9" font-weight="700" fill="currentColor">'+esc(date?fmtStamp(date):'')+'</text></svg>';
 }
 function passportHTML(){
-  var d=passportData(),n=d.countries.length;
+  var d=passportData(),n=d.countries.length,seenSt=null;try{seenSt=JSON.parse(localStorage.getItem('waypals-stamps')||'null')}catch(x){}if(!Array.isArray(seenSt))seenSt=d.countries.map(function(c){return c.name});
   var badges=[[_t('Erste Reise'),n>=1],[_t('3 Länder'),n>=3],[_t('5 Länder'),n>=5],[_t('10 Länder'),n>=10],[_t('20 Länder'),n>=20],[_t('10 Orte'),d.cities>=10],[_t('25 Orte'),d.cities>=25],[_t('10 Menschen'),d.people>=10],[_t('25 Menschen'),d.people>=25],[_t('50 Menschen'),d.people>=50]];
   var h='<div class="sbar"><button type="button" class="btn ghost" data-act="close">'+ic('back')+_t('Zurück</button></div><h2 class="stitle">Reisepass</h2>');
   h+='<p class="hint">'+n+' '+(n===1?L('Land','country'):L('Länder','countries'))+' · '+d.cities+' '+(d.cities===1?L('Ort','place'):L('Orte','places'))+' · '+d.people+' '+(d.people===1?L('Mensch','person'):L('Menschen','people'))+_t('. Für jedes Land außerhalb deines Heimatlands gibt es einen Stempel mit dem Tag deines ersten Besuchs.</p>');
-  h+=n?'<div class="stamps">'+d.countries.map(function(c){var pl=Object.keys(c.places).map(function(k){return c.places[k]});return '<figure class="stamp">'+stampSVG(c.name,c.first)+'<figcaption>'+esc(pl.slice(0,3).join(', '))+(pl.length>3?' +'+(pl.length-3):'')+(c.met?' · '+c.met+' '+(c.met===1?L('Mensch','person'):L('Menschen','people')):'')+'</figcaption></figure>'}).join('')+'</div>':_t('<p class="banner">Noch kein Stempel. Trag eine Begegnung im Ausland oder eine Reise ein, dann bekommst du den ersten.</p>');
+  h+=n?'<div class="stamps">'+d.countries.map(function(c,ci){var pl=Object.keys(c.places).map(function(k){return c.places[k]});return '<figure class="stamp'+(seenSt.indexOf(c.name)<0?' new':'')+'" style="--i:'+Math.min(ci,14)+'">'+stampSVG(c.name,c.first)+'<figcaption>'+esc(pl.slice(0,3).join(', '))+(pl.length>3?' +'+(pl.length-3):'')+(c.met?' · '+c.met+' '+(c.met===1?L('Mensch','person'):L('Menschen','people')):'')+'</figcaption></figure>'}).join('')+'</div>':_t('<p class="banner">Noch kein Stempel. Trag eine Begegnung im Ausland oder eine Reise ein, dann bekommst du den ersten.</p>');
   h+=_t('<section class="tell"><h3 class="who">Abzeichen</h3><div class="badges">')+badges.map(function(b){return '<span class="badge'+(b[1]?' on':'')+'">'+(b[1]?'✓ ':'')+esc(b[0])+'</span>'}).join('')+'</div></section>';
   return h;
 }
-function openPassport(){var el=openSheet(passportHTML(),'passport');el.addEventListener('click',function(e){if(e.target.closest('[data-act=close]'))closeSheet(el)})}
+function openPassport(){var el=openSheet(passportHTML(),'passport');try{if($$('.stamp.new',el).length)setTimeout(function(){sfx(2)},500);localStorage.setItem('waypals-stamps',JSON.stringify(passportData().countries.map(function(c){return c.name})))}catch(x){}el.addEventListener('click',function(e){if(e.target.closest('[data-act=close]'))closeSheet(el)})}
 function tripDaysIn(tr,y){
   var a=tr.from,b=tr.to<todayISO()?tr.to:todayISO();if(a>b)return 0;
   if(y!=='all'){var s=y+'-01-01',e=y+'-12-31';if(a<s)a=s;if(b>e)b=e;if(a>b)return 0}
@@ -6602,10 +6610,15 @@ function exploreTab(){
   main.replaceChildren(wrap);
   wrap.addEventListener('click',function(e){var a=e.target.closest('[data-act]');if(a)mainAct(a.getAttribute('data-act'))});
 }
+function qprefHTML(){
+  var th=PREF.theme==='light'||PREF.theme==='dark'?PREF.theme:'auto',LG=[['de','Deutsch'],['en','English'],['es','Español'],['fr','Français'],['it','Italiano'],['pt','Português'],['sq','Shqip'],['ar','العربية']];
+  return '<div class="qpref"><div class="qth" role="group" aria-label="'+esc(L('Hell oder dunkel','Light or dark'))+'">'+[['auto','◐',L('Auto','Auto')],['light','☀',L('Hell','Light')],['dark','☾',L('Dunkel','Dark')]].map(function(t){return '<button type="button" class="cb" data-qth="'+t[0]+'" aria-pressed="'+(th===t[0])+'" title="'+esc(t[2])+'"><span aria-hidden="true">'+t[1]+'</span> '+esc(t[2])+'</button>'}).join('')+'</div>'+
+    '<label class="qlg"><span aria-hidden="true">🌐</span><select data-qlg aria-label="'+esc(L('Sprache','Language'))+'">'+LG.map(function(l){return '<option value="'+l[0]+'"'+(l[0]===APP_LANG?' selected':'')+'>'+l[1]+'</option>'}).join('')+'</select></label></div>';
+}
 function meTab(){
   var wrap=document.createElement('section');wrap.className='people tabpage';
   var pr=store.post.profile||{},pd=passportData(),n=myPigeons().length;
-  wrap.innerHTML=meCardHTML()+levelCardHTML()+
+  wrap.innerHTML=meCardHTML()+qprefHTML()+levelCardHTML()+
     tileGroup(L('Mein Reisebuch','My travel book'),[
       tile('passport','star',L('Reisepass','Passport'),LT("Länder: {0}","Countries: {0}",[pd.countries.length])),
       tile('dex','star',L('Taubendex','Pigeondex'),LT("{0} von {1} Skins","{0} of {1} skins",[dexOwnedCount(),dexTotal()])),
@@ -6617,7 +6630,8 @@ function meTab(){
       tile('settings','gear',L('Einstellungen','Settings'),L('Style, Sprache, Backup, Konto','Style, language, backup, account')),
       tile('rules','trophy',L('So gibt es XP','How XP works'),'')]));
   main.replaceChildren(wrap);
-  wrap.addEventListener('click',function(e){var a=e.target.closest('[data-act]');if(a)mainAct(a.getAttribute('data-act'))});
+  wrap.addEventListener('click',function(e){var q=e.target.closest('[data-qth]');if(q){PREF.theme=q.getAttribute('data-qth');savePref();$$('[data-qth]',wrap).forEach(function(b){b.setAttribute('aria-pressed',String(b===q))});return}var a=e.target.closest('[data-act]');if(a)mainAct(a.getAttribute('data-act'))});
+  wrap.addEventListener('change',function(e){var g=e.target.closest('[data-qlg]');if(!g)return;var v=g.value;if(v!==APP_LANG){PREF.lang=v;savePref();try{location.reload()}catch(x){toast(L('Bitte öffne die App neu.','Please reopen the app.'))}}});
 }
 function openRules(){
   var el=openSheet('<div class="sbar"><button type="button" class="btn ghost" data-act="close">'+ic('back')+_t('Zurück</button></div><h2 class="stitle">So gibt es XP</h2><div class="pg">')+
@@ -7392,7 +7406,7 @@ var DEX_SK={
 };
 var DEX_GEN=['Reisetaube|Travel pigeon|none|none|none','Sonnenhut-Taube|Sun-hat pigeon|straw|none|none','Fotografen-Taube|Photographer pigeon|cap|scarf|none','Entdecker-Taube|Explorer pigeon|cowboy|vest|coffee','Weltenbummler-König|Globetrotter king|crown|cape|ball'];
 function skinEntry(id){var p=skinParse(id),e=(DEX_SK[p.c]||DEX_GEN)[p.i].split('|');return {de:e[0],en:e[1],hat:e[2],body:e[3],prop:e[4]}}
-function skinTitle(id){var e=skinEntry(id);return L(e.de,e.en)}
+function skinTitle(id){var sn=store.post.loft&&store.post.loft.skinNames;if(sn&&sn[id])return sn[id];var e=skinEntry(id);return L(e.de,e.en)}
 var DEX_PROP={
 beer:'<rect x="1" y="2.4" width="6" height="7.2" rx="1" fill="#F6C23E" stroke="#8a5a12" stroke-width=".6"/><path d="M7 3.8h1.8q1 0 1 1.4v1.4q0 1.4-1 1.4H7" fill="none" stroke="#8a5a12" stroke-width=".9"/><path d="M.8 2.6q1-2.2 2.2-.8 1-1.6 2.4 0 1-.6 1.8.8z" fill="#fff"/>',
 pretzel:'<path d="M2 8Q-.5 3 3.6 2.6Q5 2.4 6.4 2.6Q10.5 3 8 8Q5 5.6 2 8Z" fill="none" stroke="#B5701F" stroke-width="1.5" stroke-linecap="round"/>',
@@ -7739,16 +7753,18 @@ function openDex(){
   }
   function info(id){
     var d=dexState(),o=d.dex[id],r=skinRar(id),k=dexInfo(skinParse(id).c);sel=id;
-    $('[data-info]',el).innerHTML='<div class="dxd" style="--rc:'+r.col+'"><span class="p3box">'+dexIcon(o?id:'Deutschland|0','pgico',!o)+'</span><div><b>'+(o?esc(skinTitle(id)):'???')+'</b> <span class="xpb" style="background:'+r.col+';color:#fff">'+esc(rarName(r))+'</span><small>'+esc(dexCN(k.name))+' · '+esc(dexSrcLabel(skinParse(id).i))+' · '+r.kmh+' km/h</small>'+(DEX_BY[id]?'<small>🎨 '+L('Design von','Design by')+' '+esc(DEX_BY[id])+'</small>':'')+(o?(favMine()===id?'<small class="favon">♥ '+L('Deine Lieblingstaube','Your favourite pigeon')+'</small>':'<button type="button" class="btn sm" data-act="dexfav" data-id="'+esc(id)+'">♥ '+L('Als Lieblingstaube','Make favourite')+'</button>'):'')+'<small>'+(o?LT("Gefunden am {0}{1}","Found on {0}{1}",[fmtDM(new Date(o.at).toISOString().slice(0,10)),o.n>1?' · '+o.n+'x':'']):(DEX_SRC[skinParse(id).i]==='travel'?L('Noch nicht gefunden. Du bekommst sie, wenn du in diesem Land warst.','Not found yet. You get it by travelling to this country.'):DEX_SRC[skinParse(id).i]==='meet'?L('Noch nicht gefunden. Du bekommst sie, wenn du jemanden aus diesem Land triffst.','Not found yet. You get it by meeting someone from this country.'):L('Noch nicht gefunden. Du bekommst sie, wenn du in dem Land warst und jemanden von dort getroffen hast. Oder durch Zucht.','Not found yet. You get it when you have been to this country and met someone from there. Or by breeding.')))+'</small></div></div>';
+    $('[data-info]',el).innerHTML='<div class="dxd" style="--rc:'+r.col+'"><span class="p3box">'+dexIcon(o?id:'Deutschland|0','pgico',!o)+'</span><div><b>'+(o?esc(skinTitle(id)):'???')+'</b> <span class="xpb" style="background:'+r.col+';color:#fff">'+esc(rarName(r))+'</span><small>'+esc(dexCN(k.name))+' · '+esc(dexSrcLabel(skinParse(id).i))+' · '+r.kmh+' km/h</small>'+(DEX_BY[id]?'<small>🎨 '+L('Design von','Design by')+' '+esc(DEX_BY[id])+'</small>':'')+(o?'<div class="btnrow dxnm"><button type="button" class="btn ghost sm" data-act="dexname">✎ '+L('Namen geben','Give a name')+'</button></div><form class="dxnf" data-nf hidden><input type="text" maxlength="24" value="'+esc((d.skinNames||{})[id]||'')+'" placeholder="'+esc(L('z. B. Pedro','e.g. Pedro'))+'" aria-label="'+esc(L('Name der Taube','Pigeon name'))+'"><button type="submit" class="btn pri sm">'+L('Speichern','Save')+'</button></form>':'')+(o?(favMine()===id?'<small class="favon">♥ '+L('Deine Lieblingstaube','Your favourite pigeon')+'</small>':'<button type="button" class="btn sm" data-act="dexfav" data-id="'+esc(id)+'">♥ '+L('Als Lieblingstaube','Make favourite')+'</button>'):'')+'<small>'+(o?LT("Gefunden am {0}{1}","Found on {0}{1}",[fmtDM(new Date(o.at).toISOString().slice(0,10)),o.n>1?' · '+o.n+'x':'']):(DEX_SRC[skinParse(id).i]==='travel'?L('Noch nicht gefunden. Du bekommst sie, wenn du in diesem Land warst.','Not found yet. You get it by travelling to this country.'):DEX_SRC[skinParse(id).i]==='meet'?L('Noch nicht gefunden. Du bekommst sie, wenn du jemanden aus diesem Land triffst.','Not found yet. You get it by meeting someone from this country.'):L('Noch nicht gefunden. Du bekommst sie, wenn du in dem Land warst und jemanden von dort getroffen hast. Oder durch Zucht.','Not found yet. You get it when you have been to this country and met someone from there. Or by breeding.')))+'</small></div></div>';
     if(o)try{p3Live($('[data-info] .p3box',el),id,76,95)}catch(e){}
   }
   paint();
+  el.addEventListener('submit',function(e){var f=e.target.closest('[data-nf]');if(!f||!sel)return;e.preventDefault();var d=dexState(),v=String($('input',f).value||'').replace(/\s+/g,' ').trim().slice(0,24);d.skinNames=d.skinNames||{};if(v)d.skinNames[sel]=v;else delete d.skinNames[sel];store.savePost();try{circlePublish()}catch(x){}toast(v?LT("Deine Taube heißt jetzt {0}.","Your pigeon is now called {0}.",[v]):L('Name entfernt.','Name removed.'));paint();try{renderMain()}catch(x){}});
   el.addEventListener('click',function(e){
     var s=e.target.closest('[data-sk]');if(s){info(s.getAttribute('data-sk'));return}
     var a=e.target.closest('[data-act]');if(!a)return;var act=a.getAttribute('data-act');
     if(act==='close')closeSheet(el);
     else if(act==='dexchal'){openChallenges()}
     else if(act==='dxdesign')dexDesignMail();
+    else if(act==='dexname'){var nf=$('[data-nf]',el);if(nf){nf.hidden=false;var ip=$('input',nf);ip.focus();ip.select()}}
     else if(act==='dexfav'){var pr=store.post.profile=store.post.profile||{};pr.fav=a.getAttribute("data-id");store.savePost();try{circlePublish()}catch(x){}toast(L('Deine Lieblingstaube steht jetzt neben deiner Figur.','Your favourite pigeon now stands next to your figure.'));info(pr.fav);try{renderMain()}catch(x){}}
     else if(act==='loft'){closeSheet(el);openLoft()}
   });
