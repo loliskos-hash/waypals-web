@@ -313,6 +313,9 @@ textarea.ruled:focus{box-shadow:none}
 .stamps{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 10px}
 .stamp{margin:0;display:grid;gap:4px;justify-items:center;text-align:center;padding:10px 6px;border-radius:16px;background:var(--sheet);border:1.5px solid var(--line)}
 .stampsvg{width:100%;max-width:170px;height:auto;opacity:.92}
+.fest{position:relative;display:inline-grid;place-items:center;width:64px;height:72px;border-radius:50%;background:radial-gradient(circle at 50% 40%,color-mix(in srgb,var(--f2) 45%,transparent),color-mix(in srgb,var(--f1) 30%,transparent) 70%);box-shadow:0 0 0 2px color-mix(in srgb,var(--f2) 70%,transparent) inset}.fest .pgico{width:44px;height:55px}.fest .femb{position:absolute;right:-4px;top:-4px;font-style:normal;font-size:20px;filter:drop-shadow(0 1px 1px rgba(0,0,0,.25))}.fest.lockd{filter:grayscale(1);opacity:.55}
+.festbox{margin:12px 0}.festg{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:10px}.festi{display:grid;justify-items:center;text-align:center;gap:3px;padding:10px 6px;border-radius:14px;background:var(--sheet);border:1.5px solid var(--line)}.festi.can{border-color:var(--f2,#E3B04B);box-shadow:0 0 0 2px rgba(227,176,75,.35)}.festi b{font-size:13px}.festi small{font-size:11.5px;color:var(--pen)}
+.herecard.festc{background:linear-gradient(135deg,color-mix(in srgb,var(--f1) 22%,transparent),color-mix(in srgb,var(--f2) 18%,transparent));border-color:color-mix(in srgb,var(--f2) 60%,transparent);align-items:center}
 .rkk{margin:4px 0 12px}.rankl{list-style:none;margin:0 0 12px;padding:0;display:grid;gap:8px}.rankl li{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:14px;background:var(--sheet);border:1.5px solid var(--line)}.rankl li.me{border-color:var(--accent,#0F7B6C);box-shadow:0 0 0 1px var(--accent,#0F7B6C) inset}.rankl .av{width:40px;height:40px;flex:none}.rankl b{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.rankl b small{font-weight:400;color:var(--pen)}.rkn{width:30px;text-align:center;font-weight:700;font-size:16px}.rkv{font-weight:700;color:var(--ink);white-space:nowrap}
 .wishf{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 14px}.wishf input{flex:1 1 140px;min-width:0;font:inherit;padding:8px 10px;border-radius:12px;border:1.5px solid var(--line);background:var(--sheet);color:var(--ink)}
 .wishl{list-style:none;margin:0;padding:0;display:grid;gap:8px}.wishl li{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:14px;background:var(--sheet);border:1.5px solid var(--line)}.wishl li>div{flex:1;min-width:0;display:grid;gap:2px}.wishl small{color:var(--pen)}.wishl .wck{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:var(--line);font-size:14px}.wishl li.done .wck{background:#2E8B57;color:#fff}.wishl li.done b{text-decoration:line-through;text-decoration-thickness:1.5px}
@@ -4322,7 +4325,7 @@ function Globe(opts){
 /* ---------- Speicher ---------- */
 var LS_KEY='wegmarken-v1';
 var S={tab:'map',mapMode:'met',mapSel:null,q:'',tag:'',sort:'new'};
-function normPost(o){return {pub:o.pub&&typeof o.pub==='object'?o.pub:{},me:o.me||null,pigeons:Array.isArray(o.pigeons)?o.pigeons:[],trips:Array.isArray(o.trips)?o.trips:[],posts:Array.isArray(o.posts)?o.posts:[],diet:o.diet&&typeof o.diet==='object'?o.diet:{},profile:o.profile&&typeof o.profile==='object'?o.profile:null,loft:o.loft&&typeof o.loft==='object'?o.loft:null,wkb:o.wkb&&typeof o.wkb==='object'?o.wkb:null,wish:Array.isArray(o.wish)?o.wish:[],plus:o.plus&&typeof o.plus==='object'?o.plus:{},username:typeof o.username==='string'?o.username:''}}
+function normPost(o){return {pub:o.pub&&typeof o.pub==='object'?o.pub:{},me:o.me||null,pigeons:Array.isArray(o.pigeons)?o.pigeons:[],trips:Array.isArray(o.trips)?o.trips:[],posts:Array.isArray(o.posts)?o.posts:[],diet:o.diet&&typeof o.diet==='object'?o.diet:{},profile:o.profile&&typeof o.profile==='object'?o.profile:null,loft:o.loft&&typeof o.loft==='object'?o.loft:null,wkb:o.wkb&&typeof o.wkb==='object'?o.wkb:null,rkb:o.rkb&&typeof o.rkb==='object'?o.rkb:null,wish:Array.isArray(o.wish)?o.wish:[],plus:o.plus&&typeof o.plus==='object'?o.plus:{},username:typeof o.username==='string'?o.username:''}}
 var store={
   friends:[],mode:'pending',col:null,post:{me:null,pigeons:[],trips:[],posts:[],diet:{},profile:null},
   loadLocal:function(){try{var raw=localStorage.getItem(LS_KEY);if(raw){var a=JSON.parse(raw);if(Array.isArray(a))return a}}catch(e){}return []},
@@ -4751,7 +4754,7 @@ function questXP(){var s=0;circle.quests.forEach(function(q){if(q.status==='done
 function myPublic(){
   var x=xpMe(),L=levelOf(x.total),pd=passportData(),pr=store.post.profile||{},pub=pubCfg(),me=store.post.me;
   var o={name:myCircleName(),level:L.level,title:L.title,xp:x.total,countries:pd.countries.length,people:pd.people,tier:pigeonTier(L.level),av:pr.av||null,photo:pr.photo||'',fav:favMine(),favName:favMine()?skinTitle(favMine()):'',
-    wk:(function(){try{return wkGain()}catch(e){return null}})(),
+    wk:(function(){try{return wkGain()}catch(e){return null}})(),rk:(function(){try{return {m:rkGain('m'),y:rkGain('y')}}catch(e){return null}})(),
     pgs:dexBirds().slice(0,10).map(function(b){return {skin:b.skin,name:b.name,kmh:DEX_RAR[skinParse(b.skin).i].kmh}}),
     recent:(store.post.posts||[]).slice(-8).reverse().map(function(p){return {t:p.title,xp:p.xp,d:p.date,x:String(p.text||'').slice(0,160)}}),loc:!!pub.loc};
   if(pub.loc){
@@ -5502,6 +5505,7 @@ function openSettings(){
       '<div class="fl"><span>'+L('Ton und Vibration','Sound and vibration')+'</span><div class="chips">'+chip('data-snd','on',L('An','On'),PREF.snd==='off'?'off':'on')+chip('data-snd','off',L('Aus','Off'),PREF.snd==='off'?'off':'on')+'</div></div>'+
       '<div class="fl"><span>'+L('3D-Figuren (bei langsamen Geräten ausschalten)','3D figures (turn off on slow devices)')+'</span><div class="chips">'+chip('data-d3','1',L('An','On'),PREF.d3==='0'?'0':'1')+chip('data-d3','0',L('Aus','Off'),PREF.d3==='0'?'0':'1')+'</div></div>'+
       '<div class="fl"><span>'+L('Sprache','Language')+'</span><div class="chips">'+chip('data-lg','de',_t('Deutsch'),APP_LANG)+chip('data-lg','en','English',APP_LANG)+chip('data-lg','es','Español',APP_LANG)+chip('data-lg','fr','Français',APP_LANG)+chip('data-lg','it','Italiano',APP_LANG)+chip('data-lg','pt','Português',APP_LANG)+chip('data-lg','sq','Shqip',APP_LANG)+chip('data-lg','ar','العربية',APP_LANG)+'</div></div></section>';
+    h+='<section class="tell"><h3 class="who">'+L('Feiertage (freiwillig)','Holidays (optional)')+'</h3><p class="hint">'+L('Wähle, welche religiösen Feste du feiern möchtest. Dann bekommst du zu diesen Festen besondere Tauben. Wenn du nichts wählst, gibt es nur Silvester und Sommer. Deine Auswahl bleibt nur auf diesem Gerät und wird nirgends hochgeladen.','Choose which religious festivals you would like to celebrate. You then get special pigeons for them. If you choose nothing, there are only New Year’s Eve and summer. Your choice stays on this device only and is never uploaded.')+'</p><div class="chips">'+FAITHS.map(function(f){return '<button type="button" class="cb" data-faith="'+f[0]+'" aria-pressed="'+(faithSel().indexOf(f[0])>=0)+'">'+esc(L(f[1][0],f[1][1]))+'</button>'}).join('')+'</div></section>';
     h+='<section class="tell"><h3 class="who">'+L('Meine Daten','My data')+'</h3><p class="hint">'+L('Sichere deine Einträge als Datei. So kannst du sie auf ein neues Gerät mitnehmen oder wiederherstellen.','Save your entries as a file. This lets you move them to a new device or restore them.')+'</p><div class="btnrow"><button type="button" class="btn pri sm" data-act="export">'+L('Backup speichern','Save backup')+'</button><label class="btn sm" for="imp-file">'+L('Backup laden','Load backup')+'</label><input id="imp-file" type="file" accept="application/json,.json" hidden></div></section>';
     if(acc)h+='<section class="tell"><h3 class="who">'+L('Konto','Account')+'</h3><p class="hint">'+L('Angemeldet als ','Signed in as ')+esc(acc.email||acc.name||'')+'</p><div class="btnrow"><button type="button" class="btn sm" data-act="signout">'+L('Abmelden','Sign out')+'</button><button type="button" class="btn ghost sm" data-act="delacc">'+L('Konto und alle Daten löschen','Delete account and all data')+'</button></div></section>';
     h+=''+blkListHTML()+'<section class="tell"><h3 class="who">'+L('Mehr','More')+'</h3><div class="btnrow"><button type="button" class="btn sm" data-act="intro">'+L('Einführung','Introduction')+'</button><button type="button" class="btn sm" data-act="legal">'+L('Datenschutz & Rechtliches','Privacy & legal')+'</button><button type="button" class="btn sm" data-report="general" data-ruid="" data-rref="" data-rname="">'+L('Kinderschutz-Bedenken melden','Report a child safety concern')+'</button><a class="btn ghost sm" href="kinderschutz.html" target="_blank" rel="noopener">'+L('Kinderschutz','Child safety')+'</a></div></section>';
@@ -5516,6 +5520,7 @@ function openSettings(){
     var b=e.target.closest('[data-st]');if(b){PREF.style=b.getAttribute('data-st');savePref();paint();return}
     b=e.target.closest('[data-snd]');if(b){PREF.snd=b.getAttribute('data-snd');savePref();paint();if(PREF.snd!=='off')sfx(2);return}
     b=e.target.closest('[data-d3]');if(b){PREF.d3=b.getAttribute('data-d3');savePref();try{location.reload()}catch(x){toast(L('Bitte öffne die App neu.','Please reopen the app.'))}return}
+    b=e.target.closest('[data-faith]');if(b){var fv=b.getAttribute('data-faith'),fl=faithSel(),ix=fl.indexOf(fv);if(ix>=0)fl.splice(ix,1);else fl.push(fv);PREF.faith=fl;savePref();paint();return}
     b=e.target.closest('[data-th]');if(b){PREF.theme=b.getAttribute('data-th');savePref();paint();return}
     b=e.target.closest('[data-lg]');if(b){var v=b.getAttribute('data-lg');if(v!==APP_LANG){PREF.lang=v;savePref();try{location.reload()}catch(x){toast(L('Bitte öffne die App neu.','Please reopen the app.'))}}return}
     var a=e.target.closest('[data-act]');if(!a)return;var act=a.getAttribute('data-act');
@@ -6652,20 +6657,28 @@ function wkGain(){
   if(!b||b.s!==s){b=store.post.wkb={s:s,xp:now.xp,c:now.c,p:now.p};setTimeout(function(){store.savePost()},0)}
   return {s:s,xp:Math.max(0,now.xp-b.xp),c:Math.max(0,now.c-b.c),p:Math.max(0,now.p-b.p)};
 }
-function rankRows(){
-  var s=wkISO(),me=wkGain(),rows=[{me:true,name:myCircleName()||L('Du','You'),av:(store.post.profile||{}).av||null,g:me}],seen={};
-  if(circleOn())store.friends.forEach(function(f){if(!f.uid||f.example||seen[f.uid])return;var p=circle.pals[f.uid];if(!p)return;seen[f.uid]=1;var w=p.wk&&p.wk.s===s?p.wk:{xp:0,c:0,p:0};rows.push({f:f,name:first(f.name||p.name||'?'),av:p.av||null,g:{xp:+w.xp||0,c:+w.c||0,p:+w.p||0}})});
+function rkStart(per){var d=new Date();return per==='y'?d.getFullYear()+'-01-01':d.getFullYear()+'-'+pad(d.getMonth()+1)+'-01'}
+function rkGain(per){
+  if(per==='w')return wkGain();
+  var s=rkStart(per),pd=passportData(),now={xp:xpMe().total,c:pd.countries.length,p:store.friends.filter(function(f){return !f.example}).length},all=store.post.rkb||(store.post.rkb={}),b=all[per];
+  if(!b||b.s!==s){b=all[per]={s:s,xp:now.xp,c:now.c,p:now.p};setTimeout(function(){store.savePost()},0)}
+  return {s:s,xp:Math.max(0,now.xp-b.xp),c:Math.max(0,now.c-b.c),p:Math.max(0,now.p-b.p)};
+}
+function rankRows(per){
+  per=per||'w';var s=per==='w'?wkISO():rkStart(per),me=rkGain(per),rows=[{me:true,name:myCircleName()||L('Du','You'),av:(store.post.profile||{}).av||null,g:me}],seen={};
+  if(circleOn())store.friends.forEach(function(f){if(!f.uid||f.example||seen[f.uid])return;var p=circle.pals[f.uid];if(!p)return;seen[f.uid]=1;var src=per==='w'?p.wk:(p.rk&&p.rk[per]),w=src&&src.s===s?src:{xp:0,c:0,p:0};rows.push({f:f,name:first(f.name||p.name||'?'),av:p.av||null,g:{xp:+w.xp||0,c:+w.c||0,p:+w.p||0}})});
   return rows;
 }
 function rankSort(rows,k){return rows.slice().sort(function(a,b){return (b.g[k]-a.g[k])||(a.me?-1:b.me?1:a.name.localeCompare(b.name))})}
-function rankMine(){var k='xp';try{k=localStorage.getItem('waypals-rk')||'xp'}catch(e){}var r=rankSort(rankRows(),k);for(var i=0;i<r.length;i++)if(r[i].me)return {pos:i+1,n:r.length};return null}
+function rankMine(){var k='xp',per='w';try{k=localStorage.getItem('waypals-rk')||'xp';per=localStorage.getItem('waypals-rkp')||'w'}catch(e){}var r=rankSort(rankRows(per),k);for(var i=0;i<r.length;i++)if(r[i].me)return {pos:i+1,n:r.length};return null}
 function openRank(){
-  var el=openSheet('','rank'),k='xp';try{k=localStorage.getItem('waypals-rk')||'xp'}catch(e){}
+  var el=openSheet('','rank'),k='xp',per='w';try{k=localStorage.getItem('waypals-rk')||'xp';per=localStorage.getItem('waypals-rkp')||'w'}catch(e){}
   var K={xp:['XP','XP'],p:[L('Neue Menschen','New people'),L('Menschen','people')],c:[L('Neue Länder','New countries'),L('Länder','countries')]};
   function paint(){
-    var rows=rankSort(rankRows(),k),end=new Date(weekStart(1).getTime()-864e5);
-    var h='<div class="sbar"><button type="button" class="btn ghost" data-act="close">'+ic('back')+L('Zurück','Back')+'</button></div><h2 class="stitle">'+L('Wochen-Ranking','Weekly ranking')+'</h2>'+
-      '<p class="hint">'+LT("Diese Woche bis {0}. Jeden Montag geht es von vorne los.","This week until {0}. Starts over every Monday.",[fmtDM(end.getFullYear()+'-'+pad(end.getMonth()+1)+'-'+pad(end.getDate()))])+'</p>'+
+    var rows=rankSort(rankRows(per),k),end=per==='w'?new Date(weekStart(1).getTime()-864e5):per==='m'?new Date(new Date().getFullYear(),new Date().getMonth()+1,0):new Date(new Date().getFullYear(),11,31);
+    var h='<div class="sbar"><button type="button" class="btn ghost" data-act="close">'+ic('back')+L('Zurück','Back')+'</button></div><h2 class="stitle">'+L('Ranking','Ranking')+'</h2>'+
+      '<div class="chips rkk" role="group" aria-label="'+esc(L('Zeitraum','Period'))+'">'+[['w',L('Woche','Week')],['m',L('Monat','Month')],['y',L('Jahr','Year')]].map(function(x){return '<button type="button" class="cb" data-rkp="'+x[0]+'" aria-pressed="'+(per===x[0])+'">'+esc(x[1])+'</button>'}).join('')+'</div>'+
+      '<p class="hint">'+LT("Zählt bis {0}, danach geht es von vorne los.","Counts until {0}, then starts over.",[fmtDM(end.getFullYear()+'-'+pad(end.getMonth()+1)+'-'+pad(end.getDate()))])+'</p>'+
       '<div class="chips rkk" role="group" aria-label="'+esc(L('Sortieren nach','Sort by'))+'">'+['xp','p','c'].map(function(x){return '<button type="button" class="cb" data-rk="'+x+'" aria-pressed="'+(k===x)+'">'+esc(K[x][0])+'</button>'}).join('')+'</div>'+
       '<ol class="rankl">'+rows.map(function(r,i){var md=['🥇','🥈','🥉'][i];return '<li class="'+(r.me?'me':'')+'"><span class="rkn">'+(r.g[k]>0&&md?md:(i+1)+'.')+'</span>'+avatar({name:r.name,av:r.av})+'<b>'+esc(r.name)+(r.me?' <small>('+L('du','you')+')</small>':'')+'</b><span class="rkv">'+(k==='xp'?'+'+r.g.xp+' XP':'+'+r.g[k]+' '+esc(K[k][1]))+'</span></li>'}).join('')+'</ol>'+
       (rows.length<2?'<p class="hint">'+L('Noch niemand zum Vergleichen. Verbinde Freunde im Kreis, dann erscheinen sie hier.','Nobody to compare with yet. Connect friends in your circle and they will show up here.')+'</p><div><button type="button" class="btn sm" data-act="circle">'+L('Zum Kreis','To the circle')+'</button></div>':'<p class="hint">'+L('Es zählen nur Freunde aus deinem Kreis, die die neue App-Version haben.','Only friends from your circle with the new app version are counted.')+'</p>');
@@ -6674,16 +6687,55 @@ function openRank(){
   paint();
   el.addEventListener('click',function(e){
     var b=e.target.closest('[data-rk]');if(b){k=b.getAttribute('data-rk');try{localStorage.setItem('waypals-rk',k)}catch(x){}paint();return}
+    b=e.target.closest('[data-rkp]');if(b){per=b.getAttribute('data-rkp');try{localStorage.setItem('waypals-rkp',per)}catch(x){}paint();return}
     var a=e.target.closest('[data-act]');if(!a)return;var act=a.getAttribute('data-act');
     if(act==='close')closeSheet(el);else{closeSheet(el);mainAct(act)}
   });
 }
+/* ---------- Festtauben (saisonal; religiöse nur nach freiwilliger Auswahl, alles nur auf diesem Gerät) ---------- */
+var FAITHS=[['chr',['Christlich','Christian']],['isl',['Muslimisch','Muslim']],['jud',['Jüdisch','Jewish']],['hin',['Hinduistisch','Hindu']],['bud',['Buddhistisch','Buddhist']]];
+function easterISO(y){var a=y%19,b=Math.floor(y/100),c=y%100,d=Math.floor(b/4),e=b%4,f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),h=(19*a+b-d-g+15)%30,i=Math.floor(c/4),k=c%4,l=(32+2*e+2*i-h-k)%7,m=Math.floor((a+11*h+22*l)/451),mo=Math.floor((h+l-7*m+114)/31),da=((h+l-7*m+114)%31)+1;return y+'-'+pad(mo)+'-'+pad(da)}
+var FEST_D={fitr:{2026:'03-20',2027:'03-10',2028:'02-27',2029:'02-15',2030:'02-05'},adha:{2026:'05-27',2027:'05-17',2028:'05-05',2029:'04-24',2030:'04-13'},chan:{2026:'12-05',2027:'12-25',2028:'12-13',2029:'12-02',2030:'12-21'},pes:{2026:'04-02',2027:'04-22',2028:'04-11',2029:'03-31',2030:'04-18'},diw:{2026:'11-08',2027:'10-29',2028:'10-17',2029:'11-05',2030:'10-26'},holi:{2026:'03-04',2027:'03-22',2028:'03-11',2029:'03-01',2030:'03-20'},ves:{2026:'05-31',2027:'05-20',2028:'05-09',2029:'05-27',2030:'05-17'}};
+/* [id, Gruppe, Name de/en, Taubenname de/en, Zeichen, Farben, Datum(y), Tage vorher, Tage nachher] */
+var FESTS=[
+ ['sil','',['Silvester','New Year’s Eve'],['Funkentaube','Sparkle pigeon'],'✨',['#1E2A4A','#E3B04B'],function(y){return y+'-12-31'},3,3],
+ ['som','',['Sommeranfang','Midsummer'],['Sonnentaube','Sun pigeon'],'☀️',['#F2C14E','#E8743B'],function(y){return y+'-06-21'},0,14],
+ ['xmas','chr',['Weihnachten','Christmas'],['Sternentaube','Star pigeon'],'⭐',['#1F5C3F','#C2413B'],function(y){return y+'-12-24'},6,4],
+ ['eas','chr',['Ostern','Easter'],['Ostertaube','Easter pigeon'],'\u{1F95A}',['#8FBF7A','#F2C14E'],function(y){return easterISO(y)},3,6],
+ ['fitr','isl',['Ramadan und Zuckerfest','Ramadan and Eid al-Fitr'],['Halbmondtaube','Crescent pigeon'],'\u{1F319}',['#1D3B5A','#E3C27A'],function(y){return FEST_D.fitr[y]?y+'-'+FEST_D.fitr[y]:''},10,4],
+ ['adha','isl',['Opferfest','Eid al-Adha'],['Laternentaube','Lantern pigeon'],'\u{1F54C}',['#2B5A4A','#E3B04B'],function(y){return FEST_D.adha[y]?y+'-'+FEST_D.adha[y]:''},2,5],
+ ['chan','jud',['Chanukka','Hanukkah'],['Lichtertaube','Candle pigeon'],'\u{1F54E}',['#1F3F7A','#D9DDE6'],function(y){return FEST_D.chan[y]?y+'-'+FEST_D.chan[y]:''},1,8],
+ ['pes','jud',['Pessach','Passover'],['Frühlingstaube','Spring pigeon'],'\u{1F33F}',['#5A7A3A','#E8D9A8'],function(y){return FEST_D.pes[y]?y+'-'+FEST_D.pes[y]:''},1,7],
+ ['diw','hin',['Diwali','Diwali'],['Diya-Taube','Diya pigeon'],'\u{1FA94}',['#7A1F3D','#F2A93B'],function(y){return FEST_D.diw[y]?y+'-'+FEST_D.diw[y]:''},3,5],
+ ['holi','hin',['Holi','Holi'],['Farbentaube','Colour pigeon'],'\u{1F3A8}',['#D9468C','#3BA3D9'],function(y){return FEST_D.holi[y]?y+'-'+FEST_D.holi[y]:''},1,4],
+ ['ves','bud',['Vesak','Vesak'],['Lotustaube','Lotus pigeon'],'\u{1FAB7}',['#E8A0B8','#F2E3B0'],function(y){return FEST_D.ves[y]?y+'-'+FEST_D.ves[y]:''},3,5]];
+function faithSel(){return Array.isArray(PREF.faith)?PREF.faith.filter(function(f){return FAITHS.some(function(x){return x[0]===f})}):[]}
+function festMine(){try{return JSON.parse(localStorage.getItem('waypals-fest')||'{}')||{}}catch(e){return {}}}
+function festSave(o){try{localStorage.setItem('waypals-fest',JSON.stringify(o))}catch(e){}}
+function festFor(){var fs=faithSel();return FESTS.filter(function(f){return !f[1]||fs.indexOf(f[1])>=0})}
+function addDays(iso,n){var d=new Date(iso+'T12:00:00');d.setDate(d.getDate()+n);return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())}
+function festWin(f,y){var d=f[6](y);if(!d)return null;return {d:d,a:addDays(d,-f[7]),b:addDays(d,f[8]),y:y}}
+function festNow(f){var t=todayISO(),y=+t.slice(0,4);for(var k=y-1;k<=y;k++){var w=festWin(f,k);if(w&&w.a<=t&&t<=w.b)return w}return null}
+function festNext(f){var t=todayISO(),y=+t.slice(0,4);for(var k=y;k<=y+1;k++){var w=festWin(f,k);if(w&&w.a>t)return w}return null}
+function festBase(){var fv=favMine();if(fv)return fv;var c=myCountry();return (DEX_BY[c]?c:'Deutschland')+'|1'}
+function festIcon(f,locked){return '<span class="fest'+(locked?' lockd':'')+'" style="--f1:'+f[5][0]+';--f2:'+f[5][1]+'">'+dexIcon(locked?'Deutschland|0':festBase(),'pgico',locked)+'<i class="femb" aria-hidden="true">'+f[4]+'</i></span>'}
+function festOpen(){return festFor().filter(function(f){var w=festNow(f);return w&&!festMine()[f[0]+'-'+w.y]})}
+function festClaim(id){var f=FESTS.filter(function(x){return x[0]===id})[0],w=f&&festNow(f);if(!w)return;var m=festMine(),k=id+'-'+w.y;if(m[k])return;m[k]=Date.now();festSave(m);try{sfx(3)}catch(e){}toast(LT("Neue Festtaube: {0}!","New festive pigeon: {0}!",[L(f[3][0],f[3][1])]))}
+function festHTML(){
+  var m=festMine(),list=festFor();
+  var h='<section class="festbox"><h3 class="who">'+L('Festtauben','Festive pigeons')+'</h3><p class="hint">'+L('Zu Festen im Jahr gibt es besondere Tauben, nur in diesem Zeitraum.','Special pigeons for festivals of the year, only during that time.')+(faithSel().length?'':' '+L('Religiöse Feste kannst du freiwillig in den Einstellungen auswählen.','You can choose religious festivals in the settings if you like.'))+'</p><div class="festg">';
+  h+=list.map(function(f){
+    var got=Object.keys(m).filter(function(k){return k.indexOf(f[0]+'-')===0}).length,w=festNow(f),nx=festNext(f),can=w&&!m[f[0]+'-'+w.y];
+    return '<div class="festi'+(can?' can':'')+'">'+festIcon(f,!got&&!can)+'<b>'+esc(L(f[3][0],f[3][1]))+'</b><small>'+esc(L(f[2][0],f[2][1]))+(got>1?' · ×'+got:'')+'</small>'+(can?'<button type="button" class="btn pri sm" data-fest="'+f[0]+'">'+L('Abholen','Collect')+'</button>':(w?'<small>✓ '+L('Abgeholt','Collected')+'</small>':(nx?'<small>'+LT("Ab {0}","From {0}",[esc(fmtDM(nx.a))])+'</small>':'')))+'</div>'}).join('');
+  return h+'</div></section>';
+}
+function festCardHTML(){var o=festOpen();if(!o.length)return '';var f=o[0];return '<section class="herecard festc" style="--f1:'+f[5][0]+';--f2:'+f[5][1]+'">'+festIcon(f,false)+'<div><b>'+esc(LT("Zeit für {0}!","Time for {0}!",[L(f[2][0],f[2][1])]))+'</b><small>'+esc(LT("Hol dir die {0}, nur für kurze Zeit.","Get the {0}, only for a short time.",[L(f[3][0],f[3][1])]))+'</small><div class="btnrow"><button type="button" class="btn pri sm" data-fest="'+f[0]+'">'+L('Abholen','Collect')+'</button></div></div></section>'}
 function exploreTab(){
   var wrap=document.createElement('section');wrap.className='people tabpage';
   var fut=tripsAll().filter(function(tr){return tr.who==='me'&&tr.to>=todayISO()}).sort(function(a,b){return a.from<b.from?-1:1})[0];
   var fb=0;try{fb=fbItems(14,30).length}catch(e){}
   var bd=birthdayList().filter(function(b){return !b.f.example})[0];
-  wrap.innerHTML='<div class="phead"><h2 class="h2">'+L('Entdecken','Explore')+'</h2></div>'+hereHTML()+todayHTML()+
+  wrap.innerHTML='<div class="phead"><h2 class="h2">'+L('Entdecken','Explore')+'</h2></div>'+festCardHTML()+hereHTML()+todayHTML()+
     tileGroup(L('Unterwegs','On the road'),[
       tile('trips','plane',L('Reisen','Trips'),fut?esc(fut.dest.name)+' · '+esc(fmtDM(fut.from)):L('Eigene und fremde Reisen eintragen','Add your own and your friends\u2019 trips')),
       tile('wish','star',L('Wunschliste','Wish list'),(function(){var n=wishList().length;return n?LT("Traumziele: {0}","Dream destinations: {0}",[n]):L('Wo willst du noch hin?','Where do you want to go?')})()),
@@ -6693,11 +6745,11 @@ function exploreTab(){
       tile('meetups','cal',L('Treffen','Meetups'),(function(){var n=meetNext();return n?esc(n.m.fname||'')+' · '+meetDays(n.d):L('Treffen mit Freunden planen','Plan time with friends')})()),
       tile('challenges','trophy',L('Quests','Quests'),L('Aufgaben erledigen und an Freunde schicken','Complete tasks and send them to friends')),
       tile('flock','plane',L('Wander-Taube','Roaming pigeon'),(function(){var n=circleOn()?flockHeld().length:0;return n?LT(_t("Bei dir gelandet: {0}"),"Landed with you: {0}",[n]):L('Eine Taube reist über Freunde und sammelt Fotos','A pigeon travels via friends and collects photos')})()),
-      tile('rank','trophy',L('Wochen-Ranking','Weekly ranking'),(function(){var r=null;try{r=rankMine()}catch(e){}return r&&r.n>1?LT("Du bist auf Platz {0} von {1}","You are #{0} of {1}",[r.pos,r.n]):L('Wer sammelt diese Woche am meisten?','Who collects the most this week?')})()),
+      tile('rank','trophy',L('Ranking','Ranking'),(function(){var r=null;try{r=rankMine()}catch(e){}return r&&r.n>1?LT("Du bist auf Platz {0} von {1}","You are #{0} of {1}",[r.pos,r.n]):L('Wer sammelt am meisten? Woche, Monat oder Jahr','Who collects the most? Week, month or year')})()),
       tile('circle','pin',L('Kreis','Circle'),circleOn()?L('Verbunden','Connected'):L('Freunde verknüpfen, Challenges schicken','Link friends, send challenges')),
       tile('bdays','pin',L('Geburtstage','Birthdays'),bd?esc(first(bd.f.name))+' '+inDays(bd.d):L('Noch keine eingetragen','None added yet'))]);
   main.replaceChildren(wrap);
-  wrap.addEventListener('click',function(e){var o=e.target.closest('[data-open]');if(o){openDetail(o.getAttribute('data-open'));return}var a=e.target.closest('[data-act]');if(a)mainAct(a.getAttribute('data-act'))});
+  wrap.addEventListener('click',function(e){var fz=e.target.closest('[data-fest]');if(fz){festClaim(fz.getAttribute('data-fest'));renderMain();return}var o=e.target.closest('[data-open]');if(o){openDetail(o.getAttribute('data-open'));return}var a=e.target.closest('[data-act]');if(a)mainAct(a.getAttribute('data-act'))});
 }
 function qprefHTML(){
   var th=PREF.theme==='light'||PREF.theme==='dark'?PREF.theme:'auto',LG=[['de','Deutsch'],['en','English'],['es','Español'],['fr','Français'],['it','Italiano'],['pt','Português'],['sq','Shqip'],['ar','العربية']];
@@ -7834,7 +7886,7 @@ function openDex(){
       '<div class="btnrow"><button type="button" class="btn pri sm" data-act="dexchal">'+ic('trophy')+L('Challenges mit Ei','Challenges with an egg')+'</button><button type="button" class="btn sm" data-act="loft">'+L('Zum Taubenschlag','To the loft')+'</button></div></section>'+
       '<section class="pgbox dxdes"><b>🎨 '+L('Entwirf eine Taube','Design a pigeon')+'</b><small class="hint">'+L('Du kannst zeichnen? Mal eine Taube für ein Land und schick sie uns. Die schönsten kommen in die App, mit deinem Namen: „Design von …“.','Can you draw? Design a pigeon for a country and send it to us. The best ones go into the app with your name: “Design by …”.')+'</small><div class="btnrow"><a class="btn sm" href="vorlage-taube.png" download="waypals-vorlage-taube.png">'+L('Vorlage holen','Get template')+'</a><button type="button" class="btn pri sm" data-act="dxdesign">'+L('Entwurf einreichen','Send design')+'</button></div></section>'+
       fsHTML()+
-      '<p class="hint">✈ '+L('bereist','travelled')+' · ☺ '+L('getroffen','met')+' · ★ '+L('Länder-Meister','country master')+'</p><div class="dxinfo" data-info>'+L('Tippe auf eine Taube für Details.','Tap a pigeon for details.')+'</div>'+
+      festHTML()+'<p class="hint">✈ '+L('bereist','travelled')+' · ☺ '+L('getroffen','met')+' · ★ '+L('Länder-Meister','country master')+'</p><div class="dxinfo" data-info>'+L('Tippe auf eine Taube für Details.','Tap a pigeon for details.')+'</div>'+
       (vis.length?'<h3 class="who">'+L('Meine Länder','My countries')+'</h3>'+vis.map(row).join(''):'')+
       '<h3 class="who">'+L('Noch zu entdecken','Still to discover')+'</h3>'+rest.map(row).join('');
     $('.sheet-in',el).innerHTML=h;
@@ -7848,6 +7900,7 @@ function openDex(){
   paint();
   el.addEventListener('submit',function(e){var f=e.target.closest('[data-nf]');if(!f||!sel)return;e.preventDefault();var d=dexState(),v=String($('input',f).value||'').replace(/\s+/g,' ').trim().slice(0,24);d.skinNames=d.skinNames||{};if(v)d.skinNames[sel]=v;else delete d.skinNames[sel];store.savePost();try{circlePublish()}catch(x){}toast(v?LT("Deine Taube heißt jetzt {0}.","Your pigeon is now called {0}.",[v]):L('Name entfernt.','Name removed.'));paint();try{renderMain()}catch(x){}});
   el.addEventListener('click',function(e){
+    var fz=e.target.closest('[data-fest]');if(fz){festClaim(fz.getAttribute('data-fest'));paint();return}
     var s=e.target.closest('[data-sk]');if(s){info(s.getAttribute('data-sk'));return}
     var a=e.target.closest('[data-act]');if(!a)return;var act=a.getAttribute('data-act');
     if(act==='close')closeSheet(el);
