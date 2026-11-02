@@ -324,6 +324,7 @@ textarea.ruled:focus{box-shadow:none}
 .wishl{list-style:none;margin:0;padding:0;display:grid;gap:8px}.wishl li{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:14px;background:var(--sheet);border:1.5px solid var(--line)}.wishl li>div{flex:1;min-width:0;display:grid;gap:2px}.wishl small{color:var(--pen)}.wishl .wck{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:var(--line);font-size:14px}.wishl li.done .wck{background:#2E8B57;color:#fff}.wishl li.done b{text-decoration:line-through;text-decoration-thickness:1.5px}
 .form label.chk.tchk{display:flex!important;flex-direction:row;gap:10px;align-items:center;margin:4px 0}.form label.chk.tchk>span{font-weight:500;text-transform:none;letter-spacing:0;font-size:15px;color:var(--ink)}.form label.chk.tchk input{flex:none;width:22px;height:22px;margin:0}
 .herecard.goc{background:linear-gradient(135deg,rgba(70,110,170,.14),rgba(70,110,170,.04));border-color:rgba(70,110,170,.35)}.gol{list-style:none;margin:2px 0 0;padding:0;display:grid;gap:6px}.goi{all:unset;cursor:pointer;display:grid;gap:1px}.goi b{font-weight:600}.goi small{color:var(--pen)}.gonew{font-style:normal;font-size:11px;padding:1px 6px;border-radius:8px;background:#466eaa;color:#fff;margin-left:4px}
+.stkbox{display:grid;place-items:center;min-height:260px;margin:8px 0 14px;border-radius:18px;background:repeating-conic-gradient(rgba(127,127,127,.12) 0 25%,transparent 0 50%) 0 0/24px 24px}.stkbox img{width:min(300px,80vw);height:auto}
 .herecard{display:flex;gap:12px;align-items:flex-start;padding:12px 14px;margin:0 0 14px;border-radius:16px;background:linear-gradient(135deg,rgba(46,139,87,.14),rgba(46,139,87,.04));border:1.5px solid rgba(46,139,87,.35)}.herecard .hci{font-size:22px}.herecard>div{display:grid;gap:4px}.herecard small{color:var(--pen)}
 .stamp .stampsvg{animation:stampIn .42s cubic-bezier(.3,1.5,.5,1) both;animation-delay:calc(var(--i,0)*70ms)}
 .stamp.new .stampsvg{animation:stampNew .8s cubic-bezier(.3,1.6,.5,1) both;animation-delay:calc(var(--i,0)*70ms + .25s)}
@@ -6654,7 +6655,7 @@ function isStandalone(){try{return window.matchMedia('(display-mode: standalone)
 function installApp(){if(instEv){var ev=instEv;instEv=null;ev.prompt();try{ev.userChoice.then(function(){renderMain()})}catch(e){}return}var ios=/iphone|ipad|ipod/i.test(navigator.userAgent);toast(ios?L('Tippe unten auf Teilen und dann "Zum Home-Bildschirm".','Tap Share, then "Add to Home Screen".'):L('Öffne das Browser-Menü (drei Punkte) und wähle "App installieren" bzw. "Zum Startbildschirm".','Open the browser menu (three dots) and choose "Install app" or "Add to Home screen".'))}
 function mainAct(gx){
   if(gx==='install'){installApp();return true}
-  var m={rank:openRank,wish:openWish,flock:function(){openFlock()},questlab:function(){openQuestLab()},challenges:openChallenges,trips:openTrips,rules:openRules,passport:openPassport,recap:openRecap,bdays:openBirthdays,profile:openProfile,uname:openUsername,goalgo:function(){S.tab='me';renderMain()},dex:openDex,achv:openAchievements,meetups:function(){openMeetups()},claim:function(){claimGoal();renderMain()}};
+  var m={sticker:openSticker,rank:openRank,wish:openWish,flock:function(){openFlock()},questlab:function(){openQuestLab()},challenges:openChallenges,trips:openTrips,rules:openRules,passport:openPassport,recap:openRecap,bdays:openBirthdays,profile:openProfile,uname:openUsername,goalgo:function(){S.tab='me';renderMain()},dex:openDex,achv:openAchievements,meetups:function(){openMeetups()},claim:function(){claimGoal();renderMain()}};
   if(m[gx]){m[gx]();return true}
   if(gx==='daily'){var dc=dailyChallenge();if(dc)openPost(dc);return true}
   if(gx==='tfind'){var rd=eggState().eggs.filter(function(e){return e.ready<=Date.now()});if(rd.length){eggHatch(rd[0].id);renderMain()}else openChallenges();return true}
@@ -6812,7 +6813,8 @@ function exploreTab(){
     tileGroup(L('Unterwegs','On the road'),[
       tile('trips','plane',L('Reisen','Trips'),fut?esc(fut.dest.name)+' · '+esc(fmtDM(fut.from)):L('Eigene und fremde Reisen eintragen','Add your own and your friends\u2019 trips')),
       tile('wish','star',L('Wunschliste','Wish list'),(function(){var n=wishList().length;return n?LT("Traumziele: {0}","Dream destinations: {0}",[n]):L('Wo willst du noch hin?','Where do you want to go?')})()),
-      tile('recap','map',L('Rückblick','Recap'),L('Dein Reisejahr auf einen Blick','Your travel year at a glance')),
+      tile('recap','map',L('Rückblick','Recap'),L('Dein Reisejahr als Bild zum Teilen','Your travel year as an image to share')),
+      tile('sticker','star',L('Figur als Sticker','Figure as sticker'),L('Deine Figur für WhatsApp und Co.','Your figure for WhatsApp and more')),
       tile('flash','mail','Flashbacks',fb?LT("Erinnerungen: {0}","Memories: {0}",[fb]):L('Erinnerungen von früher','Memories from the past'))])+
     tileGroup(L('Mit Freunden','With friends'),[
       tile('meetups','cal',L('Treffen','Meetups'),(function(){var n=meetNext();return n?esc(n.m.fname||'')+' · '+meetDays(n.d):L('Treffen mit Freunden planen','Plan time with friends')})()),
@@ -8140,7 +8142,9 @@ function shareRecap(y){
   var g=x.createLinearGradient(0,0,W,H);g.addColorStop(0,'#0B6E65');g.addColorStop(1,'#1A9C8E');x.fillStyle=g;x.fillRect(0,0,W,H);
   x.fillStyle='rgba(255,255,255,.08)';x.beginPath();x.arc(W-120,160,260,0,7);x.fill();x.beginPath();x.arc(80,H-100,200,0,7);x.fill();
   var F='system-ui,-apple-system,Segoe UI,Roboto,sans-serif';x.fillStyle='#FFD166';x.font='800 46px '+F;x.fillText('Waypals',80,120);
-  x.fillStyle='#fff';x.font='800 92px '+F;x.fillText(y==='all'?L('Mein Reisebuch','My travel book'):L('Mein Reisejahr','My travel year'),80,260);
+  var SF='"Cormorant Garamond",Georgia,serif',nm=myCircleName()||(store.post.profile||{}).name||'';
+  x.fillStyle='#fff';x.font='700 96px '+SF;x.fillText(y==='all'?L('Mein Reisebuch','My travel book'):L('Mein Reisejahr','My travel year'),80,260);
+  if(nm){x.fillStyle='rgba(255,255,255,.85)';x.font='600 40px '+F;x.fillText(nm.length>22?nm.slice(0,21)+'…':nm,80,y==='all'?320:470)}
   if(y!=='all'){x.fillStyle='#FFD166';x.font='800 150px '+F;x.fillText(y,80,410)}
   var cells=[[s.people,L('Menschen','people')],[s.countries,L('neue Länder','new countries')],[s.places,L('Orte','places')],[s.days,L('Reisetage','travel days')]];
   cells.forEach(function(cl,i){var cx=80+(i%2)*470,cy=500+Math.floor(i/2)*270;x.fillStyle='rgba(255,255,255,.14)';x.beginPath();x.roundRect?x.roundRect(cx,cy,440,230,36):x.rect(cx,cy,440,230);x.fill();
@@ -8149,8 +8153,9 @@ function shareRecap(y){
   x.fillStyle='rgba(255,255,255,.85)';x.font='500 38px '+F;
   if(s.names.length){var line=s.names.map(function(n){return dexCN(n)}).join(', ');x.fillText(line.length>46?line.slice(0,45)+'…':line,80,1170)}
   x.fillStyle='rgba(255,255,255,.6)';x.font='600 34px '+F;x.fillText('loliskos-hash.github.io/waypals-web',80,1270);
-  var done=function(){c.toBlob(function(b){if(!b){toast(L('Das Bild konnte nicht erstellt werden.','The image could not be created.'));return}shareBlob(b,'waypals-rueckblick-'+y+'.png')},'image/png')};
-  var bird=dexBirds().slice().sort(function(a,b){return skinParse(b.skin).i-skinParse(a.skin).i})[0],svg=bird?skinSVG(bird.skin):doveSVG(3);
+  var done0=function(){c.toBlob(function(b){if(!b){toast(L('Das Bild konnte nicht erstellt werden.','The image could not be created.'));return}shareBlob(b,'waypals-rueckblick-'+y+'.png')},'image/png')};
+  var done=function(){if(!(store.post.profile||{}).av){done0();return}stickerCanvas(function(sc){if(sc)x.drawImage(sc,W-390,60,350,350);done0()})};
+  var fv=favMine(),bird=fv?{skin:fv}:dexBirds().slice().sort(function(a,b){return skinParse(b.skin).i-skinParse(a.skin).i})[0],svg=bird?skinSVG(bird.skin):doveSVG(3);
   var im=new Image();im.onload=function(){x.drawImage(im,690,1010,330,240);done()};im.onerror=done;
   im.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg.replace('<svg ','<svg xmlns="http://www.w3.org/2000/svg" width="440" height="320" '));
 }
@@ -8982,6 +8987,39 @@ function f3Apply(el){
     if(!url||!el.isConnected)return;
     var i=document.createElement('i');i.className='p3s';i.style.backgroundImage='url("'+url+'")';
     var svg=el.firstChild;el.appendChild(i);el.classList.add('p3on');if(svg&&svg.parentNode===el)el.removeChild(svg);
+  });
+}
+/* ---- Figur als Bild (Sticker, Rückblick) ---- */
+function figCanvas(m,w,h,cb){
+  if(F3.fail||!f3Init()){cb(null);return}
+  f3Ready(function(ok){if(!ok){cb(null);return}
+    try{var u=f3Uni(f3Av(m));f3Draw(u,w,h,0,0,false);var c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(P3.cv,0,0,w,h,0,0,w,h);cb(c)}catch(e){cb(null)}});
+}
+function myFig(){var pr=store.post.profile||{};return {name:myCircleName()||pr.name||'',av:pr.av||null}}
+function stickerCanvas(cb){
+  figCanvas(myFig(),400,500,function(fc){
+    if(!fc){cb(null);return}
+    var S=512,c=document.createElement('canvas');c.width=S;c.height=S;var x=c.getContext('2d'),sc=470/500,fw=400*sc,fh=470,ox=(S-fw)/2,oy=(S-fh)/2;
+    var t=document.createElement('canvas');t.width=S;t.height=S;var tx=t.getContext('2d');tx.drawImage(fc,ox,oy,fw,fh);tx.globalCompositeOperation='source-in';tx.fillStyle='#fff';tx.fillRect(0,0,S,S);
+    x.save();x.shadowColor='rgba(0,0,0,.28)';x.shadowBlur=10;x.shadowOffsetY=3;
+    for(var i=0;i<24;i++){var a=i/24*Math.PI*2;x.drawImage(t,Math.cos(a)*9,Math.sin(a)*9)}
+    x.restore();x.drawImage(fc,ox,oy,fw,fh);
+    cb(c);
+  });
+}
+function openSticker(){
+  var el=openSheet('<div class="sbar"><button type="button" class="btn ghost" data-act="close">'+ic('back')+L('Zurück','Back')+'</button></div><h2 class="stitle">'+L('Deine Figur als Sticker','Your figure as a sticker')+'</h2><p class="hint">'+L('Teile deine Figur in WhatsApp oder speichere sie als Bild. Aussehen änderst du unter „Ich“ im Profil.','Share your figure on WhatsApp or save it as an image. Change the look in your profile under “Me”.')+'</p><div class="stkbox" data-stk><span class="hint">'+L('Wird gezeichnet …','Drawing …')+'</span></div><div class="btnrow"><button type="button" class="btn pri" data-act="stk-share" disabled>'+L('Teilen','Share')+'</button><button type="button" class="btn" data-act="stk-save" disabled>'+L('Speichern','Save')+'</button></div>','sticker');
+  var blob=null;
+  stickerCanvas(function(c){
+    var box=$('[data-stk]',el);if(!box)return;
+    if(!c){box.innerHTML='<span class="hint">'+L('Auf diesem Gerät kann die Figur leider nicht gezeichnet werden.','Sorry, the figure cannot be drawn on this device.')+'</span>';return}
+    c.toBlob(function(b){blob=b;if(!b)return;var im=new Image();im.alt=L('Sticker','Sticker');im.src=URL.createObjectURL(b);box.replaceChildren(im);$$('[data-act^=stk-]',el).forEach(function(x){x.disabled=false})},'image/png');
+  });
+  el.addEventListener('click',function(e){
+    var a=e.target.closest('[data-act]');if(!a)return;var k=a.getAttribute('data-act');
+    if(k==='close')closeSheet(el);
+    else if(k==='stk-share'&&blob)shareBlob(blob,'waypals-sticker.png');
+    else if(k==='stk-save'&&blob)dlBlob(blob,'waypals-sticker.png');
   });
 }
 /* ---- Live-Viewer (Editor): drehbar, aktualisiert sich bei jeder Änderung ---- */
