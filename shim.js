@@ -46,7 +46,7 @@
   var guestLink = !wantLogin && /w-[ip][A-Za-z0-9_-]{8,}/.test(location.hash || '');
 
   // Anmeldung per E-Mail-Link (ohne Passwort): Adresse merken, damit der Link auf diesem Gerät ohne Rückfrage anmeldet
-  var EMAILKEY = 'waypals-signin-email', HASHKEY = 'waypals-signin-hash';
+  var EMAILKEY = 'waypals-signin-email', HASHKEY = 'waypals-signin-hash', LINKKEY = 'waypals-addmail', LINKRES = 'waypals-addmail-result';
   var BTN = 'padding:14px;border-radius:14px;border:0;background:#0B7F78;color:#fff;font:700 16px Nunito,system-ui,sans-serif;cursor:pointer';
   var BTN2 = 'padding:12px;border-radius:14px;border:2px solid #EADFCF;background:transparent;color:inherit;font:600 15px Nunito,system-ui,sans-serif;cursor:pointer';
   var INP = 'padding:13px 14px;border-radius:14px;border:2px solid #EADFCF;background:#fff;color:#2D2A3E;font:500 16px Nunito,system-ui,sans-serif;width:100%;box-sizing:border-box';
@@ -203,7 +203,14 @@
         window.WAYPALS_AUTH = {
           email: u.email, name: u.displayName,
           signOut: function () { auth.signOut().then(function () { location.reload() }) },
-          deleteAccount: deleteAccount
+          deleteAccount: deleteAccount,
+          emails: (u.providerData || []).map(function (p) { return p.email }).filter(Boolean).filter(function (m, i, a) { return a.indexOf(m) === i }),
+          // Weitere E-Mail-Adresse an dasselbe Konto hängen (gleiche Konto-ID, alle Daten bleiben)
+          addEmail: function (mail) { lsSet(LINKKEY, mail); return auth.sendSignInLinkToEmail(mail, { url: location.origin + location.pathname, handleCodeInApp: true }) },
+          finishAddEmail: function (mail, href) {
+            if (!auth.isSignInWithEmailLink(href)) return Promise.reject({ code: 'wp/not-link' });
+            return auth.currentUser.linkWithCredential(fb.auth.EmailAuthProvider.credentialWithLink(mail, href)).then(function () { lsSet(LINKKEY, null) });
+          }
         };
         if (overlay) { overlay.remove(); overlay = null }
         resolveReady(u);
@@ -221,6 +228,13 @@
       var mail = lsGet(EMAILKEY);
       var stop = auth.onAuthStateChanged(function (cur) {
         stop();
+        // Weitere Adresse hinzufügen: Link im selben Browser geöffnet, dann direkt an das angemeldete Konto hängen
+        var lm = lsGet(LINKKEY);
+        if (cur && lm) {
+          lsSet(LINKKEY, null);
+          cur.linkWithCredential(fb.auth.EmailAuthProvider.credentialWithLink(lm, linkHref)).then(function () { lsSet(LINKRES, 'ok') }, function (e) { lsSet(LINKRES, (e && e.code) || 'err') }).then(function () { cleanUrl(); startAuth() });
+          return;
+        }
         // Schon angemeldet und der Link ist alt oder für dasselbe Konto: Link ignorieren, nichts überschreiben
         if (cur && (!mail || (cur.email || '').toLowerCase() === mail.toLowerCase())) { if (mail) lsSet(EMAILKEY, null); cleanUrl(); startAuth(); return }
         useLink();
