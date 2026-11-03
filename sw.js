@@ -1,5 +1,5 @@
 /* Offline-Cache für die App-Hülle. Firebase/Firestore kümmern sich selbst um Offline-Daten. */
-var V = 'waypals-v55';
+var V = 'waypals-v56';
 var FILES = ['./', 'index.html', 'fonts.css', 'fonts/nunito.woff', 'fonts/caveat.woff', 'fonts/patrickhand.woff', 'shim.js', 'firebase-config.js', 'manifest.webmanifest', 'icons/icon-192.png', 'icons/icon-512.png', 'datenschutz.html', 'impressum.html'];
 /* Bei schlechtem Netz höchstens so lange auf den Server warten, dann die gespeicherte Fassung zeigen (sonst hängt die Seite beim Neuladen) */
 var WAIT = 3500;
