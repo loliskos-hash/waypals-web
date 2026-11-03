@@ -7234,6 +7234,13 @@ function unb64u(s){s=s.replace(/-/g,'+').replace(/_/g,'/');while(s.length%4)s+='
 function r2(n){return Math.round(n*100)/100}
 function avPack(av){return AV_KEYS.map(function(k){return ((av&&av[k])|0).toString(36)}).join('')}
 function avUnpack(s){var o={};AV_KEYS.forEach(function(k,i){o[k]=parseInt(s.charAt(i)||'0',36)||0});return o}
+/* Pfade (Unterschrift, Zeichnung) vereinfachen, damit der Code kurz bleibt: sonst kappen Chat-Apps lange Links (Emily, 11.000 Zeichen). */
+function simpPath(d,max){
+  var segs=String(d||'').split('M').filter(Boolean),k=1,out;
+  function build(k){return segs.map(function(sg){var pts=sg.split('L'),last=pts.length-1;return 'M'+pts.filter(function(p,i){return i%k===0||i===last}).join('L')}).join('')}
+  out=build(1);while(out.length>max&&k<24){k++;out=build(k)}
+  return out;
+}
 function packPerson(f,opt){
   opt=opt||{};var o={t:'p',n:f.name||''};
   [['nick','k'],['insta','i'],['phone','p'],['birthday','b'],['home','h'],['homeTz','z'],['langs','l'],['drink','d'],['food','f']].forEach(function(p){if(f[p[0]])o[p[1]]=f[p[0]]});
@@ -7241,7 +7248,7 @@ function packPerson(f,opt){
   if(f.veg)o.v=1;if(f.noAlc)o.m=1;
   if(f.av)o.g=avPack(f.av);
   if(opt.story&&f.theirStory)o.s=f.theirStory.slice(0,240);
-  if(opt.story&&f.sig)o.sg=String(f.sig).slice(0,9000);if(opt.story&&f.draw&&f.draw.s&&f.draw.s.length)o.dw={s:f.draw.s.slice(0,120),t:f.draw.t||''};
+  if(opt.story&&f.sig)o.sg=simpPath(f.sig,600);if(opt.story&&f.draw&&f.draw.s&&f.draw.s.length)(function(){var st=f.draw.s.slice(0,40),per=Math.max(30,Math.floor(900/st.length));o.dw={s:st.map(function(x){return {c:x.c,w:x.w,d:simpPath(x.d,per)}}),t:f.draw.t||''}})();
   if(opt.story){if(f.likeTheirs)o.lk=f.likeTheirs.slice(0,200);if(f.motto)o.mt=f.motto.slice(0,80);if(f.dream)o.dr=f.dream.slice(0,80)}
   if(opt.place&&f.place)o.pl=[f.place,f.lat!=null?r2(f.lat):null,f.lon!=null?r2(f.lon):null,f.country||''];
   if(opt.place&&f.metDate)o.dt=f.metDate;
