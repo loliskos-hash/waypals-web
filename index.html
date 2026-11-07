@@ -539,6 +539,8 @@ html[dir=rtl] .mtc,html[dir=rtl] .sbar .btn.ghost>svg.ic:first-child{transform:s
 .mswitch{position:absolute;left:12px;top:calc(12px + env(safe-area-inset-top,0px));z-index:6;display:grid;justify-items:center;gap:2px;min-width:58px;padding:7px 8px 6px;border:0;border-radius:18px;background:rgba(255,255,255,.94);color:#2D2A3E;box-shadow:0 4px 14px rgba(0,0,0,.4);font:800 .68rem/1 var(--f-ui)}
 .mswitch svg{width:34px;height:34px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
 .mswitch:active{transform:scale(.96)}
+.mapframe.nopins .fig-layer{display:none}.plat{position:absolute;left:0;top:0;border-radius:50%;background:rgba(255,255,255,.9);box-shadow:0 2px 8px rgba(0,0,0,.28);pointer-events:none}
+.mfilter{position:absolute;right:12px;top:calc(172px + env(safe-area-inset-top,0px));z-index:6;width:44px;height:44px;border-radius:50%;border:0;background:rgba(255,255,255,.94);color:#2D2A3E;display:grid;place-items:center;padding:0;box-shadow:0 4px 12px rgba(0,0,0,.4);cursor:pointer}.mfilter .ic{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.mfilter.on{background:#2D2A3E;color:#fff}.mlayers{position:absolute;right:66px;top:calc(172px + env(safe-area-inset-top,0px));z-index:6;display:none;gap:8px}.mlayers.open{display:grid}.mlayers button{border:0;border-radius:14px;background:rgba(255,255,255,.94);color:#2D2A3E;box-shadow:0 4px 14px rgba(0,0,0,.4);font:800 .66rem/1.15 var(--f-ui);padding:7px 8px;min-width:58px;max-width:78px;display:grid;justify-items:center;gap:3px;cursor:pointer}.mlayers button i{width:18px;height:18px;border-radius:50%;display:block;border:2px solid #fff;box-shadow:0 0 0 1.5px #2D2A3E}.mlayers button.on{background:#2D2A3E;color:#fff}.mlayers button:active{transform:scale(.96)}
 #mapinfo{position:absolute;left:12px;right:12px;bottom:26px;z-index:6;pointer-events:none;display:block}
 #mapinfo>*{pointer-events:auto}
 .mbar{display:flex;gap:8px;flex-wrap:wrap}
@@ -3790,6 +3792,7 @@ var ICONS={
   copy:'<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/>',
   mail:'<rect x="3" y="6" width="18" height="13" rx="2"/><path d="m3 8 9 6 9-6"/>',
   edit:'<path d="M4 20h4L19 9l-4-4L4 16v4Z"/><path d="m13.5 6.5 4 4"/>',
+  filter:'<path d="M4 5h16l-6 7.5V19l-4-2v-4.5L4 5Z"/>',
   fit:'<path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/>',
   pin:'<path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11Z"/><circle cx="12" cy="10" r="2.3"/>',
   cam:'<path d="M4 8h3l1.5-2h7L17 8h3v11H4V8Z"/><circle cx="12" cy="13" r="3.5"/>',
@@ -4116,7 +4119,7 @@ function Globe(opts){
     _t('<div class="zoom"><button type="button" data-z="in" aria-label="Hineinzoomen">+</button><button type="button" data-z="out" aria-label="Herauszoomen">−</button><button type="button" data-z="fit" aria-label="Auf alle Figuren zoomen">')+ic('fit')+'</button></div>'+
     _t('<p class="ghint">Ziehen zum Drehen · zwei Finger zum Zoomen</p>');
   var cv=$('canvas',host),ctx=cv.getContext('2d'),lk=$('.lk',host),fl=$('.fig-layer',host),hint=$('.ghint',host);
-  var EXP_Z=5,lastExp=false,raw=[],curStyle='fig',v={lon:8,lat:28,zoom:1},MAXZ=40,MINZ=0.75,W=0,H=0,dpr=1,base=120,T={},raf=0,anim=null,vel=null;
+  var EXP_Z=12,hl=null,lastExp=false,raw=[],curStyle='fig',v={lon:8,lat:28,zoom:1},MAXZ=80,MINZ=0.75,W=0,H=0,dpr=1,base=120,T={},raf=0,anim=null,vel=null;
   var previews={},groups=[],sel=null,els={},sigs={},doves=[],dEls={},fitKey='',XS=new Float32Array(2048),YS=new Float32Array(2048),BK=new Uint8Array(2048);
   var reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
   function resize(){
@@ -4209,7 +4212,7 @@ function Globe(opts){
     ctx.fillStyle='#C6E6A4';ctx.strokeStyle='#F4FBE8';ctx.lineWidth=Math.min(2,1+v.zoom*0.06);ctx.lineJoin='round';
     var vc=vec(v.lat,v.lon),vr=Math.asin(Math.min(1,Math.hypot(W,H)/2/R)),lod=v.zoom<2.5?'lo':'fine',k,o,C,rs;
     ctx.lineWidth=Math.min(1.5,0.6+v.zoom*0.05);
-    for(i=0;i<COUNTRIES.length;i++){C=COUNTRIES[i];rs=C[lod];for(k=0;k<rs.length;k++){o=rs[k];if(o.c[0]*vc[0]+o.c[1]*vc[1]+o.c[2]*vc[2]<Math.cos(Math.min(Math.PI,o.r+vr)))continue;drawPoly(o.p,false)}}
+    var hc;for(i=0;i<COUNTRIES.length;i++){C=COUNTRIES[i];rs=C[lod];hc=hl&&hl[C.name];if(hc)ctx.fillStyle=hc;for(k=0;k<rs.length;k++){o=rs[k];if(o.c[0]*vc[0]+o.c[1]*vc[1]+o.c[2]*vc[2]<Math.cos(Math.min(Math.PI,o.r+vr)))continue;drawPoly(o.p,false)}if(hc)ctx.fillStyle='#C6E6A4'}
     ctx.fillStyle='#8FC9F3';ctx.strokeStyle='#F4FBE8';
     for(i=0;i<LAKES.length;i++){o=LAKES[i];if(o.c[0]*vc[0]+o.c[1]*vc[1]+o.c[2]*vc[2]<Math.cos(Math.min(Math.PI,o.r+vr)))continue;drawPoly(o.p,true)}
     drawLabels();
@@ -4224,7 +4227,7 @@ function Globe(opts){
     for(i=0;i<groups.length;i++){g=groups[i];p=proj(vec(g.lat,g.lon));it.push({g:g,x:p.x,y:p.y,z:p.z,lead:null,n:g.count,cl:0,tot:g.count})}
     vis=it.filter(function(a){return a.z>0.03&&a.x>-70&&a.x<W+70&&a.y>-90&&a.y<H+90});
     vis.sort(function(a,b){return (((b.g.base||b.g.key)===sel)-((a.g.base||a.g.key)===sel))||(b.n-a.n)});
-    for(i=0;i<vis.length;i++){a=vis[i];if(a.lead)continue;for(j=i+1;j<vis.length;j++){b=vis[j];if(b.lead)continue;if(Math.hypot(a.x-b.x,a.y-b.y)<(els[a.g.key]&&els[a.g.key].small?19:32)){b.lead=a;a.cl++;a.tot+=b.n}}}
+    for(i=0;i<vis.length;i++){a=vis[i];if(a.lead)continue;for(j=i+1;j<vis.length;j++){b=vis[j];if(b.lead)continue;if(a.g.base&&a.g.base===b.g.base)continue;if((els[a.g.key]&&els[a.g.key].small)?Math.hypot(a.x-b.x,a.y-b.y)<24:(Math.abs(a.x-b.x)<46&&Math.abs(a.y-b.y)<66)){b.lead=a;a.cl++;a.tot+=b.n}}}
     it.forEach(function(a){
       var e=els[a.g.key];if(!e)return;
       if(a.z<=0.03||a.lead||a.x<-70||a.x>W+70||a.y<-90||a.y>H+90){if(!e.hid){e.el.style.display='none';e.hid=true}return}
@@ -4236,7 +4239,16 @@ function Globe(opts){
       var bt=(e.pin?a.cl>0:a.tot>1)?String(a.tot):'';if(e.bd&&e.bdt!==bt){e.bd.textContent=bt;e.bd.hidden=!bt;e.bdt=bt}
       var showLab=!cl&&(v.zoom>=2.2||(a.g.base||a.g.key)===sel);if(e.lab&&e.labOn!==showLab){e.lab.hidden=!showLab;e.labOn=showLab}
     });
-    drawLinks();placeDoves();
+    updPlat(it);drawLinks();placeDoves();
+  }
+  var pEls={};
+  function updPlat(it){
+    var by={},k;
+    if(lastExp)it.forEach(function(a){var b=a.g.base;if(!b||a.lead||a.z<=0.03)return;var e=els[a.g.key];if(!e||e.hid)return;(by[b]=by[b]||[]).push(a)});
+    for(k in by){var L=by[k],x0=1e9,x1=-1e9,y1=-1e9,y0=1e9;L.forEach(function(a){x0=Math.min(x0,a.x);x1=Math.max(x1,a.x);y1=Math.max(y1,a.y);y0=Math.min(y0,a.y)});
+      var w=x1-x0+64,h=18+(y1-y0)*0.9,pe=pEls[k];if(!pe){pe=pEls[k]=document.createElement('div');pe.className='plat';fl.insertBefore(pe,fl.firstChild)}
+      pe.style.width=w.toFixed(0)+'px';pe.style.height=h.toFixed(0)+'px';pe.style.transform='translate('+((x0+x1)/2-w/2).toFixed(1)+'px,'+(y1-h/2-1).toFixed(1)+'px)';pe.style.zIndex='0';pe.style.display=''}
+    for(k in pEls)if(!by[k]){pEls[k].remove();delete pEls[k]}
   }
   function arcPath(A,B,lift,fn,t0,t1){
     t0=t0||0;t1=t1==null?1:t1;var ang=angBetween(A,B),N=Math.max(6,Math.ceil(ang*45*(t1-t0))),d='',pen=false,k,t,P,q;
@@ -4274,14 +4286,14 @@ function Globe(opts){
     var out=[];
     list.forEach(function(g){
       if(g.draft||v.zoom<EXP_Z||!g.members||g.members.length<2){out.push(g);return}
-      var n=g.members.length,rpx=Math.max(24,44/(2*Math.sin(Math.PI/n)));
-      g.members.forEach(function(m,i){out.push({key:g.key+'#'+i,base:g.key,blat:g.lat,blon:g.lon,ring:rpx,ai:2*Math.PI*i/n-Math.PI/2,lat:g.lat,lon:g.lon,name:g.name,count:1,members:[m],trv:g.trv,links:g.links})});
+      var n=g.members.length,per=Math.min(n,5);
+      g.members.forEach(function(m,i){var row=Math.floor(i/per),cnt=Math.min(per,n-row*per);out.push({key:g.key+'#'+i,base:g.key,blat:g.lat,blon:g.lon,ox:(i%per-(cnt-1)/2)*36,oy:-row*24,lat:g.lat,lon:g.lon,name:g.name,count:1,members:[m],trv:g.trv,links:g.links})});
     });
     return out;
   }
   function refreshExp(){
     var k=1/(base*v.zoom)/D2R;
-    groups.forEach(function(g){if(g.blat==null)return;var dl=g.ring*k,cl=Math.max(0.2,Math.cos(g.blat*D2R));g.lat=Math.max(-85,Math.min(85,g.blat+dl*Math.sin(g.ai)));g.lon=g.blon+dl*Math.cos(g.ai)/cl});
+    groups.forEach(function(g){if(g.blat==null)return;var cl=Math.max(0.2,Math.cos(g.blat*D2R));g.lat=Math.max(-85,Math.min(85,g.blat-g.oy*k));g.lon=g.blon+g.ox*k/cl});
   }
   function setPins(gs,s,style){
     raw=gs||[];sel=s||null;style=style||'fig';curStyle=style;lastExp=v.zoom>=EXP_Z;groups=explodeFor(raw);var keep={},i,g,m;
@@ -4292,7 +4304,7 @@ function Globe(opts){
       var e=els[g.key];
       if(e&&sigs[g.key]===sig)return;
       if(e)e.el.remove();
-      var b=document.createElement('button');b.type='button';b.className='fig'+(g.draft?' draft':'');b.setAttribute('data-key',g.key);b.setAttribute('data-base',g.base||g.key);
+      var b=document.createElement('button');b.type='button';b.className='fig'+(g.draft?' draft':'')+(g.base?' ex':'');b.setAttribute('data-key',g.key);b.setAttribute('data-base',g.base||g.key);
       b.setAttribute('aria-label',g.draft?_t('Gewählter Ort'):(g.count>1?g.name+', '+g.count+_t(' Menschen'):lead.name+', '+g.name));
       var asPin=g.draft||style==='pin';if(asPin&&!g.draft)b.classList.add('small');var lab=g.draft?'':esc(g.base?first(lead.name):(asPin||g.count>1)?g.name:first(lead.name));
       b.innerHTML=(g.draft?PIN_SVG:asPin?pinSVG(g.count):figSVG(lead,uid()))+(lab?'<span class="lab">'+lab+'</span>':'')+'<span class="bd" hidden></span>'+(g.trv?'<span class="trv">'+ic('plane')+'</span>':'');
@@ -4309,6 +4321,7 @@ function Globe(opts){
     Object.keys(dEls).forEach(function(k){if(!keep[k]){dEls[k].remove();delete dEls[k]}});
     schedule();
   }
+  function setLayer(map,hidePins){hl=map||null;host.classList.toggle('nopins',!!hidePins);schedule()}
   function launch(id){
     var dv=doves.find(function(x){return x.id===id});if(!dv)return;
     var A=vec(dv.from.lat,dv.from.lon),B=vec(dv.to.lat,dv.to.lon),ang=angBetween(A,B),M=slerp(A,B,ang,.5);
@@ -4383,7 +4396,7 @@ function Globe(opts){
   if(window.ResizeObserver)new ResizeObserver(resize).observe(host);
   setInterval(function(){if(host.isConnected&&doves.length)schedule()},30000);
   schedule();
-  return {el:host,setPins:setPins,setDoves:setDoves,launch:launch,focusOn:focusOn,fit:fit,resize:resize};
+  return {el:host,setLayer:setLayer,setPins:setPins,setDoves:setDoves,launch:launch,focusOn:focusOn,fit:fit,resize:resize};
 }
 
 /* ---------- Speicher ---------- */
@@ -7611,7 +7624,14 @@ function groups(){
 }
 function pigeonsInFlight(){var n=Date.now();return store.post.pigeons.filter(function(p){return !p.mail&& n<p.sent+p.dur})}
 function pigeonsFor(f){return store.post.pigeons.filter(function(p){return p.fid===f.id}).sort(function(a,b){return b.sent-a.sent})}
-function syncMap(){mapView.setPins(groups(),S.mapSel,S.mapMode==='home'?'fig':'pin');mapView.setDoves(pigeonsInFlight().concat(mailDoves()).map(function(x){if(x.skin)return x;var c=myCountry();if(!DEX_C.some(function(d){return d[0]===c}))c='Deutschland';return Object.assign({},x,{skin:c+'|'+Math.min(4,x.tier||0)})}))}
+function layerCountries(kind){
+  var o={},add=function(n,c){if(n)o[n]=c};
+  if(kind==='friends'){allFriends().forEach(function(f){add(f.homeLat!=null?countryAtLL(f.homeLat,f.homeLon)||countryOf(f.home):countryOf(f.home),'#FF9E7A')})}
+  else if(kind==='been'){passportData().countries.forEach(function(c){add(c.name,'#F2C14E')});var h=myCountry();if(h&&!o[h])add(h,'#F7E3A1')}
+  return o;
+}
+function layerNames(kind){return Object.keys(layerCountries(kind)).map(function(n){return cn(n)}).sort(function(a,b){return a.localeCompare(b)})}
+function syncMap(){var lay=S.mapLayer||'';mapView.setLayer(lay?layerCountries(lay):null,!!lay);mapView.setPins(groups(),S.mapSel,S.mapMode==='home'?'fig':'pin');mapView.setDoves(pigeonsInFlight().concat(mailDoves()).map(function(x){if(x.skin)return x;var c=myCountry();if(!DEX_C.some(function(d){return d[0]===c}))c='Deutschland';return Object.assign({},x,{skin:c+'|'+Math.min(4,x.tier||0)})}))}
 function pigeonCard(p){var n=Date.now(),pr=pigeonProg(p,n).p;return _t('<div class="pgi"><div><b>Brief an ')+esc(first(p.fname))+'</b> <small>'+esc((p.from&&p.from.name)||'')+' → '+esc((p.to&&p.to.name)||'')+_t('</small></div><div class="prog" role="progressbar" aria-label="Flugfortschritt" aria-valuenow="')+Math.round(pr*100)+'" aria-valuemin="0" aria-valuemax="100"><i style="width:'+(pr*100).toFixed(1)+_t('%"></i></div><small>Noch ')+fmtDur(p.sent+p.dur-n)+_t(' · Ankunft ')+esc(fmtWhen(p.sent+p.dur))+'</small>'+stopLine(p,n)+'</div>'}
 function checkArrivals(){var n=Date.now(),ch=false;circleTick();mailTick();loftTick();store.post.pigeons.forEach(function(p){(p.stops||[]).forEach(function(s){if(!s.notified&&n>=p.sent+s.at){s.notified=true;ch=true;var who=s.names.join(' und '),pl=s.place?' in '+s.place:'';toast(n<p.sent+s.at+s.rest?_t('Deine Taube macht kurz Halt bei ')+who+pl+_t('. Dort flog eine Taube von dir vorbei.'):_t('Eine Taube von dir flog bei ')+who+pl+' vorbei.')}});if(!p.notified&&n>=p.sent+p.dur){p.notified=true;ch=true;toast(_t('Die Brieftaube mit deinem Brief an ')+first(p.fname)+_t(' ist angekommen.'))}});if(ch)store.savePost()}
 function beenStats(){
@@ -7622,6 +7642,10 @@ function beenStats(){
 }
 function paintMapInfo(){
   var info=$('#mapinfo');if(!info)return;
+  if(S.mapLayer){var nm=layerNames(S.mapLayer),ttl=S.mapLayer==='friends'?L('Länder mit Freunden','Countries with friends'):L('Besuchte Länder','Visited countries');
+    var lh='<div class="mbar"><button type="button" class="mpill" data-act="layopen">'+esc(ttl)+' <b>'+nm.length+'</b></button><button type="button" class="mpill" data-act="trips">'+ic('plane')+L('Reisen','Trips')+'</button></div>';
+    if(S.mapInfoOpen)lh='<div class="mpop"><button type="button" class="mx" data-act="closeinfo" aria-label="'+L('Schließen','Close')+'">\u00D7</button><div class="infocard"><h3>'+esc(ttl)+'<span class="count">'+nm.length+'</span></h3><p class="hint">'+(nm.length?nm.map(esc).join(' · '):L('Noch keine.','None yet.'))+'</p></div></div>';
+    info.innerHTML=lh;return}
   var list=allFriends(),g=groups(),sel=null;
   g.forEach(function(x){if(x.key===S.mapSel)sel=x});
   var demo=!store.friends.length;
@@ -7633,7 +7657,7 @@ function paintMapInfo(){
     html=(!list.length?_t('<p class="banner">Noch niemand eingetragen. Tippe unten auf das Plus.</p>'):'')+
       '<p class="stat">'+_t('Menschen')+' <b>'+placed+'</b> · '+(home?_t('Städte'):_t('Orte'))+' <b>'+g.length+'</b>'+(noPin?' · '+noPin+' '+(home?_t('ohne Wohnort'):_t('ohne Ort')):'')+'</p>'+
       '<p class="hint">'+(home?_t('Hier leben die Menschen wirklich. Ein Flieger zeigt, wer gerade verreist ist und wo. Tippe auf eine Figur für die Linie nach Hause oder zum Treffpunkt.'):_t('Hier habt ihr euch kennengelernt. Tippe auf einen Pin, dann siehst du per gestrichelter Linie, wo die Menschen heute wohnen.'))+'</p>'+'<div><button type="button" class="btn" data-act="trips">'+ic('plane')+_t('Reisen &amp; Wiedersehen</button></div>')+(home&&noPin?'<p class="banner">Bei '+noPin+(noPin===1?_t(' Person fehlt'):_t(' Personen fehlt'))+_t(' noch der Wohnort. Trag ihn im Eintrag ein, dann erscheint sie hier.</p>'):'')+(home&&pigeonsInFlight().length?_t('<p class="who" style="margin-top:8px">Brieftauben unterwegs</p><div class="pg">')+pigeonsInFlight().map(pigeonCard).join('')+'</div>':'')+
-      _t('<p class="who" style="margin-top:8px">Zuletzt kennengelernt</p><ul class="plist">')+sorted(list).slice(0,4).map(rowHTML).join('')+'</ul>';
+      _t('<p class="who" style="margin-top:8px">Zuletzt kennengelernt</p><ul class="plist">')+sorted(list).map(rowHTML).join('')+'</ul>';
   }
   var home2=S.mapMode==='home',placed2=list.length-list.filter(function(f){return home2?f.homeLat==null:f.lat==null}).length;
   if(sel||S.mapInfoOpen)info.innerHTML='<div class="mpop"><button type="button" class="mx" data-act="closeinfo" aria-label="'+L('Schließen','Close')+'">\u00D7</button>'+html+'</div>';
@@ -7657,9 +7681,17 @@ function mapTab(){
   paintSw();
   sw.addEventListener('click',function(){S.mapMode=S.mapMode==='home'?'met':'home';S.mapSel=null;S.mapInfoOpen=false;paintSw();syncMap();paintMapInfo()});
   wrap.appendChild(mapView.el);wrap.appendChild(sw);
+  var lay=document.createElement('div');lay.className='mlayers';
+  lay.innerHTML='<button type="button" data-lay="friends"><i style="background:#FF9E7A"></i>'+L('Länder mit Freunden','Friend countries')+'</button><button type="button" data-lay="been"><i style="background:#F2C14E"></i>'+L('Besuchte Länder','Visited countries')+'</button>';
+  var paintLay=function(){$$('button',lay).forEach(function(b){var on=b.getAttribute('data-lay')===S.mapLayer;b.classList.toggle('on',on);b.setAttribute('aria-pressed',on?'true':'false')})};
+  lay.addEventListener('click',function(e){var b=e.target.closest('[data-lay]');if(!b)return;var k=b.getAttribute('data-lay');S.mapLayer=S.mapLayer===k?'':k;S.mapSel=null;S.mapInfoOpen=false;paintLay();syncMap();paintMapInfo()});
+  var fb=document.createElement('button');fb.type='button';fb.className='mfilter';fb.setAttribute('aria-label',L('Filter','Filter'));fb.innerHTML=ic('filter');
+  fb.addEventListener('click',function(){lay.classList.toggle('open')});
+  var _pl=paintLay;paintLay=function(){_pl();fb.classList.toggle('on',!!S.mapLayer)};
+  paintLay();wrap.appendChild(lay);wrap.appendChild(fb);
   var info=document.createElement('div');info.id='mapinfo';wrap.appendChild(info);
   main.replaceChildren(wrap);
-  info.addEventListener('click',function(e){var r=e.target.closest('[data-open]');if(r){openDetail(r.getAttribute('data-open'));return}if(e.target.closest('[data-act=trips]')){openTrips();return}if(e.target.closest('[data-act=closeinfo]')){S.mapSel=null;S.mapInfoOpen=false;syncMap();paintMapInfo();return}if(e.target.closest('[data-act=infoopen]')){S.mapInfoOpen=true;paintMapInfo()}});
+  info.addEventListener('click',function(e){var r=e.target.closest('[data-open]');if(r){openDetail(r.getAttribute('data-open'));return}if(e.target.closest('[data-act=trips]')){openTrips();return}if(e.target.closest('[data-act=closeinfo]')){S.mapSel=null;S.mapInfoOpen=false;syncMap();paintMapInfo();return}if(e.target.closest('[data-act=infoopen]')||e.target.closest('[data-act=layopen]')){S.mapInfoOpen=true;paintMapInfo()}});
   syncMap();paintMapInfo();
 }
 function rowHTML(f){
