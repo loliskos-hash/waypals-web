@@ -528,7 +528,7 @@ html[dir=rtl] .mtc,html[dir=rtl] .sbar .btn.ghost>svg.ic:first-child{transform:s
 .dove.top{width:56px;height:70px;margin:-29px 0 0 -28px;transform-origin:50% 42%}.dove.top .p3s{filter:drop-shadow(0 5px 3px rgba(0,0,0,.28))}
 .avdet .avprev{position:sticky;top:calc(58px + env(safe-area-inset-top,0px));z-index:1;margin-top:0;padding:4px;box-shadow:0 8px 10px -8px rgba(0,0,0,.35)}.avdet .avprev .p3,.avdet .avprev svg,.avdet .avprev canvas{height:132px;width:auto;max-width:100%}
 #app.mapfull{max-width:none;padding-inline:0}
-#app.mapfull .top{display:block;position:fixed;top:calc(env(safe-area-inset-top,0px) + 14px);right:70px;z-index:6;padding:0;background:none;width:auto}#app.mapfull .top>div,#app.mapfull .top #sync{display:none}#app.mapfull .bellb{margin:0;background:rgba(255,255,255,.95);color:#222;border:0;width:44px;height:44px}
+#app.mapfull .top{display:contents}#app.mapfull .top>div,#app.mapfull .top #sync{display:none}#app.mapfull .bellb{position:fixed;left:12px;top:calc(env(safe-area-inset-top,0px) + 100px);z-index:6;margin:0;background:rgba(255,255,255,.95);color:#222;border:0;width:44px;height:44px;box-shadow:0 2px 8px rgba(0,0,0,.25)}
 #app.mapfull .tabs{padding-inline:20px;background:#070A22;border-top-color:rgba(255,255,255,.08);position:relative;z-index:7}
 #app.mapfull .tab{color:#A9AFD0}#app.mapfull .tab[aria-current="page"]{color:#fff}
 .maptab.full .ghint{bottom:76px;font-size:.66rem;font-weight:600;padding:4px 10px;color:rgba(232,238,255,.6);background:rgba(10,16,50,.3)}
@@ -7584,7 +7584,7 @@ function groups(){
 }
 function pigeonsInFlight(){var n=Date.now();return store.post.pigeons.filter(function(p){return !p.mail&& n<p.sent+p.dur})}
 function pigeonsFor(f){return store.post.pigeons.filter(function(p){return p.fid===f.id}).sort(function(a,b){return b.sent-a.sent})}
-function syncMap(){mapView.setPins(groups(),S.mapSel,S.mapMode==='home'?'fig':'pin');mapView.setDoves(pigeonsInFlight().concat(mailDoves()))}
+function syncMap(){mapView.setPins(groups(),S.mapSel,S.mapMode==='home'?'fig':'pin');mapView.setDoves(pigeonsInFlight().concat(mailDoves()).map(function(x){if(x.skin)return x;var c=myCountry();if(!DEX_C.some(function(d){return d[0]===c}))c='Deutschland';return Object.assign({},x,{skin:c+'|'+Math.min(4,x.tier||0)})}))}
 function pigeonCard(p){var n=Date.now(),pr=pigeonProg(p,n).p;return _t('<div class="pgi"><div><b>Brief an ')+esc(first(p.fname))+'</b> <small>'+esc((p.from&&p.from.name)||'')+' → '+esc((p.to&&p.to.name)||'')+_t('</small></div><div class="prog" role="progressbar" aria-label="Flugfortschritt" aria-valuenow="')+Math.round(pr*100)+'" aria-valuemin="0" aria-valuemax="100"><i style="width:'+(pr*100).toFixed(1)+_t('%"></i></div><small>Noch ')+fmtDur(p.sent+p.dur-n)+_t(' · Ankunft ')+esc(fmtWhen(p.sent+p.dur))+'</small>'+stopLine(p,n)+'</div>'}
 function checkArrivals(){var n=Date.now(),ch=false;circleTick();mailTick();loftTick();store.post.pigeons.forEach(function(p){(p.stops||[]).forEach(function(s){if(!s.notified&&n>=p.sent+s.at){s.notified=true;ch=true;var who=s.names.join(' und '),pl=s.place?' in '+s.place:'';toast(n<p.sent+s.at+s.rest?_t('Deine Taube macht kurz Halt bei ')+who+pl+_t('. Dort flog eine Taube von dir vorbei.'):_t('Eine Taube von dir flog bei ')+who+pl+' vorbei.')}});if(!p.notified&&n>=p.sent+p.dur){p.notified=true;ch=true;toast(_t('Die Brieftaube mit deinem Brief an ')+first(p.fname)+_t(' ist angekommen.'))}});if(ch)store.savePost()}
 function beenStats(){
