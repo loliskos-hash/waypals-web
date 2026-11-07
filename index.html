@@ -522,7 +522,7 @@ html[dir=rtl] .mtc,html[dir=rtl] .sbar .btn.ghost>svg.ic:first-child{transform:s
 :root[data-style="notebook"] .brand{font-size:1.8rem}
 @media (max-width:480px){.tagline{display:none}}
 .fk{gap:8px}.fkh{display:flex;gap:10px;align-items:center;min-width:0}.fkh>div{min-width:0}.fkh small{display:block;color:var(--muted);font-size:.8rem;overflow-wrap:anywhere}
-.fkp{flex:none;width:48px;height:60px;display:block}.fkp .p3,.fkp .p3s{width:48px;height:60px}
+.fkp{flex:none;width:48px;height:60px;display:block}.fkp .p3,.fkp .p3s{width:48px;height:60px}.fkp[style] .p3,.fkp[style] .p3s{width:100%;height:100%}
 .fkalb{display:flex;gap:10px;overflow-x:auto;padding:4px 2px 8px;-webkit-overflow-scrolling:touch}.fkph{margin:0;flex:none;display:grid;gap:4px;justify-items:center;max-width:124px}
 .fkph figcaption{text-align:center;font-size:.8rem;min-width:0}.fkph small{display:block;color:var(--muted);overflow-wrap:anywhere}
 .dove.top{display:block;padding:0;width:56px;height:70px;margin:-29px 0 0 -28px;transform-origin:50% 42%}.dove.top .p3s{filter:drop-shadow(0 5px 3px rgba(0,0,0,.28))}
@@ -5647,18 +5647,18 @@ function mailCal(m){
 function openDoveInfo(m,p){
   var n=Date.now(),row=function(k,v){return '<div class="fl"><span>'+k+'</span><b>'+v+'</b></div>'},h='',skin,title,text,eta,from,to,now,start,route='',km='';
   if(m){
-    skin=m.skin||'Deutschland|'+Math.min(4,m.tier||0);title=m.from===circle.me?LT('Brieftaube an {0}','Carrier pigeon to {0}',[esc(m.toName||'?')]):LT('Brieftaube von {0}','Carrier pigeon from {0}',[esc(m.fromName||'?')]);
-    text=m.text||'';eta=m.status==='carried'&&!(mailIsHome(m)&&mailArrived(m))?mailEta(m):0;from=(m.fromName||'?')+((m.home&&m.home.name)?' ('+m.home.name+')':'');to=m.toName||'?';start=m.sentAt;
+    skin=m.skin||'Deutschland|'+Math.min(4,m.tier||0);var lp=store.post.pigeons.find(function(x){return x.mail===m.id}),pn=lp&&lp.pname;title=pn?esc(pn):(m.from===circle.me?LT('Brieftaube an {0}','Carrier pigeon to {0}',[esc(m.toName||'?')]):LT('Brieftaube von {0}','Carrier pigeon from {0}',[esc(m.fromName||'?')]));var dp=(m.cur&&m.cur.tk==='dest')?m.cur.tp:((m.plan||[]).filter(function(x){return x.k==='dest'})[0]||{}).place;
+    text=m.text||'';eta=m.status==='carried'&&!(mailIsHome(m)&&mailArrived(m))?mailEta(m):0;from=(m.fromName||'?')+((m.home&&m.home.name)?' ('+m.home.name+')':'');to=(dp?dp+' (':'')+(m.toName||'?')+(dp?')':'');start=m.sentAt;
     now=mailArrived(m)?LT('Gelandet bei {0}','Landed with {0}',[esc(m.holderName||'?')]):LT('Fliegt zu {0}, Ankunft {1}','Flying to {0}, arrival {1}',[esc(m.holderName||'?'),esc(fmtWhen(m.arriveAt))]);
     route=mailRoute(m);
     if(m.cur)km=Math.round(haversine({lat:m.cur.fa,lon:m.cur.fo},{lat:m.cur.ta,lon:m.cur.tl}))+' km';
   }else{
-    skin=p.skin||'Deutschland|'+Math.min(4,p.tier||0);title=LT('Brieftaube an {0}','Carrier pigeon to {0}',[esc(p.fname||'?')]);text=p.text||'';eta=p.sent+p.dur;from=(p.from&&p.from.name)||'?';to=p.fname||'?';start=p.sent;
+    skin=p.skin||'Deutschland|'+Math.min(4,p.tier||0);title=p.pname?esc(p.pname):LT('Brieftaube an {0}','Carrier pigeon to {0}',[esc(p.fname||'?')]);text=p.text||'';eta=p.sent+p.dur;from=(p.from&&p.from.name)||'?';to=((p.to&&p.to.name)?p.to.name+' (':'')+(p.fname||'?')+((p.to&&p.to.name)?')':'');start=p.sent;
     var pg=pigeonProg(p,n);now=pg.stop?LT('Rastet gerade bei {0}','Resting with {0}',[esc((pg.stop.names||[]).join(' & '))]):LT('Unterwegs, noch {0}','On its way, {0} left',[fmtDur(Math.max(0,eta-n))]);
     route=(p.stops||[]).map(function(x){return esc((x.names||[]).join(' & '))}).join(' → ');km=Math.round(p.km||0)+' km';
   }
   var el=openSheet('','fsheet');
-  h='<div class="sbar"><button type="button" class="btn ghost" data-act="close">'+ic('back')+L('Zurück','Back')+'</button></div><div class="fkh"><span class="fkp">'+p3Wrap(skin,true)+'</span><div><h2 class="stitle" style="margin:0">'+title+'</h2><small>'+now+'</small></div></div>';
+  h='<div class="sbar"><button type="button" class="btn ghost" data-act="close">'+ic('back')+L('Zurück','Back')+'</button></div><div class="fkh"><span class="fkp" style="width:96px;height:120px;flex:none">'+p3Wrap(skin)+'</span><div><h2 class="stitle" style="margin:0">'+title+'</h2><small>'+(m?LT('Brieftaube an {0}','Carrier pigeon to {0}',[esc(m.toName||'?')]):LT('Brieftaube an {0}','Carrier pigeon to {0}',[esc(p.fname||'?')]))+'</small><br><small>'+now+'</small></div></div>';
   h+=(text?'<h4 class="who">'+L('Dein Brief','The letter')+'</h4><p class="letter">'+esc(text).replace(/\n/g,'<br>')+'</p>':'')+'<h4 class="who">'+L('Reise','Journey')+'</h4>';
   h+=row(L('Von','From'),esc(from))+row(L('Nach','To'),esc(to))+(start?row(L('Gestartet','Started'),esc(fmtWhen(start))):'')+(eta?row(L('Ankunft etwa','Arrival around'),esc(fmtWhen(eta))):'')+(km?row(L('Strecke','Distance'),km):'')+(route?row(L('Stationen','Stops'),route):'');
   if(m)h+=mailAlbum(m);
