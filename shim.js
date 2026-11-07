@@ -41,9 +41,9 @@
   // Ausnahme: Gast hat im Formular „Anmelden“ getippt.
   var wantLogin = false; try { wantLogin = sessionStorage.getItem('waypals-wantlogin') === '1'; sessionStorage.removeItem('waypals-wantlogin') } catch (e) {}
   var startHref = location.href;
-  var codeLink = /w-p[A-Za-z0-9_-]{8,}/.test(location.hash || '');
+  var codeLink = /w-[pc][A-Za-z0-9_-]{8,}/.test(location.hash || '');
   // Antwort-Links (#w-p…) zeigen die Antwort auch ohne Anmeldung; anmelden lässt sich dann im Fenster selbst
-  var guestLink = !wantLogin && /w-[ip][A-Za-z0-9_-]{8,}/.test(location.hash || '');
+  var guestLink = !wantLogin && /w-[ipc][A-Za-z0-9_-]{8,}/.test(location.hash || '');
 
   // Anmeldung per E-Mail-Link (ohne Passwort): Adresse merken, damit der Link auf diesem Gerät ohne Rückfrage anmeldet
   var EMAILKEY = 'waypals-signin-email', HASHKEY = 'waypals-signin-hash', LINKKEY = 'waypals-addmail', LINKRES = 'waypals-addmail-result';
@@ -202,6 +202,7 @@
         user = u; lsSet(LOCALKEY, null);
         window.WAYPALS_AUTH = {
           email: u.email, name: u.displayName,
+          created: Date.parse((u.metadata || {}).creationTime || '') || 0,
           signOut: function () { auth.signOut().then(function () { location.reload() }) },
           deleteAccount: deleteAccount,
           emails: (u.providerData || []).map(function (p) { return p.email }).filter(Boolean).filter(function (m, i, a) { return a.indexOf(m) === i }),
