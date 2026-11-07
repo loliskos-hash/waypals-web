@@ -4231,15 +4231,17 @@ function Globe(opts){
     for(i=0;i<groups.length;i++){g=groups[i];p=proj(vec(g.lat,g.lon));it.push({g:g,x:p.x,y:p.y,z:p.z,lead:null,n:g.count,cl:0,tot:g.count})}
     vis=it.filter(function(a){return a.z>0.03&&a.x>-70&&a.x<W+70&&a.y>-90&&a.y<H+90});
     vis.sort(function(a,b){return (((b.g.base||b.g.key)===sel)-((a.g.base||a.g.key)===sel))||(b.n-a.n)});
-    for(i=0;i<vis.length;i++){a=vis[i];if(a.lead)continue;for(j=i+1;j<vis.length;j++){b=vis[j];if(b.lead)continue;if(a.g.base&&a.g.base===b.g.base)continue;if((els[a.g.key]&&els[a.g.key].small)?Math.hypot(a.x-b.x,a.y-b.y)<24:(Math.abs(a.x-b.x)<46&&Math.abs(a.y-b.y)<66)){b.lead=a;a.cl++;a.tot+=b.n}}}
+    for(i=0;i<vis.length;i++){a=vis[i];if(a.lead)continue;for(j=i+1;j<vis.length;j++){b=vis[j];if(b.lead)continue;if(a.g.base&&a.g.base===b.g.base)continue;if((els[a.g.key]&&els[a.g.key].small)?Math.hypot(a.x-b.x,a.y-b.y)<24:(Math.abs(a.x-b.x)<46&&Math.abs(a.y-b.y)<66)){b.lead=a;a.cl++;b.pk=a.cl-1;a.tot+=b.n}}}
     it.forEach(function(a){
       var e=els[a.g.key];if(!e)return;
-      if(a.z<=0.03||a.lead||a.x<-70||a.x>W+70||a.y<-90||a.y>H+90){if(!e.hid){e.el.style.display='none';e.hid=true}return}
+      var fol=a.lead&&a.pk<5&&a.lead.z>0.03;
+      if(a.z<=0.03||(a.lead&&!fol)||a.x<-70||a.x>W+70||a.y<-90||a.y>H+90){if(!e.hid){e.el.style.display='none';e.hid=true}return}
       if(e.hid){e.el.style.display='';e.hid=false}
-      var sc=(a.z<0.35?0.7+0.3*a.z/0.35:1)*(e.small?0.62:1),op=Math.min(1,(a.z-0.03)/0.2);
+      if(fol){var PO=[[-17,0],[17,0],[-9,-9],[9,-9],[0,-16]][a.pk];a.x=a.lead.x+PO[0];a.y=a.lead.y+PO[1]}
+      var sc=(a.z<0.35?0.7+0.3*a.z/0.35:1)*(e.small?0.62:0.76),op=Math.min(1,(a.z-0.03)/0.2);
       e.el.style.transform='translate('+a.x.toFixed(1)+'px,'+a.y.toFixed(1)+'px) translate(-50%,-95%) scale('+sc.toFixed(3)+')';
-      e.el.style.opacity=op.toFixed(2);e.el.style.zIndex=String(Math.round(a.y)+((a.g.base||a.g.key)===sel?1000:0));
-      var cl=a.cl>0;e.el.classList.toggle('cl',cl);e.el.classList.toggle('sel',(a.g.base||a.g.key)===sel);e.el.dataset.cl=cl?'1':'';e.cx=a.x;e.cy=a.y;
+      e.el.style.opacity=op.toFixed(2);e.el.style.zIndex=String(Math.round(a.y)-(fol?(a.pk>1?2:1):0)+((a.g.base||a.g.key)===sel?1000:0));
+      var cl=a.cl>0||!!a.lead;e.el.classList.toggle('cl',cl);e.el.classList.toggle('sel',(a.g.base||a.g.key)===sel);e.el.dataset.cl=cl?'1':'';e.cx=a.x;e.cy=a.y;
       var bt=(e.pin?a.cl>0:a.tot>1)?String(a.tot):'';if(e.bd&&e.bdt!==bt){e.bd.textContent=bt;e.bd.hidden=!bt;e.bdt=bt}
       var showLab=!cl&&(v.zoom>=2.2||(a.g.base||a.g.key)===sel);if(e.lab&&e.labOn!==showLab){e.lab.hidden=!showLab;e.labOn=showLab}
     });
@@ -4248,9 +4250,9 @@ function Globe(opts){
   var pEls={};
   function updPlat(it){
     var by={},k;
-    it.forEach(function(a){var e=els[a.g.key];if(a.lead||a.z<=0.03||!e||e.hid||e.small)return;var b=a.g.base||(a.cl>0?'c'+a.g.key:'');if(!b)return;(by[b]=by[b]||[]).push(a)});
+    it.forEach(function(a){var e=els[a.g.key];if((a.lead&&!(a.pk<5&&a.lead.z>0.03))||a.z<=0.03||!e||e.hid||e.small)return;var b=a.g.base||(a.cl>0?'c'+a.g.key:a.lead?'c'+a.lead.g.key:'');if(!b)return;(by[b]=by[b]||[]).push(a)});
     for(k in by){var L=by[k],x0=1e9,x1=-1e9,y1=-1e9,y0=1e9;L.forEach(function(a){x0=Math.min(x0,a.x);x1=Math.max(x1,a.x);y1=Math.max(y1,a.y);y0=Math.min(y0,a.y)});
-      var w=x1-x0+64,h=18+(y1-y0)*0.9,pe=pEls[k];if(!pe){pe=pEls[k]=document.createElement('div');pe.className='plat';fl.insertBefore(pe,fl.firstChild)}
+      var w=x1-x0+50,h=15+(y1-y0)*0.9,pe=pEls[k];if(!pe){pe=pEls[k]=document.createElement('div');pe.className='plat';fl.insertBefore(pe,fl.firstChild)}
       pe.style.width=w.toFixed(0)+'px';pe.style.height=h.toFixed(0)+'px';pe.style.transform='translate('+((x0+x1)/2-w/2).toFixed(1)+'px,'+(y1-h/2-1).toFixed(1)+'px)';pe.style.zIndex='0';pe.style.display=''}
     for(k in pEls)if(!by[k]){pEls[k].remove();delete pEls[k]}
   }
@@ -4291,7 +4293,7 @@ function Globe(opts){
     list.forEach(function(g){
       if(g.draft||v.zoom<EXP_Z||!g.members||g.members.length<2){out.push(g);return}
       var n=g.members.length,per=Math.min(n,5);
-      g.members.forEach(function(m,i){var row=Math.floor(i/per),cnt=Math.min(per,n-row*per);out.push({key:g.key+'#'+i,ai:i,base:g.key,blat:g.lat,blon:g.lon,ox:(i%per-(cnt-1)/2)*36,oy:-row*24,lat:g.lat,lon:g.lon,name:g.name,count:1,members:[m],trv:g.trv,links:g.links})});
+      g.members.forEach(function(m,i){var row=Math.floor(i/per),cnt=Math.min(per,n-row*per);out.push({key:g.key+'#'+i,ai:i,base:g.key,blat:g.lat,blon:g.lon,ox:(i%per-(cnt-1)/2)*19,oy:-row*14,lat:g.lat,lon:g.lon,name:g.name,count:1,members:[m],trv:g.trv,links:g.links})});
     });
     return out;
   }
@@ -7672,9 +7674,14 @@ function checkHash(){
     var go=function(r){if(r.t==='i')lastInvite=h;else lastCode=h;handleCode(r)};if(o.t==='c')codeResolve(o,go);else go(o)}}}catch(e){}
 }
 
+function meMember(){
+  var me=store.post.me,pr=store.post.profile||{};if(!me||me.lat==null||me.lon==null)return null;
+  var nm=(pr.name||myCircleName()||'').trim();
+  return {id:'__me',me:true,name:nm?nm+' ('+L('Ich','Me')+')':L('Ich','Me'),av:pr.av||null,photo:pr.photo||'',home:me.name||'',homeLat:me.lat,homeLon:me.lon,lat:null,lon:null,place:me.name||'',tags:[],metDate:''};
+}
 function groups(){
-  var m={},out=[],home=S.mapMode==='home';
-  allFriends().forEach(function(f){
+  var m={},out=[],home=S.mapMode==='home',mm=home&&!S.mapLayer?meMember():null;
+  allFriends().concat(mm?[mm]:[]).forEach(function(f){
     var tp=home?activeTrip(f.id):null;
     var la=tp?tp.dest.lat:home?f.homeLat:f.lat,lo=tp?tp.dest.lon:home?f.homeLon:f.lon;
     if(la==null||lo==null)return;
@@ -7704,6 +7711,7 @@ function beenStats(){
   var U=function(t){return t.charAt(0).toUpperCase()+t.slice(1)};
   return U(L('Länder','Countries'))+' <b>'+pd.countries.length+'</b> \u00B7 '+U(L('Städte','Cities'))+' <b>'+pd.cities+'</b> \u00B7 '+U(L('Kontinente','Continents'))+' <b>'+k+'</b>';
 }
+function realCities(g){return g.filter(function(x){return x.members.some(function(f){return !f.me})}).length}
 function paintMapInfo(){
   var info=$('#mapinfo');if(!info)return;
   if(S.mapLayer){var nm=layerNames(S.mapLayer),ttl=S.mapLayer==='friends'?L('Länder mit Freunden','Countries with friends'):L('Besuchte Länder','Visited countries');
@@ -7719,13 +7727,13 @@ function paintMapInfo(){
   }else{
     var home=S.mapMode==='home',noPin=list.filter(function(f){return home?f.homeLat==null:f.lat==null}).length,placed=list.length-noPin;
     html=(!list.length?_t('<p class="banner">Noch niemand eingetragen. Tippe unten auf das Plus.</p>'):'')+
-      '<p class="stat">'+_t('Menschen')+' <b>'+placed+'</b> · '+(home?_t('Städte'):_t('Orte'))+' <b>'+g.length+'</b>'+(noPin?' · '+noPin+' '+(home?_t('ohne Wohnort'):_t('ohne Ort')):'')+'</p>'+
+      '<p class="stat">'+_t('Menschen')+' <b>'+placed+'</b> · '+(home?_t('Städte'):_t('Orte'))+' <b>'+realCities(g)+'</b>'+(noPin?' · '+noPin+' '+(home?_t('ohne Wohnort'):_t('ohne Ort')):'')+'</p>'+
       '<p class="hint">'+(home?_t('Hier leben die Menschen wirklich. Ein Flieger zeigt, wer gerade verreist ist und wo. Tippe auf eine Figur für die Linie nach Hause oder zum Treffpunkt.'):_t('Hier habt ihr euch kennengelernt. Tippe auf einen Pin, dann siehst du per gestrichelter Linie, wo die Menschen heute wohnen.'))+'</p>'+'<div><button type="button" class="btn" data-act="trips">'+ic('plane')+_t('Reisen &amp; Wiedersehen</button></div>')+(home&&noPin?'<p class="banner">Bei '+noPin+(noPin===1?_t(' Person fehlt'):_t(' Personen fehlt'))+_t(' noch der Wohnort. Trag ihn im Eintrag ein, dann erscheint sie hier.</p>'):'')+(home&&pigeonsInFlight().length?_t('<p class="who" style="margin-top:8px">Brieftauben unterwegs</p><div class="pg">')+pigeonsInFlight().map(pigeonCard).join('')+'</div>':'')+
       _t('<p class="who" style="margin-top:8px">Zuletzt kennengelernt</p><ul class="plist">')+sorted(list).map(rowHTML).join('')+'</ul>';
   }
   var home2=S.mapMode==='home',placed2=list.length-list.filter(function(f){return home2?f.homeLat==null:f.lat==null}).length;
   if(sel||S.mapInfoOpen)info.innerHTML='<div class="mpop"><button type="button" class="mx" data-act="closeinfo" aria-label="'+L('Schließen','Close')+'">\u00D7</button>'+html+'</div>';
-  else info.innerHTML='<div class="mbar"><button type="button" class="mpill" data-act="infoopen">'+(home2?L('Menschen','People')+' <b>'+placed2+'</b> \u00B7 '+L('Städte','Cities')+' <b>'+g.length+'</b>':beenStats())+'</button><button type="button" class="mpill" data-act="trips">'+ic('plane')+L('Reisen','Trips')+'</button></div>';
+  else info.innerHTML='<div class="mbar"><button type="button" class="mpill" data-act="infoopen">'+(home2?L('Menschen','People')+' <b>'+placed2+'</b> \u00B7 '+L('Städte','Cities')+' <b>'+realCities(g)+'</b>':beenStats())+'</button><button type="button" class="mpill" data-act="trips">'+ic('plane')+L('Reisen','Trips')+'</button></div>';
 }
 function dailyCard(){
   var d=dexState(),t=todayISO(),done=d.daily===t,yd=new Date();yd.setDate(yd.getDate()-1);
@@ -9681,7 +9689,7 @@ function f3Live(box,m,w,h,bust){
 }
 
 /* ---------- Detail ---------- */
-function openDetail(id){
+function openDetail(id){if(id==='__me'){closeAllSheets();S.tab='me';renderMain();return}
   var el=openSheet('','detail');
   function paint(){
     var f=allFriends().find(function(x){return x.id===id});
