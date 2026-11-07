@@ -9743,7 +9743,7 @@ function plCandidates(f){
   frAll().forEach(function(r){
     if(r.status!=='accepted')return;
     var o=frOther(r);
-    if(!o.uid||seen[o.uid]||store.friends.some(function(x){return x.uid===o.uid}))return;
+    if(!o.uid||!(o.name||o.user)||seen[o.uid]||store.friends.some(function(x){return x.uid===o.uid}))return;
     seen[o.uid]=1;out.push(o);
   });
   var fnm=first(f.name||'').toLowerCase();
@@ -9769,7 +9769,7 @@ function openPigeon(f){
     _t('<button type="button" class="btn pri big" data-act="send">Taube losschicken</button>'),'');
   var pp=placePicker($('[data-pp=from]',el),{label:_t('Von wo startet die Taube?'),text:me?me.name:'',lat:me?me.lat:null,lon:me?me.lon:null,tz:me?me.tz:'',placeholder:_t('Deine Stadt'),pinText:_t('Startort gefunden'),noPinText:_t('Wähle einen Vorschlag oder markiere den Ort auf der Karte.')});
   var info=$('[data-info]',el),sendBtn=$('[data-act=send]',el);
-  var rf=!!(f.uid&&circleOn()&&palOf(f)),mphotos=[];
+  var rf=!!(f.uid&&circleOn()&&(palOf(f)||frFriendUids().indexOf(f.uid)>=0)),mphotos=[];
   el.addEventListener('click',function(e){if(e.target.closest('[data-act=pl-link]')){closeSheet(el);openPlLink(f)}});
   if(rf){
     info.insertAdjacentHTML('beforebegin','<div class="fl"><span>'+L('Fotos mitschicken (bis zu 2)','Send photos along (up to 2)')+'</span><div data-mph></div><div class="btnrow"><label class="btn sm" for="mp-cam">'+ic('cam')+L('Foto aufnehmen','Take photo')+'</label><input id="mp-cam" type="file" accept="image/*" capture="environment" hidden><label class="btn sm" for="mp-gal">'+L('Aus Galerie','From gallery')+'</label><input id="mp-gal" type="file" accept="image/*" hidden></div><small class="hint">'+L('Der Empfänger bekommt die Fotos wirklich. Unterwegs können Freunde, die du kennst, eigene Fotos dazulegen.','The recipient really receives the photos. On the way, friends you know can add photos of their own.')+'</small></div>');
