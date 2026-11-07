@@ -5293,14 +5293,20 @@ function blkBtns(o,friend){
     (isBlocked(o.uid)?'':'<button type="button" class="btn ghost sm rpt" data-blk="m"'+a+'>'+(isMuted(o.uid)?L('Stummschaltung aufheben','Unmute'):L('Stummschalten','Mute'))+'</button>')+
     '<button type="button" class="btn ghost sm rpt" data-blk="b"'+a+'>'+(isBlocked(o.uid)?L('Blockierung aufheben','Unblock'):L('Blockieren','Block'))+'</button>';
 }
+function blkRows(){var rows=[];Object.keys(blk.b).forEach(function(u){rows.push([u,blk.b[u],'b'])});Object.keys(blk.m).forEach(function(u){if(!blk.b[u])rows.push([u,blk.m[u],'m'])});return rows}
 function blkListHTML(){
   if(!circleOn())return '';
-  var rows=[];
-  Object.keys(blk.b).forEach(function(u){rows.push([u,blk.b[u],'b'])});Object.keys(blk.m).forEach(function(u){if(!blk.b[u])rows.push([u,blk.m[u],'m'])});
-  return '<section class="tell"><h3 class="who">'+L('Blockierte Nutzer','Blocked users')+'</h3>'+(rows.length?rows.map(function(r){var x=r[1]||{};
-    return '<div class="frrow"><div class="frtx"><b>'+esc(x.n||('@'+(x.u||'?')))+'</b><small>'+(r[2]==='b'?L('Blockiert','Blocked'):L('Stummgeschaltet','Muted'))+(x.u?' · @'+esc(x.u):'')+'</small></div><div class="frbt"><button type="button" class="btn sm" data-blk="'+r[2]+'" data-buid="'+esc(r[0])+'" data-bname="'+esc(x.n||'')+'" data-buser="'+esc(x.u||'')+'">'+L('Freigeben','Unblock')+'</button></div></div>'}).join('')
-    :'<p class="hint">'+L('Niemand. Blockieren und Stummschalten findest du im Profil einer Person oder beim Ablehnen einer Anfrage.','Nobody. You can block or mute someone from their profile or when declining a request.')+'</p>')+'</section>';
+  var n=blkRows().length;
+  return '<button type="button" class="btn sm" data-blkopen="1">'+L('Blockierte Nutzer','Blocked users')+(n?' ('+n+')':'')+'</button>';
 }
+function openBlkList(){
+  var rows=blkRows();
+  var el=openSheet('<div class="sbar"><button type="button" class="btn ghost" data-act="close">'+ic('back')+L('Zurück','Back')+'</button></div><h2 class="stitle">'+L('Blockierte Nutzer','Blocked users')+'</h2><section class="tell">'+(rows.length?rows.map(function(r){var x=r[1]||{};
+    return '<div class="frrow"><div class="frtx"><b>'+esc(x.n||('@'+(x.u||'?')))+'</b><small>'+(r[2]==='b'?L('Blockiert','Blocked'):L('Stummgeschaltet','Muted'))+(x.u?' · @'+esc(x.u):'')+'</small></div><div class="frbt"><button type="button" class="btn sm" data-blk="'+r[2]+'" data-buid="'+esc(r[0])+'" data-bname="'+esc(x.n||'')+'" data-buser="'+esc(x.u||'')+'">'+L('Freigeben','Unblock')+'</button></div></div>'}).join('')
+    :'<p class="hint">'+L('Niemand. Blockieren und Stummschalten findest du im Profil einer Person oder beim Ablehnen einer Anfrage.','Nobody. You can block or mute someone from their profile or when declining a request.')+'</p>')+'</section>','fsheet');
+  el.addEventListener('click',function(e){if(e.target.closest('[data-act=close]'))closeSheet(el)});
+}
+document.addEventListener('click',function(e){if(e.target.closest('[data-blkopen]')){e.stopPropagation();openBlkList()}},true);
 document.addEventListener('click',function(e){
   var b=e.target.closest('[data-blk]');if(!b)return;e.stopPropagation();
   var k=b.getAttribute('data-blk'),o={uid:b.getAttribute('data-buid'),name:b.getAttribute('data-bname'),user:b.getAttribute('data-buser')};
@@ -6024,7 +6030,7 @@ function openSettings(){
     h+='<section class="tell"><h3 class="who">'+L('Feiertage (freiwillig)','Holidays (optional)')+'</h3><p class="hint">'+L('Wähle, welche religiösen Feste du feiern möchtest. Dann bekommst du zu diesen Festen besondere Tauben. Wenn du nichts wählst, gibt es nur Silvester und Sommer. Deine Auswahl bleibt nur auf diesem Gerät und wird nirgends hochgeladen.','Choose which religious festivals you would like to celebrate. You then get special pigeons for them. If you choose nothing, there are only New Year’s Eve and summer. Your choice stays on this device only and is never uploaded.')+'</p><div class="chips">'+FAITHS.map(function(f){return '<button type="button" class="cb" data-faith="'+f[0]+'" aria-pressed="'+(faithSel().indexOf(f[0])>=0)+'">'+esc(L(f[1][0],f[1][1]))+'</button>'}).join('')+'</div></section>';
     h+='<section class="tell"><h3 class="who">'+L('Meine Daten','My data')+'</h3><p class="hint">'+L('Sichere deine Einträge als Datei. So kannst du sie auf ein neues Gerät mitnehmen oder wiederherstellen.','Save your entries as a file. This lets you move them to a new device or restore them.')+'</p><div class="btnrow"><button type="button" class="btn pri sm" data-act="export">'+L('Backup speichern','Save backup')+'</button><label class="btn sm" for="imp-file">'+L('Backup laden','Load backup')+'</label><input id="imp-file" type="file" accept="application/json,.json" hidden></div></section>';
     if(acc)h+='<section class="tell"><h3 class="who">'+L('Konto','Account')+'</h3><p class="hint">'+L('Angemeldet als ','Signed in as ')+esc(acc.email||acc.name||'')+'</p>'+((acc.emails||[]).length>1?'<p class="hint">'+L('Weitere Adressen: ','More addresses: ')+esc(acc.emails.filter(function(m){return m!==acc.email}).join(', '))+'</p>':'')+(acc.addEmail?'<div class="btnrow"><button type="button" class="btn sm" data-act="addmail">'+L('Weitere E-Mail-Adresse hinzufügen','Add another email address')+'</button></div>':'')+'<div class="btnrow"><button type="button" class="btn sm" data-act="signout">'+L('Abmelden','Sign out')+'</button><button type="button" class="btn ghost sm" data-act="delacc">'+L('Konto und alle Daten löschen','Delete account and all data')+'</button></div></section>';
-    h+=''+blkListHTML()+'<section class="tell"><h3 class="who">'+L('Mehr','More')+'</h3><div class="btnrow"><button type="button" class="btn sm" data-act="intro">'+L('Einführung','Introduction')+'</button><button type="button" class="btn sm" data-act="legal">'+L('Datenschutz & Rechtliches','Privacy & legal')+'</button><button type="button" class="btn sm" data-report="general" data-ruid="" data-rref="" data-rname="">'+L('Kinderschutz-Bedenken melden','Report a child safety concern')+'</button><a class="btn ghost sm" href="kinderschutz.html" target="_blank" rel="noopener">'+L('Kinderschutz','Child safety')+'</a></div></section>';
+    h+='<section class="tell"><h3 class="who">'+L('Mehr','More')+'</h3><div class="btnrow">'+blkListHTML()+'<button type="button" class="btn sm" data-act="intro">'+L('Einführung','Introduction')+'</button><button type="button" class="btn sm" data-act="legal">'+L('Datenschutz & Rechtliches','Privacy & legal')+'</button><button type="button" class="btn sm" data-report="general" data-ruid="" data-rref="" data-rname="">'+L('Kinderschutz-Bedenken melden','Report a child safety concern')+'</button><a class="btn ghost sm" href="kinderschutz.html" target="_blank" rel="noopener">'+L('Kinderschutz','Child safety')+'</a></div></section>';
     $('.sheet-in',el).innerHTML=h;
   }
   paint();
