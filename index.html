@@ -4878,7 +4878,7 @@ function myPublic(){
   var o={name:myCircleName(),level:L.level,title:L.title,xp:x.total,countries:pd.countries.length,people:pd.people,tier:pigeonTier(L.level),av:pr.av||null,photo:pr.photo||'',fav:favMine(),favName:favMine()?skinTitle(favMine()):'',
     wk:(function(){try{return wkGain()}catch(e){return null}})(),rk:(function(){try{return {m:rkGain('m'),y:rkGain('y')}}catch(e){return null}})(),
     pgs:dexBirds().slice(0,10).map(function(b){return {skin:b.skin,name:b.name,kmh:DEX_RAR[skinParse(b.skin).i].kmh}}),
-    recent:(store.post.posts||[]).slice(-8).reverse().map(function(p){return {t:p.title,xp:p.xp,d:p.date,x:String(p.text||'').slice(0,160)}}),loc:!!pub.loc,stopOk:!!pub.stop};
+    recent:(store.post.posts||[]).slice(-8).reverse().map(function(p){return {t:p.title,xp:p.xp,d:p.date,x:String(p.text||'').slice(0,160)}}),loc:!!pub.loc,stopOk:pub.stop!==false};
   if(pub.loc&&me)o.home={name:me.name||'',lat:me.lat,lon:me.lon};
   var cut=new Date(Date.now()-365*864e5),cs=cut.getFullYear()+'-'+pad(cut.getMonth()+1)+'-'+pad(cut.getDate());
   var tl=(store.post.trips||[]).filter(function(t){return t.who==='me'&&t.to>=cs&&(pub.loc||t.tell)}).slice(-20).map(function(t){return {id:t.id,dest:t.dest,from:t.from,to:t.to,kind:t.kind||'',vague:!!t.vague,tell:!!t.tell}});
@@ -5361,7 +5361,7 @@ function circleHTML(){
   h+=_t('<section class="tell"><h3 class="who">Mein Eintrag im Kreis</h3><form class="form" data-form novalidate autocomplete="off"><label class="fl"><span>Dein Name im Kreis</span><input name="cname" value="')+esc(myCircleName())+_t('" maxlength="40" placeholder="Wie sollen dich die anderen sehen?"></label>')+
     '<label class="chk"><input type="checkbox" name="on"'+(pub.on?' checked':'')+_t('> <span>Mein Level und meine geschafften Challenges für den Kreis sichtbar machen</span></label>')+
     '<label class="chk"><input type="checkbox" name="loc"'+(pub.loc?' checked':'')+'> <span>Auch meinen Wohnort und meine Reisen teilen (für das Wiedersehen-Radar)</span></label>'+
-    '<label class="chk"><input type="checkbox" name="stop"'+(pub.stop?' checked':'')+'> <span>'+L('Brieftauben meiner Freunde dürfen bei mir Halt machen (Foto dazulegen, weiterfliegen)','Carrier pigeons of my friends may stop at my place (add a photo, fly on)')+'</span></label>'+
+    '<label class="chk"><input type="checkbox" name="stop"'+(pub.stop!==false?' checked':'')+'> <span>'+L('Brieftauben meiner Freunde dürfen bei mir Halt machen (Foto dazulegen, weiterfliegen)','Carrier pigeons of my friends may stop at my place (add a photo, fly on)')+'</span></label>'+
     _t('<button type="button" class="btn pri" data-act="save-pub">Speichern</button></form>')+(mine?_t('<p class="hint">Aktuell sichtbar als Level ')+mine.level+' mit '+mine.xp+_t(' XP.</p>'):_t('<p class="hint">Noch nicht sichtbar. Dein Name und der erste Haken reichen.</p>'))+'</section>';
   var inc=circle.quests.filter(function(q){return q.to===circle.me&&!isBlocked(q.from)&&qState(q)!=='flying'&&qState(q)!=='done'}),out=circle.quests.filter(function(q){return q.from===circle.me&&qState(q)!=='done'}),don=circle.quests.filter(function(q){return qState(q)==='done'&&(q.from===circle.me||q.to===circle.me)});
   h+=_t('<section class="tell"><h3 class="who">Challenges für dich</h3>')+(inc.length?'<div class="pg">'+inc.map(function(q){return questCardHTML(q,'to')}).join('')+'</div>':_t('<p class="hint">Keine offene Challenge. Wenn dir jemand eine Taube schickt, erscheint sie hier.</p>'))+'</section>';
