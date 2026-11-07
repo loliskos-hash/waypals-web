@@ -202,6 +202,7 @@
         user = u; lsSet(LOCALKEY, null);
         window.WAYPALS_AUTH = {
           email: u.email, name: u.displayName,
+          created: Date.parse((u.metadata || {}).creationTime || '') || 0,
           signOut: function () { auth.signOut().then(function () { location.reload() }) },
           deleteAccount: deleteAccount,
           emails: (u.providerData || []).map(function (p) { return p.email }).filter(Boolean).filter(function (m, i, a) { return a.indexOf(m) === i }),
