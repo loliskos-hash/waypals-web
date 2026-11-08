@@ -224,6 +224,8 @@ textarea.ruled:focus{box-shadow:none}
 .row{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:14px;width:100%;text-align:left;background:none;border:0;border-bottom:1.5px dotted var(--line);padding:12px 2px;min-height:68px}
 .row .nm{display:flex;align-items:center;gap:6px;min-width:0;font:700 1.6rem/1.1 var(--f-hand)}
 .row .nmt{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.wpk{display:inline-grid;place-items:center;flex:none;width:16px;height:16px;border-radius:50%;background:var(--pen);color:var(--on-pen);font:700 .68rem/1 var(--f-ui)}
+.dname .wpk{width:22px;height:22px;font-size:.9rem;margin-left:10px;vertical-align:middle}
 .row .meta{display:block;font-size:.86rem;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .row .tg{font-size:.76rem;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:2px 9px;white-space:nowrap}
 .av{width:48px;height:48px;border-radius:50%;object-fit:cover;display:grid;place-items:center;flex:none;border:1.5px solid var(--line)}
@@ -5203,10 +5205,24 @@ function frMergeDone(dupId,oldId){
     (P.pigeons||[]).forEach(function(q){if(q.fid===dupId){q.fid=oldId;ch=true}});
     if(ch)store.savePost();
     var OK={id:1,name:1,av:1,uid:1,uname:1,metDate:1,viaApp:1,updatedAt:1,createdAt:1,figSync:1,guestAv:1,figK:1};
-    var empty=Object.keys(dup).every(function(k){var v=dup[k];return OK[k]||v==null||v===''||v===false||(Array.isArray(v)&&!v.length)||(typeof v==='object'&&!Array.isArray(v)&&!Object.keys(v).length)});
+    function emp(v){return v==null||v===''||v===false||(Array.isArray(v)&&!v.length)||(typeof v==='object'&&!Array.isArray(v)&&!Object.keys(v).length)}
+    function js(v){try{return JSON.stringify(v)}catch(e){return ''}}
+    /* Angaben des Doppel-Eintrags (Gemaltes, Unterschrift, Fotos, Notizen …) in den alten Eintrag übernehmen, ohne dort etwas zu überschreiben */
+    var cur=store.friends.find(function(x){return x.id===oldId})||old,upd=Object.assign({},cur),moved=false;
+    Object.keys(dup).forEach(function(k){
+      if(OK[k])return;var v=dup[k],ov=cur[k];if(emp(v))return;
+      if(emp(ov)){upd[k]=v;moved=true}
+      else if(Array.isArray(v)&&Array.isArray(ov)){var have=ov.map(js),add=v.filter(function(x){return have.indexOf(js(x))<0});if(add.length){upd[k]=ov.concat(add);moved=true}}
+    });
+    if(moved)store.save(upd);
+    var after=store.friends.find(function(x){return x.id===oldId})||upd;
+    var empty=Object.keys(dup).every(function(k){
+      if(OK[k])return true;var v=dup[k];if(emp(v))return true;var ov=after[k];
+      return Array.isArray(v)&&Array.isArray(ov)?v.every(function(x){return ov.map(js).indexOf(js(x))>=0}):js(v)===js(ov);
+    });
     var used=false;try{used=JSON.stringify(store.post).indexOf(dupId)>=0}catch(e){used=true}
     if(empty&&!used){store.remove(dupId);toast(L('Zusammengeführt. Der leere Doppel-Eintrag wurde entfernt.','Merged. The empty duplicate entry was removed.'))}
-    else toast(L('Verbunden. Der zweite Eintrag bleibt, weil darin schon Daten stehen.','Linked. The second entry stays because it already has data.'))
+    else toast(L('Verbunden. Der zweite Eintrag bleibt, weil darin Angaben stehen, die nicht übernommen werden konnten.','Linked. The second entry stays because it has details that could not be carried over.'))
   }
   closeAllSheets();openDetail(oldId);
 }
@@ -7965,7 +7981,7 @@ function rowHTML(f){
   var at=(S.tab==='map'&&S.mapMode==='home')?activeTrip(f.id):null;
   var meta=at?_t('Gerade in ')+at.dest.name+(tripOpen(at)?'':' (bis '+fmtDM(at.to)+')'):(S.tab==='map'&&S.mapMode==='home'&&f.home)?_t('Wohnt in ')+f.home:[f.place,fmtDate(f.metDate)].filter(Boolean).join(' · ');
   var tg=(f.tags&&f.tags[0])?'<span class="tg">'+esc(f.tags[0])+'</span>':'<span></span>';
-  return '<li><button type="button" class="row" data-open="'+esc(f.id)+'">'+avatarFlag(f)+'<span style="min-width:0"><span class="nm"><span class="nmt">'+esc(f.name)+'</span>'+(f.example?_t('<span class="ex">Beispiel</span>'):'')+'</span><span class="meta">'+esc(meta||_t('Noch ohne Ort'))+'</span></span>'+tg+'</button></li>';
+  return '<li><button type="button" class="row" data-open="'+esc(f.id)+'">'+avatarFlag(f)+'<span style="min-width:0"><span class="nm"><span class="nmt">'+esc(f.name)+'</span>'+(f.uid&&!f.example?'<span class="wpk" title="'+L('Hat Waypals','Has Waypals')+'" aria-label="'+L('Hat Waypals','Has Waypals')+'">✓</span>':'')+(f.example?_t('<span class="ex">Beispiel</span>'):'')+'</span><span class="meta">'+esc(meta||_t('Noch ohne Ort'))+'</span></span>'+tg+'</button></li>';
 }
 var refreshPeople=null;
 function peopleTab(){
@@ -10154,7 +10170,7 @@ function detailHTML(f){
   return '<div class="sbar"><button type="button" class="btn ghost" data-act="back">'+ic('back')+_t('Zurück</button>')+(f.example?'':'<div class="sbar-r"><button type="button" class="btn ghost" data-act="edit">'+ic('edit')+_t('Bearbeiten</button></div>'))+'</div>'+
     (f.example?_t('<p class="banner">Beispiel-Eintrag. So sieht eine fertige Seite aus.</p>'):'')+
     '<header class="dh"><figure class="polaroid">'+(f.photo&&f.av&&!F3.fail?'<div class="pflip"><i><span class="pf"><img src="'+esc(f.photo)+'" alt="Foto von '+esc(f.name)+'"></span><span class="pb">'+figSVG({name:f.name,av:f.av},'dp'+esc(f.id||''))+'</span></i></div>':f.photo?'<img src="'+esc(f.photo)+'" alt="Foto von '+esc(f.name)+'">':f.av?'<div class="pfig">'+figSVG({name:f.name,av:f.av},'dp'+esc(f.id||''))+'</div>':'<div class="ph">'+esc((f.name||'?').trim().charAt(0).toUpperCase())+'</div>')+'<figcaption>'+esc(f.nick||fn)+'</figcaption></figure>'+
-    '<div><h2 class="dname hand">'+esc(f.name)+'</h2><p class="dmeta">'+meta.join(' · ')+'</p>'+'<div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">'+(f.lat!=null?'<button type="button" class="btn sm" data-act="showmap">'+ic('pin')+_t('Auf dem Globus</button>'):'')+(f.uid&&!f.example&&frUnlinked(f.id).length?'<button type="button" class="btn sm" data-act="frmerge">'+L('Alten Eintrag verbinden','Link old entry')+'</button>':'')+'<button type="button" class="btn sm pri" data-act="pigeon">'+ic('dove')+_t('Brieftaube schicken</button><button type="button" class="btn sm" data-act="trip">')+ic('plane')+_t('Reise eintragen</button></div>')+'</div></header>'+
+    '<div><h2 class="dname hand">'+esc(f.name)+(f.uid&&!f.example?'<span class="wpk" title="'+L('Hat Waypals','Has Waypals')+'" aria-label="'+L('Hat Waypals','Has Waypals')+'">✓</span>':'')+'</h2><p class="dmeta">'+meta.join(' · ')+'</p>'+'<div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">'+(f.lat!=null?'<button type="button" class="btn sm" data-act="showmap">'+ic('pin')+_t('Auf dem Globus</button>'):'')+(f.uid&&!f.example&&frUnlinked(f.id).length?'<button type="button" class="btn sm" data-act="frmerge">'+L('Alten Eintrag verbinden','Link old entry')+'</button>':'')+'<button type="button" class="btn sm pri" data-act="pigeon">'+ic('dove')+_t('Brieftaube schicken</button><button type="button" class="btn sm" data-act="trip">')+ic('plane')+_t('Reise eintragen</button></div>')+'</div></header>'+
     _t('<section class="tell"><h3 class="who">Unsere Geschichte</h3>')+story+'</section>'+
     (f.sig?_t('<section><p class="who">Unterschrift</p>')+sigSvg(f.sig)+'</section>':'')+bookHTML(f)+albumHTML(f)+momentsHTML(f)+
     (rows?'<dl class="kvs">'+rows+'</dl>':'')+trh+pgh+statsHTML(f)+cap+
