@@ -5163,10 +5163,11 @@ function frLinkEntry(r,force){
   var o=frOther(r),have=store.friends.find(function(f){return f.uid===o.uid});
   if(have){openDetail(have.id);return}
   var s=frSeen();s['x:'+r.id]=1;frSeenSet(s);frBadge();
-  var cand=frCandsOpen(o);
+  var cand=frCandsOpen(o),sn0=frSeen(),named=cand.length>0;
+  cand=cand.concat(frUnlinked().filter(function(x){return cand.indexOf(x)<0&&!sn0['n:'+o.uid+':'+x.id]}));
   function fresh(){var f={id:uid(),name:o.name||o.user,av:o.av||null,uid:o.uid,uname:o.user,metDate:todayISO(),tags:[],viaApp:true};store.save(f);frEdit(f)}
   if(!cand.length||force){fresh();return}
-  var el=openSheet(unHead(L('Eintrag verbinden','Link entry'))+'<p class="hint">'+LT('Du hast schon einen Eintrag, der zu {0} passen könnte. Verbinde ihn, dann bleiben Fotos und Notizen erhalten.','You already have an entry that might be {0}. Link it and your photos and notes stay.',[esc(o.name||'@'+o.user)])+'</p><div class="pg">'+
+  var el=openSheet(unHead(L('Eintrag verbinden','Link entry'))+'<p class="hint">'+(named?LT('Du hast schon einen Eintrag, der zu {0} passen könnte. Verbinde ihn, dann bleiben Fotos und Notizen erhalten.','You already have an entry that might be {0}. Link it and your photos and notes stay.',[esc(o.name||'@'+o.user)]):LT('Hast du {0} schon eingetragen? Wähle den Eintrag, dann bleiben Ort, Datum, Fotos und Notizen erhalten.','Did you already add {0}? Pick the entry and place, date, photos and notes stay.',[esc(o.name||'@'+o.user)]))+'</p><div class="pg">'+
     cand.map(function(f){return '<button type="button" class="pgi tripi" data-link="'+esc(f.id)+'"><b>'+esc(f.name)+'</b><small>'+esc([f.place,fmtDate(f.metDate)].filter(Boolean).join(' · ')||L('Noch ohne Ort','No place yet'))+'</small></button>'}).join('')+
     '</div><div class="btnrow"><button type="button" class="btn sm" data-act="fr-new">'+L('Neuen Eintrag anlegen','Create new entry')+'</button></div>','fsheet');
   el.addEventListener('click',function(e){
@@ -5174,8 +5175,40 @@ function frLinkEntry(r,force){
     if(e.target.closest('[data-act=fr-new]')){closeSheet(el);fresh();return}
     var b=e.target.closest('[data-link]');if(!b)return;
     var f=store.friends.find(function(x){return x.id===b.getAttribute('data-link')});if(!f)return;
-    closeSheet(el);frLinkAsk(f,o,function(ok){if(ok)frEdit(store.friends.find(function(x){return x.id===f.id})||f)});
+    closeSheet(el);frLinkAsk(f,o,function(ok){if(ok)frAfterLink(f)});
   });
+}
+function frAfterLink(f){var g=store.friends.find(function(x){return x.id===f.id})||f;if(g.place||g.photo)openDetail(g.id);else frEdit(g)}
+function frUnlinked(exId){return store.friends.filter(function(x){return !x.uid&&!x.example&&x.id!==exId})}
+/* Doppel-Eintrag mit Konto (z. B. beim Annehmen automatisch angelegt) mit altem manuellem Eintrag zusammenführen */
+function frMergeOpen(dup){
+  var c=frUnlinked(dup.id);
+  if(!c.length){toast(L('Keine Einträge ohne Konto vorhanden.','No entries without an account.'));return}
+  var el=openSheet(unHead(L('Alten Eintrag verbinden','Link old entry'))+'<p class="hint">'+LT('Welcher deiner Einträge ist {0}? Ort, Datum, Fotos und Notizen bleiben erhalten.','Which of your entries is {0}? Place, date, photos and notes stay.',[esc(first(dup.name))])+'</p><div class="pg">'+
+    c.map(function(f){return '<button type="button" class="pgi tripi" data-link="'+esc(f.id)+'"><b>'+esc(f.name)+'</b><small>'+esc([f.place,fmtDate(f.metDate)].filter(Boolean).join(' · ')||L('Noch ohne Ort','No place yet'))+'</small></button>'}).join('')+'</div>','fsheet');
+  el.addEventListener('click',function(e){
+    if(e.target.closest('[data-act=close]')){closeSheet(el);return}
+    var b=e.target.closest('[data-link]');if(!b)return;
+    var old=store.friends.find(function(x){return x.id===b.getAttribute('data-link')});if(!old)return;
+    closeSheet(el);
+    var o={uid:dup.uid,name:dup.name,user:dup.uname||'',av:(circle.pals[dup.uid]||{}).av||null};
+    frLinkAsk(old,o,function(ok){if(ok)frMergeDone(dup.id,old.id)});
+  });
+}
+function frMergeDone(dupId,oldId){
+  var dup=store.friends.find(function(x){return x.id===dupId}),old=store.friends.find(function(x){return x.id===oldId});if(!old)return;
+  if(dup&&dup.id!==old.id){
+    var P=store.post,ch=false;
+    (P.trips||[]).forEach(function(t){if(t.who===dupId){t.who=oldId;ch=true}});
+    (P.pigeons||[]).forEach(function(q){if(q.fid===dupId){q.fid=oldId;ch=true}});
+    if(ch)store.savePost();
+    var OK={id:1,name:1,av:1,uid:1,uname:1,metDate:1,viaApp:1,updatedAt:1,createdAt:1,figSync:1,guestAv:1,figK:1};
+    var empty=Object.keys(dup).every(function(k){var v=dup[k];return OK[k]||v==null||v===''||v===false||(Array.isArray(v)&&!v.length)||(typeof v==='object'&&!Array.isArray(v)&&!Object.keys(v).length)});
+    var used=false;try{used=JSON.stringify(store.post).indexOf(dupId)>=0}catch(e){used=true}
+    if(empty&&!used){store.remove(dupId);toast(L('Zusammengeführt. Der leere Doppel-Eintrag wurde entfernt.','Merged. The empty duplicate entry was removed.'))}
+    else toast(L('Verbunden. Der zweite Eintrag bleibt, weil darin schon Daten stehen.','Linked. The second entry stays because it already has data.'))
+  }
+  closeAllSheets();openDetail(oldId);
 }
 function avKey(a){if(!a||typeof a!=='object')return '';return Object.keys(a).sort().map(function(k){return k+':'+JSON.stringify(a[k])}).join('|')}
 function frFigSync(u){
@@ -5252,7 +5285,7 @@ function frAct(btn){
   else if(k==='wd')frWithdraw(r).then(function(){toast(L('Anfrage zurückgezogen.','Request withdrawn.'))}).catch(fail);
   else if(k==='link')frLinkEntry(r);
   else if(k==='new')frLinkEntry(r,true);
-  else if(k==='lk'){btn.disabled=false;var o=frOther(r),c=frCandsOpen(o)[0];if(c)frLinkAsk(c,o,function(ok){if(ok)frEdit(store.friends.find(function(x){return x.id===c.id})||c)})}
+  else if(k==='lk'){btn.disabled=false;var o=frOther(r),c=frCandsOpen(o)[0];if(c)frLinkAsk(c,o,function(ok){if(ok)frAfterLink(c)})}
 }
 /* Auffindbar per E-Mail: finds/{SHA-256 der Adresse, HEX groß} = {uid,user,at}; nur exakter Abruf */
 var FIND_CACHE={};
@@ -9975,6 +10008,7 @@ function openDetail(id){if(id==='__me'){closeAllSheets();S.tab='me';renderMain()
     if(act==='back')closeSheet(el);
     else if(act==='wp-prof')openUserPreview(a.getAttribute('data-un'));
     else if(act==='edit')openForm(f);
+    else if(act==='frmerge')frMergeOpen(f);
     else if(act==='reply-cont'&&f.replyDraft)openGuest(Object.assign({},f.replyDraft.p,{remote:true,story:'',draft:f.replyDraft.d,entryId:f.id}));
     else if(act==='showmap'){closeAllSheets();S.tab='map';S.mapMode='met';S.mapSel=f.lat!=null?f.lat.toFixed(2)+','+f.lon.toFixed(2):null;renderMain();if(f.lat!=null)mapView.focusOn(f.lat,f.lon,3.5)}
     else if(act==='open-cap')openCapsule(f);
@@ -10120,7 +10154,7 @@ function detailHTML(f){
   return '<div class="sbar"><button type="button" class="btn ghost" data-act="back">'+ic('back')+_t('Zurück</button>')+(f.example?'':'<div class="sbar-r"><button type="button" class="btn ghost" data-act="edit">'+ic('edit')+_t('Bearbeiten</button></div>'))+'</div>'+
     (f.example?_t('<p class="banner">Beispiel-Eintrag. So sieht eine fertige Seite aus.</p>'):'')+
     '<header class="dh"><figure class="polaroid">'+(f.photo&&f.av&&!F3.fail?'<div class="pflip"><i><span class="pf"><img src="'+esc(f.photo)+'" alt="Foto von '+esc(f.name)+'"></span><span class="pb">'+figSVG({name:f.name,av:f.av},'dp'+esc(f.id||''))+'</span></i></div>':f.photo?'<img src="'+esc(f.photo)+'" alt="Foto von '+esc(f.name)+'">':f.av?'<div class="pfig">'+figSVG({name:f.name,av:f.av},'dp'+esc(f.id||''))+'</div>':'<div class="ph">'+esc((f.name||'?').trim().charAt(0).toUpperCase())+'</div>')+'<figcaption>'+esc(f.nick||fn)+'</figcaption></figure>'+
-    '<div><h2 class="dname hand">'+esc(f.name)+'</h2><p class="dmeta">'+meta.join(' · ')+'</p>'+'<div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">'+(f.lat!=null?'<button type="button" class="btn sm" data-act="showmap">'+ic('pin')+_t('Auf dem Globus</button>'):'')+'<button type="button" class="btn sm pri" data-act="pigeon">'+ic('dove')+_t('Brieftaube schicken</button><button type="button" class="btn sm" data-act="trip">')+ic('plane')+_t('Reise eintragen</button></div>')+'</div></header>'+
+    '<div><h2 class="dname hand">'+esc(f.name)+'</h2><p class="dmeta">'+meta.join(' · ')+'</p>'+'<div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">'+(f.lat!=null?'<button type="button" class="btn sm" data-act="showmap">'+ic('pin')+_t('Auf dem Globus</button>'):'')+(f.uid&&!f.example&&frUnlinked(f.id).length?'<button type="button" class="btn sm" data-act="frmerge">'+L('Alten Eintrag verbinden','Link old entry')+'</button>':'')+'<button type="button" class="btn sm pri" data-act="pigeon">'+ic('dove')+_t('Brieftaube schicken</button><button type="button" class="btn sm" data-act="trip">')+ic('plane')+_t('Reise eintragen</button></div>')+'</div></header>'+
     _t('<section class="tell"><h3 class="who">Unsere Geschichte</h3>')+story+'</section>'+
     (f.sig?_t('<section><p class="who">Unterschrift</p>')+sigSvg(f.sig)+'</section>':'')+bookHTML(f)+albumHTML(f)+momentsHTML(f)+
     (rows?'<dl class="kvs">'+rows+'</dl>':'')+trh+pgh+statsHTML(f)+cap+
