@@ -1,5 +1,5 @@
 /* Offline-Cache für die App-Hülle. Firebase/Firestore kümmern sich selbst um Offline-Daten. */
-var V = 'waypals-v80';
+var V = 'waypals-v81';
 var FILES = ['./', 'index.html', 'fonts.css', 'fonts/nunito.woff', 'fonts/caveat.woff', 'fonts/patrickhand.woff', 'shim.js', 'firebase-config.js', 'manifest.webmanifest', 'icons/icon-192.png', 'icons/icon-512.png', 'datenschutz.html', 'impressum.html'];
 /* Bei schlechtem Netz höchstens so lange auf den Server warten, dann die gespeicherte Fassung zeigen (sonst hängt die Seite beim Neuladen) */
 var WAIT = 3500;
@@ -21,5 +21,20 @@ self.addEventListener('fetch', function (e) {
     function give(res) { if (!done && res) { done = true; ok(res) } }
     var t = setTimeout(function () { cached().then(give) }, WAIT);
     net.then(function (res) { clearTimeout(t); give(res) }, function () { clearTimeout(t); cached().then(function (m) { if (m) give(m); else if (!done) { done = true; no(new Error('offline')) } }) });
+  }));
+});
+/* Push-Benachrichtigungen (über Firebase Cloud Messaging, Nachricht kommt als data: title, body, tag, url) */
+self.addEventListener('push', function (e) {
+  var p = {}; try { p = e.data ? e.data.json() : {} } catch (x) { try { p = { data: { body: e.data.text() } } } catch (y) {} }
+  var d = p.data || p, n = p.notification || {};
+  var title = d.title || n.title || 'Waypals', body = d.body || n.body || '';
+  e.waitUntil(self.registration.showNotification(title, { body: body, tag: d.tag || undefined, icon: 'icons/icon-192.png', badge: 'icons/icon-192.png', data: { url: d.url || './' } }));
+});
+self.addEventListener('notificationclick', function (e) {
+  e.notification.close();
+  var url = new URL((e.notification.data && e.notification.data.url) || './', self.registration.scope).href;
+  e.waitUntil(self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(function (cs) {
+    for (var i = 0; i < cs.length; i++) { if (cs[i].url.indexOf(self.registration.scope) === 0 && 'focus' in cs[i]) return cs[i].focus() }
+    return self.clients.openWindow(url);
   }));
 });

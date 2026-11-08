@@ -1,0 +1,26 @@
+# Push-Benachrichtigungen: schaut alle paar Minuten nach neuen Tauben/Anfragen und verschickt sie (kostenlos, ohne Firebase Blaze).
+# Braucht das Repository-Secret FIREBASE_SERVICE_ACCOUNT (kompletter Inhalt der Dienstkonto-JSON aus Firebase).
+name: Push
+on:
+  schedule:
+    - cron: '*/5 * * * *'
+  workflow_dispatch:
+concurrency:
+  group: push
+  cancel-in-progress: false
+jobs:
+  send:
+    if: github.repository == 'loliskos-hash/waypals-web'
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: tools/push
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm install --prefix tools/push --no-audit --no-fund firebase-admin@12.7.0
+      - run: node tools/push/send.mjs
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
