@@ -4426,7 +4426,8 @@ function Globe(opts){
 /* ---------- Speicher ---------- */
 var LS_KEY='wegmarken-v1';
 var S={tab:'map',mapMode:'met',mapSel:null,q:'',tag:'',sort:'new'};
-function normPost(o){return {pub:o.pub&&typeof o.pub==='object'?o.pub:{},me:o.me||null,pigeons:Array.isArray(o.pigeons)?o.pigeons:[],trips:Array.isArray(o.trips)?o.trips:[],posts:Array.isArray(o.posts)?o.posts:[],diet:o.diet&&typeof o.diet==='object'?o.diet:{},profile:o.profile&&typeof o.profile==='object'?o.profile:null,loft:o.loft&&typeof o.loft==='object'?o.loft:null,wkb:o.wkb&&typeof o.wkb==='object'?o.wkb:null,rkb:o.rkb&&typeof o.rkb==='object'?o.rkb:null,wish:Array.isArray(o.wish)?o.wish:[],plus:o.plus&&typeof o.plus==='object'?o.plus:{},city:o.city&&typeof o.city==='object'?o.city:{},username:typeof o.username==='string'?o.username:'',savedAt:+o.savedAt||0}}
+function normPost(o){var r=normPost0(o),h=r.profile;if(h&&h.homeLat!=null&&h.homeLon!=null)r.me={name:h.home||'',lat:h.homeLat,lon:h.homeLon,tz:h.homeTz||''};return r}
+function normPost0(o){return {pub:o.pub&&typeof o.pub==='object'?o.pub:{},me:o.me||null,pigeons:Array.isArray(o.pigeons)?o.pigeons:[],trips:Array.isArray(o.trips)?o.trips:[],posts:Array.isArray(o.posts)?o.posts:[],diet:o.diet&&typeof o.diet==='object'?o.diet:{},profile:o.profile&&typeof o.profile==='object'?o.profile:null,loft:o.loft&&typeof o.loft==='object'?o.loft:null,wkb:o.wkb&&typeof o.wkb==='object'?o.wkb:null,rkb:o.rkb&&typeof o.rkb==='object'?o.rkb:null,wish:Array.isArray(o.wish)?o.wish:[],plus:o.plus&&typeof o.plus==='object'?o.plus:{},city:o.city&&typeof o.city==='object'?o.city:{},username:typeof o.username==='string'?o.username:'',savedAt:+o.savedAt||0}}
 var store={
   friends:[],mode:'pending',col:null,post:{me:null,pigeons:[],trips:[],posts:[],diet:{},profile:null},
   loadLocal:function(){try{var raw=localStorage.getItem(LS_KEY);if(raw){var a=JSON.parse(raw);if(Array.isArray(a))return a}}catch(e){}return []},
@@ -7723,7 +7724,7 @@ function openProfile(){
   function save(){
     var pr=collect();if(!pr.name){var er=$('.err',el),ni=$('[name=name]',el);er.hidden=false;er.textContent=_t('Bitte trag deinen Namen ein.');toast(_t('Bitte trag deinen Namen ein.'));try{ni.scrollIntoView({block:'center',behavior:'smooth'});ni.focus({preventScroll:true})}catch(x){}return null}
     store.post.profile=pr;store.post.diet={veg:pr.veg,noAlc:pr.noAlc};
-    if(!store.post.me&&pr.homeLat!=null)store.post.me={name:pr.home,lat:pr.homeLat,lon:pr.homeLon,tz:pr.homeTz};
+    if(pr.homeLat!=null)store.post.me={name:pr.home,lat:pr.homeLat,lon:pr.homeLon,tz:pr.homeTz};
     store.savePost();if(S.tab==='me')renderMain();return pr;
   }
   el.addEventListener('click',function(e){
@@ -10059,7 +10060,7 @@ function openPigeon(f){
       if(!text){toast(_t('Schreib erst einen Brief.'));return}
       if(s.lat==null||!dest)return;
       var km=haversine(s,dest),fm=Math.round(Math.max(60000,km/MP.kmh*3600000)),stp=routeStops(s,dest,fm,f.id,rf?mailOkFn(mailSkip(f.uid)):null),dur=rf?fm:fm+stp.length*STOP_REST;
-      store.post.me={name:s.text,lat:s.lat,lon:s.lon,tz:s.tz||''};
+      var mh=store.post.profile||{};if(!store.post.me&&mh.homeLat==null)store.post.me={name:s.text,lat:s.lat,lon:s.lon,tz:s.tz||''};
       var pid=uid();
       store.post.pigeons.push({id:pid,fid:f.id,fname:f.name,text:text,sent:Date.now(),dur:dur,km:km,from:{lat:s.lat,lon:s.lon,name:s.text},to:dest,notified:false,kmh:MP.kmh,tier:MP.tier,pid:MP.id,hue:MP.hue,skin:MP.skin||'',pname:MP.name,stops:rf?[]:stp,mail:rf?pid:undefined});
       if(rf){
