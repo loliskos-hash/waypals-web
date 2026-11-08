@@ -9939,7 +9939,7 @@ function plCandidates(f){
 }
 function openPlLink(f){
   var c=plCandidates(f);
-  if(!c.length){toast(L('Keine verbundenen Freunde ohne Eintrag gefunden.','No connected friends without an entry found.'));return}
+  if(!c.length){var en=openSheet(unHead(L('Mit Konto verknüpfen','Link with account'))+'<p class="hint">'+L('Keine verbundenen Freunde ohne Eintrag gefunden.','No connected friends without an entry found.')+'</p><div class="btnrow"><button type="button" class="btn ghost" data-act="close">'+L('Schließen','Close')+'</button></div>','fsheet');en.addEventListener('click',function(e){if(e.target.closest('[data-act=close]'))closeSheet(en)});return}
   var el=openSheet(unHead(L('Mit Konto verknüpfen','Link with account'))+'<p class="hint">'+L('Wähle die Person aus deinen Freunden. Dein Eintrag mit Foto und Geschichte bleibt erhalten, es wird nur die Verbindung gesetzt.','Choose the person among your friends. Your entry with photo and story stays, only the connection is set.')+'</p><div class="pg">'+c.map(function(o,i){return '<button type="button" class="pgi tripi" data-pl="'+i+'"><b>'+esc(o.name||'@'+o.user)+'</b><small>@'+esc(o.user||'')+'</small></button>'}).join('')+'</div>','fsheet');
   el.addEventListener('click',function(e){
     if(e.target.closest('[data-act=close]')){closeSheet(el);return}
@@ -9975,7 +9975,7 @@ function openPigeon(f){
     if(s.lat==null){info.innerHTML=_t('<b>Wo startet die Taube?</b><span>Gib oben deine Stadt an.</span>');sendBtn.disabled=true;return}
     var km=haversine(s,dest),fm=Math.max(60000,km/MP.kmh*3600000),stp=routeStops(s,dest,fm,f.id,rf?mailOkFn(mailSkip(f.uid)):null),dur=rf?fm:fm+stp.length*STOP_REST;
     info.innerHTML='<b>'+Math.round(km)+_t(' km · ')+fmtDur(dur)+_t('</b><span>Ankunft etwa ')+esc(fmtWhen(Date.now()+dur))+'.</span>'+(stp.length?_t('<span>Unterwegs macht sie kurz Halt bei: ')+stp.map(function(o){return esc(o.names.join(' und '))+(o.place?' ('+esc(o.place)+')':'')}).join(', ')+'.</span>':'');sendBtn.disabled=false;
-    if(!rf)info.innerHTML+='<span><b>'+L('Achtung:','Note:')+'</b> '+L('Diese Person ist nicht mit dir verbunden. Die Taube fliegt nur bei dir, der Brief kommt dort nicht an. Verbinde dich zuerst über Benutzername oder Einladung.','This person is not connected to you. The pigeon only flies on your device and the letter will not arrive. Connect first via username or invitation.')+'</span>'+(plCandidates(f).length?'<div class="btnrow"><button type="button" class="btn sm" data-act="pl-link">'+L('Mit Konto verknüpfen','Link with account')+'</button></div>':'');
+    if(!rf)info.innerHTML+='<span><b>'+L('Achtung:','Note:')+'</b> '+L('Diese Person ist nicht mit dir verbunden. Die Taube fliegt nur bei dir, der Brief kommt dort nicht an. Verbinde dich zuerst über Benutzername oder Einladung.','This person is not connected to you. The pigeon only flies on your device and the letter will not arrive. Connect first via username or invitation.')+'</span>'+'<div class="btnrow"><button type="button" class="btn sm" data-act="pl-link">'+L('Mit Konto verknüpfen','Link with account')+'</button></div>';
   }
   calc();var iv=setInterval(calc,500);el._onClose=function(){clearInterval(iv)};
   el.addEventListener('click',function(e){
