@@ -5167,7 +5167,7 @@ function frLinkEntry(r,force){
   var s=frSeen();s['x:'+r.id]=1;frSeenSet(s);frBadge();
   var cand=frCandsOpen(o),sn0=frSeen(),named=cand.length>0;
   cand=cand.concat(frUnlinked().filter(function(x){return cand.indexOf(x)<0&&!sn0['n:'+o.uid+':'+x.id]}));
-  function fresh(){var f={id:uid(),name:o.name||o.user,av:o.av||null,uid:o.uid,uname:o.user,metDate:todayISO(),tags:[],viaApp:true};store.save(f);frEdit(f)}
+  function fresh(){var f={id:uid(),name:o.name||o.user,av:o.av||null,uid:o.uid,uname:o.user,metDate:todayISO(),tags:[],viaApp:true};frTakeHome(f,o.uid);store.save(f);frEdit(f)}
   if(!cand.length||force){fresh();return}
   var el=openSheet(unHead(L('Eintrag verbinden','Link entry'))+'<p class="hint">'+(named?LT('Du hast schon einen Eintrag, der zu {0} passen könnte. Verbinde ihn, dann bleiben Fotos und Notizen erhalten.','You already have an entry that might be {0}. Link it and your photos and notes stay.',[esc(o.name||'@'+o.user)]):LT('Hast du {0} schon eingetragen? Wähle den Eintrag, dann bleiben Ort, Datum, Fotos und Notizen erhalten.','Did you already add {0}? Pick the entry and place, date, photos and notes stay.',[esc(o.name||'@'+o.user)]))+'</p><div class="pg">'+
     cand.map(function(f){return '<button type="button" class="pgi tripi" data-link="'+esc(f.id)+'"><b>'+esc(f.name)+'</b><small>'+esc([f.place,fmtDate(f.metDate)].filter(Boolean).join(' · ')||L('Noch ohne Ort','No place yet'))+'</small></button>'}).join('')+
@@ -5179,6 +5179,13 @@ function frLinkEntry(r,force){
     var f=store.friends.find(function(x){return x.id===b.getAttribute('data-link')});if(!f)return;
     closeSheet(el);frLinkAsk(f,o,function(ok){if(ok)frAfterLink(f)});
   });
+}
+/* Wohnort aus dem geteilten Profil übernehmen, nur wenn die Person ihn teilt und im Eintrag noch keiner steht */
+function frTakeHome(f,u){
+  var p=circle.pals[u],h=p&&p.home;
+  if(!h||!h.name||f.home)return f;
+  f.home=h.name;if(h.lat!=null&&h.lon!=null){f.homeLat=h.lat;f.homeLon=h.lon}
+  return f;
 }
 function frAfterLink(f){var g=store.friends.find(function(x){return x.id===f.id})||f;if(g.place||g.photo)openDetail(g.id);else frEdit(g)}
 function frUnlinked(exId){return store.friends.filter(function(x){return !x.uid&&!x.example&&x.id!==exId})}
@@ -5265,7 +5272,7 @@ function frLinkAsk(f,o,done){
     if(e.target.closest('[data-act=close]')){closeSheet(el);return}
     var b=e.target.closest('[data-lk]');if(!b)return;closeSheet(el);
     if(b.getAttribute('data-lk')==='yes'){
-      var n=Object.assign({},f,{uid:o.uid,uname:o.user,viaApp:true});store.save(n);frFigSync(o.uid);
+      var n=frTakeHome(Object.assign({},f,{uid:o.uid,uname:o.user,viaApp:true}),o.uid);store.save(n);frFigSync(o.uid);
       toast(LT('Verbunden mit {0}','Linked with {0}',[first(n.name)]));if(done)done(true);
     }else{var s=frSeen();s['n:'+o.uid+':'+f.id]=1;frSeenSet(s);onChange();if(done)done(false)}
   });
