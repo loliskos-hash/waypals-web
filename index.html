@@ -5081,7 +5081,7 @@ function openUserPreview(n){
     if(sb&&d){sb.disabled=true;frSend({uid:d.uid,name:d.name||'',user:n}).then(function(r){toast(r==='sent'?L('Anfrage gesendet.','Request sent.'):L('Ihr seid jetzt befreundet.','You are now friends.'))}).catch(function(){sb.disabled=false;toast(L('Das hat nicht geklappt. Bist du online?','That did not work. Are you online?'))})}
   });
   if(!circleOn()){bad='<p class="banner">'+L('Melde dich an, um @','Sign in to add @')+esc(n)+L(' als Freund hinzuzufügen.',' as a friend.')+'</p>'+unLoginBtn();paint();return}
-  unLookup(n).then(function(x){if(!x)bad='<p class="banner">'+L('Diesen Benutzernamen gibt es nicht. Vielleicht wurde er geändert.','This username does not exist. Maybe it was changed.')+'</p>';d=x;paint()})
+  unLookup(n).then(function(x){if(!x)bad='<p class="banner">'+L('Diesen Benutzernamen gibt es nicht. Vielleicht wurde er geändert.','This username does not exist. Maybe it was changed.')+'</p><p class="hint">'+L('Vielleicht ist das nur ein Spitzname. Frag die Person nach ihrem Waypals-Benutzernamen oder schick ihr eine Einladung.','Maybe this is just a nickname. Ask the person for their Waypals username or send them an invitation.')+'</p>';d=x;paint()})
     .catch(function(){bad='<p class="banner">'+L('Das Profil lässt sich gerade nicht laden. Bist du online?','The profile cannot be loaded right now. Are you online?')+'</p>';paint()});
 }
 /* ---------- Freundschaftsanfragen (Freundessystem Etappe 2) ---------- */
