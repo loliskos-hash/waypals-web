@@ -4427,7 +4427,7 @@ function Globe(opts){
 var LS_KEY='wegmarken-v1';
 var S={tab:'map',mapMode:'met',mapSel:null,q:'',tag:'',sort:'new'};
 function normPost(o){var r=normPost0(o),h=r.profile;if(h&&h.homeLat!=null&&h.homeLon!=null)r.me={name:h.home||'',lat:h.homeLat,lon:h.homeLon,tz:h.homeTz||''};return r}
-function normPost0(o){return {pub:o.pub&&typeof o.pub==='object'?o.pub:{},me:o.me||null,pigeons:Array.isArray(o.pigeons)?o.pigeons:[],trips:Array.isArray(o.trips)?o.trips:[],posts:Array.isArray(o.posts)?o.posts:[],diet:o.diet&&typeof o.diet==='object'?o.diet:{},profile:o.profile&&typeof o.profile==='object'?o.profile:null,loft:o.loft&&typeof o.loft==='object'?o.loft:null,wkb:o.wkb&&typeof o.wkb==='object'?o.wkb:null,rkb:o.rkb&&typeof o.rkb==='object'?o.rkb:null,wish:Array.isArray(o.wish)?o.wish:[],plus:o.plus&&typeof o.plus==='object'?o.plus:{},city:o.city&&typeof o.city==='object'?o.city:{},username:typeof o.username==='string'?o.username:'',savedAt:+o.savedAt||0}}
+function normPost0(o){return {pub:o.pub&&typeof o.pub==='object'?o.pub:{},me:o.me||null,pigeons:Array.isArray(o.pigeons)?o.pigeons:[],trips:Array.isArray(o.trips)?o.trips:[],posts:Array.isArray(o.posts)?o.posts:[],diet:o.diet&&typeof o.diet==='object'?o.diet:{},profile:o.profile&&typeof o.profile==='object'?o.profile:null,loft:o.loft&&typeof o.loft==='object'?o.loft:null,wkb:o.wkb&&typeof o.wkb==='object'?o.wkb:null,rkb:o.rkb&&typeof o.rkb==='object'?o.rkb:null,wish:Array.isArray(o.wish)?o.wish:[],plus:o.plus&&typeof o.plus==='object'?o.plus:{},city:o.city&&typeof o.city==='object'?o.city:{},username:typeof o.username==='string'?o.username:'',findable:typeof o.findable==='boolean'?o.findable:undefined,savedAt:+o.savedAt||0}}
 var store={
   friends:[],mode:'pending',col:null,post:{me:null,pigeons:[],trips:[],posts:[],diet:{},profile:null},
   loadLocal:function(){try{var raw=localStorage.getItem(LS_KEY);if(raw){var a=JSON.parse(raw);if(Array.isArray(a))return a}}catch(e){}return []},
@@ -5275,12 +5275,14 @@ function findHTML(f){
 var findAsked=false;
 function findAsk(){
   if(findAsked||!circleOn()||!findMail()||!store.postReady)return;
-  if(store.post.findable!==undefined){findAsked=true;return}
+  if(store.post.findable!==undefined){findAsked=true;if(store.post.findable)findSync(true).catch(function(){});return}
+  try{var lf=localStorage.getItem('waypals-findask');if(lf){findAsked=true;store.post.findable=lf==='1';store.savePost();return}}catch(e){}
   try{if(layer.children.length)return}catch(e){}
   findAsked=true;
   var el=openSheet('<div class="chooser"><h2 class="h2">'+L('Sollen deine Freunde dich finden?','Should your friends be able to find you?')+'</h2><p class="hint">'+L('Wer deine E-Mail-Adresse kennt, sieht dann, dass du bei Waypals bist, und kann dir eine Freundschaftsanfrage schicken. Deine Adresse selbst wird nicht gespeichert, nur eine Prüfsumme. Du kannst das jederzeit unter Ich → Einstellungen ändern.','Anyone who knows your email address will see that you are on Waypals and can send you a friend request. Your address itself is not stored, only a checksum. You can change this anytime under Me → Settings.')+'</p><button type="button" class="btn pri" data-fa="1">'+L('Ja, auffindbar sein','Yes, make me findable')+'</button><button type="button" class="btn ghost" data-fa="0">'+L('Nein, lieber nicht','No, thanks')+'</button></div>','chooser-wrap',true);
-  el.addEventListener('click',function(e){var b=e.target.closest('[data-fa]');if(!b)return;var on=b.getAttribute('data-fa')==='1';closeSheet(el);
-    (on?findSync(true):Promise.resolve()).then(function(){store.post.findable=on;store.savePost();if(on)toast(L('Du bist jetzt über deine E-Mail auffindbar.','You can now be found by your email.'))}).catch(function(){findAsked=false});});
+  el.addEventListener('click',function(e){var b=e.target.closest('[data-fa]');if(!b)return;var on=b.getAttribute('data-fa')==='1';
+    try{localStorage.setItem('waypals-findask',on?'1':'0')}catch(x){}closeSheet(el);
+    setTimeout(function(){store.post.findable=on;store.savePost();if(on)findSync(true).catch(function(){})},50);});
 }
 function openContactMatch(){
   if(!(navigator.contacts&&navigator.contacts.select)){toast(L('Dein Handy unterstützt die Kontaktauswahl nicht. Such per E-Mail oder Benutzername.','Your phone does not support picking contacts. Search by email or username.'));return}
@@ -6148,7 +6150,7 @@ function openSettings(){
     b=e.target.closest('[data-faith]');if(b){var fv=b.getAttribute('data-faith'),fl=faithSel(),ix=fl.indexOf(fv);if(ix>=0)fl.splice(ix,1);else fl.push(fv);PREF.faith=fl;savePref();paint();return}
     b=e.target.closest('[data-th]');if(b){PREF.theme=b.getAttribute('data-th');savePref();paint();return}
     b=e.target.closest('[data-findme]');if(b){var on=b.getAttribute('data-findme')==='1';if(on===!!store.post.findable)return;
-      findSync(on).then(function(){store.post.findable=on;store.savePost();paint();toast(on?L('Du bist jetzt über deine E-Mail auffindbar.','You can now be found by your email.'):L('Du bist nicht mehr über deine E-Mail auffindbar.','You can no longer be found by your email.'))}).catch(function(){toast(L('Das hat nicht geklappt. Bitte später noch einmal.','That did not work. Please try again later.'))});return}
+      store.post.findable=on;try{localStorage.setItem('waypals-findask',on?'1':'0')}catch(x){}store.savePost();paint();findSync(on).catch(function(){});toast(on?L('Du bist jetzt über deine E-Mail auffindbar.','You can now be found by your email.'):L('Du bist nicht mehr über deine E-Mail auffindbar.','You can no longer be found by your email.'));return}
     b=e.target.closest('[data-lg]');if(b){var v=b.getAttribute('data-lg');if(v!==APP_LANG){PREF.lang=v;savePref();try{location.reload()}catch(x){toast(L('Bitte öffne die App neu.','Please reopen the app.'))}}return}
     var a=e.target.closest('[data-act]');if(!a)return;var act=a.getAttribute('data-act');
     if(act==='close')closeSheet(el);
@@ -7987,7 +7989,7 @@ function onChange(){
   try{circlePublish()}catch(e){}
   try{unSync()}catch(e){}
   try{frBadge()}catch(e){}
-  try{setTimeout(findAsk,1500)}catch(e){}
+  try{setTimeout(findAsk,4000)}catch(e){}
   try{bellBadge()}catch(e){}
   var chip=$('#sync');
   var txt=store.mode==='cloud'?_t('In deinem Konto gespeichert'):store.mode==='local'?_t('Nur auf diesem Gerät'):_t('Lädt …');
