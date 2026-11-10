@@ -4429,6 +4429,17 @@ function Globe(opts){
 }
 
 /* ---------- Speicher ---------- */
+/* Ruckel-Protokoll: merkt sich nur auf diesem Gerät, wann die App länger als 0,7 s stand und was kurz davor lief (Anzeige unter Einstellungen). Keine Inhalte, nichts wird hochgeladen. */
+var WPLAG=(function(){
+  var marks=[],log=[],t0=Date.now(),vis=Date.now();
+  try{log=JSON.parse(localStorage.getItem('waypals-lag')||'[]')||[]}catch(e){log=[]}
+  function add(kind,ms,extra){try{log.push([new Date().toISOString().slice(5,16).replace('T',' '),Math.round((Date.now()-t0)/100)/10,kind,Math.round(ms),extra||'']);if(log.length>12)log=log.slice(-12);localStorage.setItem('waypals-lag',JSON.stringify(log))}catch(e){}}
+  function mark(n){marks.push(n);if(marks.length>6)marks.shift()}
+  function time(n,fn){var a=performance.now();try{return fn()}finally{var d=performance.now()-a;mark(n+' '+Math.round(d));if(d>250)add(n,d,'')}}
+  try{document.addEventListener('visibilitychange',function(){vis=Date.now()});
+    var last=performance.now();setInterval(function(){var n=performance.now(),d=n-last-250;last=n;if(d>700&&!document.hidden&&Date.now()-vis>3000)add('Stau',d,marks.join(', '))},250)}catch(e){}
+  return {mark:mark,time:time,add:add,get:function(){return log}};
+})();
 var LS_KEY='wegmarken-v1';
 var S={tab:'map',mapMode:'met',mapSel:null,q:'',tag:'',sort:'new'};
 function normPost(o){var r=normPost0(o),h=r.profile;if(h&&h.homeLat!=null&&h.homeLon!=null)r.me={name:h.home||'',lat:h.homeLat,lon:h.homeLon,tz:h.homeTz||''};return r}
@@ -4479,6 +4490,8 @@ var store={
             /* Nur Metadaten geändert (z. B. Schreibvorgang bestätigt): nichts neu zeichnen, spart Rechenzeit */
             var nch=1;try{nch=snap.docChanges().length}catch(e){}
             if(!nch&&cache===lastCache)return;lastCache=cache;
+            WPLAG.mark('Konto '+snap.size+(cache?' Speicher':' Server')+' '+nch);
+            var idsBefore=self.friends.map(function(f){return f&&f.id}).join('|'),postBefore=self.post;
             var cloud=snap.docs.filter(function(d){return d.id!=='_post'}).map(function(d){return Object.assign({},d.data(),{id:d.id})});
             var inCloud={};cloud.forEach(function(f){inCloud[f.id]=1});
             /* Nur lokal vorhandene Einträge: nie still verwerfen. Weg nur, wenn sie schon einmal im Konto waren (also anderswo gelöscht wurden). */
@@ -4500,9 +4513,13 @@ var store={
                   self.postDirty=false;setTimeout(function(){self.savePost()},0);
                 }else self.post=cp;
               }else if(!localNewer&&!self.postDirty)self.post=cp;
-              try{localStorage.setItem('wegmarken-post-v1',JSON.stringify(self.post))}catch(e){}}}
+              /* Unveränderte Daten nicht noch einmal komplett auf das Gerät schreiben (bei vielen Fotos dauerte das spürbar) */
+              var postSame=nch===0&&postBefore&&self.post&&(self.post===postBefore||((self.post.savedAt||0)>0&&self.post.savedAt===postBefore.savedAt));
+              if(postSame)self.post=postBefore;else try{localStorage.setItem('wegmarken-post-v1',JSON.stringify(self.post))}catch(e){}}}
             else if(!cache&&!postDone){postDone=true;self.postReady=true;self.postDirty=false;self.savePost()}
-            self.saveLocal();onChange();
+            if(nch===0&&idsBefore===self.friends.map(function(f){return f&&f.id}).join('|')){}
+            else WPLAG.time('Freunde sichern',function(){self.saveLocal()});
+            WPLAG.time('Anzeige',onChange);
           },function(){self.mode='local';self.col=null;onChange()});
         }else{self.mode='local'}
         onChange();
@@ -6193,7 +6210,7 @@ function openAddMail(){
   });
 }
 function addMailResult(){var r=null;try{r=localStorage.getItem('waypals-addmail-result');if(r)localStorage.removeItem('waypals-addmail-result')}catch(e){}if(!r)return;toast(r==='ok'?L('Fertig! Du kannst dich jetzt auch mit der neuen Adresse anmelden.','Done! You can now sign in with the new address too.'):(r==='auth/credential-already-in-use'||r==='auth/email-already-in-use'?L('Diese Adresse gehört schon zu einem anderen Waypals-Konto. Es wurde nichts verändert.','This address already belongs to another Waypals account. Nothing was changed.'):L('Das hat nicht geklappt. Bitte nochmal versuchen.','That did not work. Please try again.')))}
-var APP_VER=101;/* gleiche Nummer wie V in sw.js */
+var APP_VER=102;/* gleiche Nummer wie V in sw.js */
 function openSettings(){
   var el=openSheet('','settings');
   function chip(attr,val,label,cur){return '<button type="button" class="cb" '+attr+'="'+val+'" aria-pressed="'+(cur===val)+'">'+label+'</button>'}
@@ -6212,6 +6229,8 @@ function openSettings(){
     if(acc)h+='<section class="tell"><h3 class="who">'+L('Konto','Account')+'</h3><p class="hint">'+L('Angemeldet als ','Signed in as ')+esc(acc.email||acc.name||'')+'</p>'+((acc.emails||[]).length>1?'<p class="hint">'+L('Weitere Adressen: ','More addresses: ')+esc(acc.emails.filter(function(m){return m!==acc.email}).join(', '))+'</p>':'')+(acc.addEmail?'<div class="btnrow"><button type="button" class="btn sm" data-act="addmail">'+L('Weitere E-Mail-Adresse hinzufügen','Add another email address')+'</button></div>':'')+(acc.email?'<div class="fl"><span>'+L('Über meine E-Mail-Adresse auffindbar','Findable by my email address')+'</span><div class="chips">'+chip('data-findme','1',L('An','On'),store.post.findable?'1':'0')+chip('data-findme','0',L('Aus','Off'),store.post.findable?'1':'0')+'</div><small class="hint">'+L('Freunde, die deine Adresse kennen, sehen dann, dass du Waypals nutzt. Deine Adresse selbst wird nicht gespeichert, nur eine Prüfsumme.','Friends who know your address can then see that you use Waypals. Your address itself is not stored, only a checksum.')+'</small></div>':'')+'<div class="btnrow"><button type="button" class="btn sm" data-act="signout">'+L('Abmelden','Sign out')+'</button><button type="button" class="btn ghost sm" data-act="delacc">'+L('Konto und alle Daten löschen','Delete account and all data')+'</button></div></section>';
     h+='<section class="tell"><h3 class="who">'+L('Mehr','More')+'</h3><div class="btnrow">'+blkListHTML()+'<button type="button" class="btn sm" data-act="intro">'+L('Einführung','Introduction')+'</button><button type="button" class="btn sm" data-act="legal">'+L('Datenschutz & Rechtliches','Privacy & legal')+'</button><button type="button" class="btn sm" data-report="general" data-ruid="" data-rref="" data-rname="">'+L('Kinderschutz-Bedenken melden','Report a child safety concern')+'</button><a class="btn ghost sm" href="kinderschutz.html" target="_blank" rel="noopener">'+L('Kinderschutz','Child safety')+'</a></div></section>';
     h+='<p class="hint" style="text-align:center;opacity:.7">Waypals · Version '+APP_VER+'</p>';
+    (function(){var lg=[];try{lg=WPLAG.get()}catch(e){}if(!lg.length)return;
+      h+='<details class="hint" style="opacity:.8"><summary>'+L('Ruckel-Protokoll','Stutter log')+' ('+lg.length+')</summary><div style="font:11px/1.5 ui-monospace,monospace;user-select:text;-webkit-user-select:text;word-break:break-word">'+lg.slice().reverse().map(function(r){return esc(r[0]+' · '+r[1]+'s · '+r[2]+' '+r[3]+'ms'+(r[4]?' · '+r[4]:''))}).join('<br>')+'</div></details>'})();
     $('.sheet-in',el).innerHTML=h;
   }
   paint();
@@ -8053,7 +8072,8 @@ function peopleTab(){
   });
   paint();
 }
-function renderMain(){
+function renderMain(){return WPLAG.time('Seite',renderMain0)}
+function renderMain0(){
   refreshPeople=null;
   if(S.tab==='map')mapTab();else if(S.tab==='explore')exploreTab();else if(S.tab==='me')meTab();else peopleTab();
   $('#app').classList.toggle('mapfull',S.tab==='map');main.classList.toggle('mapmain',S.tab==='map');
@@ -10001,7 +10021,7 @@ function f3Pump(){
       var i=0;(function step(){try{
         /* Solange ein Finger auf dem Bildschirm ist (Karte drehen, scrollen), wird nicht gezeichnet: das Zeichnen belegt die Grafikeinheit und ließ sonst alles kurz stehen */
         if((F3.touch&&Date.now()-(F3.tdn||0)<8000)||Date.now()-(F3.tend||0)<500){setTimeout(step,200);return}
-        var t0=performance.now();f3Draw(u,360,450,i/P3N,0,bust);x.drawImage(P3.cv,0,0,360,450,i*180,0,180,225);i++;
+        var t0=performance.now();WPLAG.mark('Figur');f3Draw(u,360,450,i/P3N,0,bust);x.drawImage(P3.cv,0,0,360,450,i*180,0,180,225);i++;
         /* Immer nur ein Bild, danach doppelt so lange Pause, wie es gedauert hat */
         if(i<P3N){setTimeout(step,Math.max(30,Math.min(250,Math.round((performance.now()-t0)*2))));return}
         if(at.toBlob)at.toBlob(function(b){if(b)f3CachePut(k,b);end(b?URL.createObjectURL(b):at.toDataURL('image/png'))},'image/png');else end(at.toDataURL('image/png'));}catch(e){F3.fail=true;end(null)}})();
