@@ -4614,6 +4614,18 @@ function geoSearch(q,cb){
     }).catch(function(){});
   },400);
 }
+/* Sofort-Suche ohne Verzögerung (beim Speichern ohne gewählten Vorschlag), auch für Namen in Landessprache wie „Warszawa" */
+function geoFind(q){
+  q=String(q||'').trim();if(q.length<2)return Promise.resolve(null);
+  var c=findCity(q)||findCity(q.split(',')[0]);if(c)return Promise.resolve(c);
+  var k=NORM(q);if(GEO.c[k]&&GEO.c[k].length)return Promise.resolve(GEO.c[k][0]);
+  if(navigator.onLine===false||!window.fetch)return Promise.resolve(null);
+  var ctl=window.AbortController?new AbortController():null,tm=setTimeout(function(){if(ctl)ctl.abort()},5000);
+  return fetch('https://photon.komoot.io/api/?q='+encodeURIComponent(q)+'&limit=5&lang=de&layer=city&layer=locality&layer=district',ctl?{signal:ctl.signal}:{}).then(function(r){return r.json()}).then(function(j){
+    clearTimeout(tm);var f=(j.features||[])[0];if(!f)return null;var p=f.properties||{},g=(f.geometry||{}).coordinates||[],lat=+g[1],lon=+g[0];if(!isFinite(lat)||!isFinite(lon))return null;
+    return {name:p.name||q,country:p.country||'',region:p.state||'',lat:Math.round(lat*1000)/1000,lon:Math.round(lon*1000)/1000,tz:nearTz(lat,lon),geo:true};
+  }).catch(function(){clearTimeout(tm);return null});
+}
 function placePicker(host,o){
   o=o||{};
   var st={text:o.text||'',lat:o.lat==null?null:o.lat,lon:o.lon==null?null:o.lon,tz:o.tz||'',country:o.country||'',src:(o.lat!=null?'city':'')};
@@ -4663,7 +4675,10 @@ function placePicker(host,o){
     if(e.target.closest('[data-pp="map"]'))pickOnMap(st,function(){inp.value=st.text;paintMeta()});
   });
   paintMeta();
-  return {get:function(){return st}};
+  return {get:function(){return st},resolve:function(){
+    if(st.lat!=null||!st.text)return Promise.resolve(st);
+    return geoFind(st.text).then(function(c){if(c&&st.lat==null){applyCity(c);st.geoName=st.text;paintMeta()}return st});
+  }};
 }
 function pickOnMap(st,done){
   var el=openSheet('<div class="sbar"><button type="button" class="btn ghost" data-act="cancel">'+ic('back')+_t('Abbrechen</button><button type="button" class="btn pri" data-act="ok" disabled>Übernehmen</button></div><h2 class="stitle">Ort auf der Karte wählen</h2><p class="hint">Dreh den Globus, zoome mit zwei Fingern oder den Tasten und tippe auf den Ort.</p><div class="mapslot"></div><p class="ppmeta"></p>'),'pickmap');
@@ -7789,7 +7804,7 @@ function openProfile(){
     var a=e.target.closest('[data-act]');if(!a)return;var act=a.getAttribute('data-act');
     if(act==='close')closeSheet(el);
     else if(act==='ph-del'){photo='';paintPh()}
-    else if(act==='save'){Promise.resolve(photoP).then(function(){if(save()){closeSheet(el);toast(_t('Profil gespeichert'))}})}
+    else if(act==='save'){Promise.all([photoP,home.resolve()]).then(function(){if(save()){closeSheet(el);toast(_t('Profil gespeichert'))}})}
     else if(act==='share'){var pr=save();if(pr){closeSheet(el);openShareSheet(_t('Mein Profil'),_t('Die andere Person scannt den Code mit der normalen Handy-Kamera. Der Link öffnet Waypals und füllt ihr Formular mit deinen Angaben vor. Ohne Waypals kann sie den Code über „Code einfügen" übernehmen.'),makeCode(packPerson(pr)),function(lg){return invLang(lg,'Hier ist mein Eintrag für dein Freundebuch 🕊️ Öffne den Link, dann landet er direkt in deinem Waypals.','Here is my entry for your friend book 🕊️ Open the link and it goes straight into your Waypals.')})}}
   });
 }
@@ -8147,7 +8162,10 @@ function openForm(existing,draft){
     var fd=new FormData(form),name=String(fd.get('name')||'').trim();
     if(!name){err.hidden=false;err.textContent=_t('Bitte gib einen Namen ein.');$('[name=name]',el).focus();return}
     err.hidden=true;
-    if(!noHomeOk&&ppHome.get().lat==null&&ppHome.get().lat!==0){
+    if(!save.rs){save.rs=1;var bS=$('[data-act=save]',el);if(bS)bS.disabled=true;
+      Promise.all([ppHome.resolve(),ppMet.resolve()]).then(function(){if(bS)bS.disabled=false;save()},function(){if(bS)bS.disabled=false;save()});return}
+    save.rs=0;
+    if(!noHomeOk&&!ppHome.get().text&&ppHome.get().lat==null){
       var wh=openSheet('<h2 class="stitle">'+L('Wohnort fehlt','Home is missing')+'</h2><p class="hint">'+LT('Du hast vergessen einzutragen, wo {0} wohnt. Ohne Wohnort erscheint die Person nicht auf der Freunde-Karte.','You have not added where {0} lives. Without a home, this person will not appear on the friends map.',[esc(first(name))])+'</p><div class="btnrow"><button type="button" class="btn pri" data-w="home">'+L('Wohnort eintragen','Add home')+'</button><button type="button" class="btn ghost" data-w="go">'+L('Trotzdem speichern','Save anyway')+'</button></div>','fsheet');
       wh.addEventListener('click',function(e){var b=e.target.closest('[data-w]');if(!b)return;closeSheet(wh);
         if(b.getAttribute('data-w')==='go'){noHomeOk=true;save()}
