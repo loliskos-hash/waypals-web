@@ -1,5 +1,5 @@
 /* Offline-Cache für die App-Hülle. Firebase/Firestore kümmern sich selbst um Offline-Daten. */
-var V = 'waypals-v97';
+var V = 'waypals-v98';
 var FILES = ['./', 'index.html', 'fonts.css', 'fonts/nunito.woff', 'fonts/caveat.woff', 'fonts/patrickhand.woff', 'shim.js', 'firebase-config.js', 'manifest.webmanifest', 'icons/icon-192.png', 'icons/icon-512.png', 'datenschutz.html', 'impressum.html'];
 /* Start ohne Warten: App-Hülle sofort aus dem Speicher, neue Fassung still im Hintergrund holen (gilt ab dem nächsten Start).
    Früher wurde index.html (über 800 KB) bei jedem Start zuerst vom Server geladen; bei schwachem Netz hing die App auf dem Startbild. */
