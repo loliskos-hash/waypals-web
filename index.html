@@ -540,6 +540,7 @@ html[dir=rtl] .mtc,html[dir=rtl] .sbar .btn.ghost>svg.ic:first-child{transform:s
 #app.mapfull .tab{color:#A9AFD0}#app.mapfull .tab[aria-current="page"]{color:#fff}
 .maptab.full .ghint{bottom:76px;font-size:.66rem;font-weight:600;padding:4px 10px;color:rgba(232,238,255,.6);background:rgba(10,16,50,.3)}
 #main.mapmain{padding:0;margin:0;overflow:hidden;position:relative}
+#main:not(.mapmain){-webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 14px,#000 calc(100% - 12px),transparent 100%);mask-image:linear-gradient(to bottom,transparent 0,#000 14px,#000 calc(100% - 12px),transparent 100%)}
 .maptab.full{display:block;position:relative;height:100%}
 .maptab.full .mapframe{height:100%;min-height:0;border-radius:0;box-shadow:none}
 .maptab.full .zoom{top:calc(12px + env(safe-area-inset-top,0px))}
@@ -7338,7 +7339,7 @@ function openWish(){
 function hereFriends(){
   var t=todayISO(),act=function(tr){return tr.from<=t&&tr.to>=t},home=myCountry();
   var mt=tripsAll().filter(function(tr){return tr.who==='me'&&act(tr)})[0],myC=mt?countryOfPlace(mt.dest.name,mt.dest.lat,mt.dest.lon):home,meAway=!!mt&&myC!==home,out=[];
-  if(!myC)return out;
+  if(!myC)return null;
   store.friends.forEach(function(f){
     if(f.example)return;var ft=[];try{ft=tripsAllOf(f.id).filter(act)}catch(e){}
     var fc='',fAway=false;
@@ -7349,7 +7350,7 @@ function hereFriends(){
   return out.length?{c:myC,list:out}:null;
 }
 function hereHTML(){
-  var h=null;try{h=hereFriends()}catch(e){}if(!h)return '';
+  var h=null;try{h=hereFriends()}catch(e){}if(!h||!h.list||!h.list.length)return '';
   var nm=h.list.map(function(x){return first(x.f.name)}),txt=nm.length===1?LT("{0} ist gerade auch in {1}!","{0} is in {1} right now too!",[esc(nm[0]),esc(cn(h.c))]):LT("{0} sind gerade auch in {1}!","{0} are in {1} right now too!",[esc(nm.slice(0,-1).join(', ')+' '+L('und','and')+' '+nm[nm.length-1]),esc(cn(h.c))]);
   return '<section class="herecard"><span class="hci" aria-hidden="true">📍</span><div><b>'+txt+'</b><small>'+L('Vielleicht klappt ein Treffen?','Maybe you can meet up?')+'</small><div class="btnrow">'+h.list.slice(0,3).map(function(x){return '<button type="button" class="btn sm" data-open="'+esc(x.f.id)+'">'+esc(first(x.f.name))+'</button>'}).join('')+'</div></div></section>';
 }
