@@ -1,5 +1,5 @@
 /* Offline-Cache für die App-Hülle. Firebase/Firestore kümmern sich selbst um Offline-Daten. */
-var V = 'waypals-v99';
+var V = 'waypals-v100';
 var FILES = ['./', 'index.html', 'fonts.css', 'fonts/nunito.woff', 'fonts/caveat.woff', 'fonts/patrickhand.woff', 'fonts/dm-sans-latin-wght-normal.woff2', 'fonts/cormorant-garamond-latin-600-normal.woff2', 'fonts/cormorant-garamond-latin-700-normal.woff2', 'shim.js', 'firebase-config.js', 'manifest.webmanifest', 'icons/icon-192.png', 'icons/icon-512.png', 'datenschutz.html', 'impressum.html'];
 /* Start ohne Warten: App-Hülle sofort aus dem Speicher, neue Fassung still im Hintergrund holen (gilt ab dem nächsten Start).
    Früher wurde index.html (über 800 KB) bei jedem Start zuerst vom Server geladen; bei schwachem Netz hing die App auf dem Startbild. */
@@ -10,7 +10,7 @@ self.addEventListener('install', function (e) {
     return Promise.all(FILES.map(function (f) { return fetch(new Request(f, { cache: 'reload' })).then(function (r) { if (r.ok) return c.put(f, r) }).catch(function () {}) }));
   }).then(function () { return self.skipWaiting() }));
 });
-self.addEventListener('activate', function (e) { e.waitUntil(caches.keys().then(function (ks) { return Promise.all(ks.filter(function (k) { return k !== V && k !== 'waypals-fb' }).map(function (k) { return caches.delete(k) })) }).then(function () { return self.clients.claim() })) });
+self.addEventListener('activate', function (e) { e.waitUntil(caches.keys().then(function (ks) { return Promise.all(ks.filter(function (k) { return k !== V && k !== 'waypals-fb' && k !== 'waypals-fig' }).map(function (k) { return caches.delete(k) })) }).then(function () { return self.clients.claim() })) });
 function keep(r, res) { if (res && res.ok && res.type === 'basic') { var cp = res.clone(); caches.open(V).then(function (c) { return c.put(r, cp) }).catch(function () {}) } return res }
 self.addEventListener('fetch', function (e) {
   var r = e.request; if (r.method !== 'GET' || r.headers.has('range')) return;

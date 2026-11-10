@@ -9955,7 +9955,34 @@ function f3Bust(f){
 function f3Make(k,cb){
   var s=F3.sheet[k];
   if(s){if(s.url)cb(s.url);else if(s.fail)cb(null);else s.cbs.push(cb);return}
-  s=F3.sheet[k]={cbs:[cb]};F3.q.push(k);f3Pump();
+  s=F3.sheet[k]={cbs:[cb]};
+  /* Fertige Figurenbilder bleiben auf dem Gerät gespeichert: beim nächsten Start kein erneutes Zeichnen (das ließ die App kurz hängen) */
+  f3CacheGet(k,function(url){
+    if(url){s.url=url;var c=s.cbs;s.cbs=[];c.forEach(function(f){try{f(url)}catch(e){}});return}
+    F3.q.push(k);f3Pump();
+  });
+}
+function f3CacheVer(){if(F3.cver)return F3.cver;var h=5381,t=F3_FS,i;for(i=0;i<t.length;i++)h=((h<<5)+h+t.charCodeAt(i))|0;return F3.cver='f'+(h>>>0).toString(36)}
+function f3CacheReq(k){return 'https://waypals.invalid/fig/'+f3CacheVer()+'/'+encodeURIComponent(k)+'.png'}
+function f3CacheGet(k,cb){
+  var done=false;function fin(u){if(done)return;done=true;cb(u)}
+  try{
+    if(!window.caches||!caches.open)return fin(null);
+    setTimeout(function(){fin(null)},1500);
+    caches.open('waypals-fig').then(function(c){return c.match(f3CacheReq(k))}).then(function(r){return r?r.blob():null}).then(function(b){fin(b&&b.size?URL.createObjectURL(b):null)}).catch(function(){fin(null)});
+  }catch(e){fin(null)}
+}
+function f3CachePut(k,b){
+  try{
+    if(!b||!window.caches||!caches.open)return;
+    caches.open('waypals-fig').then(function(c){
+      return c.put(f3CacheReq(k),new Response(b,{headers:{'Content-Type':'image/png'}})).then(function(){return c.keys()}).then(function(ks){
+        var v='/fig/'+f3CacheVer()+'/',old=ks.filter(function(q){return q.url.indexOf(v)<0}),cur=ks.length-old.length;
+        if(cur>240)old=old.concat(ks.filter(function(q){return q.url.indexOf(v)>=0}).slice(0,80));
+        return Promise.all(old.map(function(q){return c.delete(q)}));
+      });
+    }).catch(function(){});
+  }catch(e){}
 }
 function f3Pump(){
   if(F3.run||!F3.q.length)return;F3.run=true;
@@ -9966,8 +9993,9 @@ function f3Pump(){
       if(!f3Init())return end(null);
       var bust=k.slice(-2)==='#b',u=f3Uni(f3Av(F3.reg[k])),at=document.createElement('canvas');at.width=180*P3N;at.height=225;var x=at.getContext('2d');x.imageSmoothingQuality='high';
       var i=0;(function step(){try{var t0=performance.now();while(i<P3N){f3Draw(u,360,450,i/P3N,0,bust);x.drawImage(P3.cv,0,0,360,450,i*180,0,180,225);i++;if(performance.now()-t0>10)break}
-        if(i<P3N){setTimeout(step,0);return}
-        if(at.toBlob)at.toBlob(function(b){end(b?URL.createObjectURL(b):at.toDataURL('image/png'))},'image/png');else end(at.toDataURL('image/png'));}catch(e){F3.fail=true;end(null)}})();
+        /* Nach jedem Schwung genauso lange Pause, wie das Zeichnen gedauert hat: die Bedienung bleibt flüssig, auch auf langsamen Handys */
+        if(i<P3N){setTimeout(step,Math.min(120,Math.round(performance.now()-t0)));return}
+        if(at.toBlob)at.toBlob(function(b){if(b)f3CachePut(k,b);end(b?URL.createObjectURL(b):at.toDataURL('image/png'))},'image/png');else end(at.toDataURL('image/png'));}catch(e){F3.fail=true;end(null)}})();
     }catch(e){F3.fail=true;end(null)}
   };
   f3Ready(function(){(window.requestAnimationFrame||setTimeout)(function(){setTimeout(go,0)})});
@@ -10382,7 +10410,7 @@ renderMain();
   (function w(){if(store.mode!=='pending'||document.getElementById('wp-login')||Date.now()-t0>12000){if(window.wpStep)wpStep(5);setTimeout(function(){s.classList.add('sp-done');setTimeout(function(){if(s.parentNode)s.remove()},450)},250);return}setTimeout(w,120)})()})();
 translateStatic(document.getElementById('app')||document.body);store.init();
 window.__wpBoot=1;setTimeout(checkHash,900);window.addEventListener('hashchange',checkHash);
-setTimeout(checkArrivals,3500);setTimeout(function(){(window.requestIdleCallback||setTimeout)(f3Warm,{timeout:4000})},5500);setTimeout(maybeIntro,3000);setTimeout(birthdayToast,6500);setTimeout(addMailResult,2500);setTimeout(flashbackCheck,8500);
+setTimeout(checkArrivals,3500);setTimeout(maybeIntro,3000);setTimeout(birthdayToast,6500);setTimeout(addMailResult,2500);setTimeout(flashbackCheck,8500);
 setInterval(function(){checkArrivals();if(S.tab==='map'&&!S.mapSel)paintMapInfo();syncMap()},30000);
 })();
 </script>
