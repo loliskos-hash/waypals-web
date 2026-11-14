@@ -13,7 +13,7 @@
 <meta name="theme-color" content="#FFF8EE">
 <link rel="manifest" href="manifest.webmanifest" id="mfst">
 <script>/* Untere Android-Leiste = theme_color des Manifests: passend zu Stil und Hell/Dunkel wählen */
-function wpMfst(){try{var p=JSON.parse(localStorage.getItem('waypals-pref')||'{}')||{},st=/^(minimal|notebook)$/.test(p.style)?p.style:'bunt',dk=p.theme==='dark'||(p.theme!=='light'&&matchMedia('(prefers-color-scheme: dark)').matches),f=(st==='bunt'&&!dk)?'manifest.webmanifest':'manifest-'+st+'-'+(dk?'dark':'light')+'.webmanifest',l=document.getElementById('mfst');if(l&&l.getAttribute('href')!==f)l.setAttribute('href',f)}catch(e){}}wpMfst();</script>
+function wpMfst(){try{var p=JSON.parse(localStorage.getItem('waypals-pref')||'{}')||{},st=/^(minimal|notebook|reise)$/.test(p.style)?p.style:'bunt',dk=p.theme==='dark'||(p.theme!=='light'&&matchMedia('(prefers-color-scheme: dark)').matches),f=(st==='bunt'&&!dk)?'manifest.webmanifest':'manifest-'+st+'-'+(dk?'dark':'light')+'.webmanifest',l=document.getElementById('mfst');if(l&&l.getAttribute('href')!==f)l.setAttribute('href',f)}catch(e){}}wpMfst();</script>
 <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -413,6 +413,48 @@ label.chk{display:flex!important;flex-direction:row!important;gap:12px;align-ite
 :root[data-style="notebook"] .pg>.pgi:nth-child(odd){transform:rotate(-.3deg)}
 :root[data-style="notebook"] .pg>.pgi:nth-child(even){transform:rotate(.25deg)}
 :root[data-style="notebook"] .stitle,:root[data-style="notebook"] .h2{font-family:var(--f-hand);font-size:2rem}
+/* Layout Reisetagebuch: Papier mit Körnung, Polaroid-Karten, Siegelrot; dunkel = Nachtblau mit Goldtinte */
+:root[data-style="reise"]{--paper:#F3EADA;--sheet:#FBF6EA;--ink:#2A2620;--muted:#7A6E5E;--line:#DCCDB0;--pen:#7A2E1F;--pen-soft:#F1E1D3;--on-pen:#FFF8EE;--marker:#C9A24A;--on-marker:#2A2620;--pin:#7A2E1F;--g1:rgba(201,162,74,.10);--g2:rgba(122,46,31,.05);--ok:#2E6B4F;--danger:#9B2C2C;--shadow:0 1px 2px rgba(70,50,20,.08),0 10px 22px -12px rgba(70,50,20,.35);--rgr:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .35 0 0 0 0 .26 0 0 0 0 .16 0 0 0 .09 0'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)'/%3E%3C/svg%3E")}
+@media (prefers-color-scheme:dark){:root[data-style="reise"]:not([data-theme="light"]){--paper:#0F1730;--sheet:#17213F;--ink:#EFE4C8;--muted:#A99F86;--line:#2B3657;--pen:#E2C47A;--pen-soft:#25304F;--on-pen:#0F1730;--marker:#E2C47A;--on-marker:#0F1730;--pin:#E2C47A;--g1:rgba(226,196,122,.08);--g2:rgba(90,120,200,.10);--ok:#7FD1A6;--danger:#FF9A8F;--scrim:rgba(4,8,20,.72);--shadow:0 2px 4px rgba(0,0,0,.35),0 14px 28px -14px rgba(0,0,0,.8);--rgr:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .9 0 0 0 0 .85 0 0 0 0 .7 0 0 0 .05 0'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)'/%3E%3C/svg%3E");color-scheme:dark}}
+:root[data-style="reise"][data-theme="dark"]{--paper:#0F1730;--sheet:#17213F;--ink:#EFE4C8;--muted:#A99F86;--line:#2B3657;--pen:#E2C47A;--pen-soft:#25304F;--on-pen:#0F1730;--marker:#E2C47A;--on-marker:#0F1730;--pin:#E2C47A;--g1:rgba(226,196,122,.08);--g2:rgba(90,120,200,.10);--ok:#7FD1A6;--danger:#FF9A8F;--scrim:rgba(4,8,20,.72);--shadow:0 2px 4px rgba(0,0,0,.35),0 14px 28px -14px rgba(0,0,0,.8);--rgr:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .9 0 0 0 0 .85 0 0 0 0 .7 0 0 0 .05 0'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)'/%3E%3C/svg%3E");color-scheme:dark}
+:root[data-style="reise"] body,:root[data-style="reise"] .sheet,:root[data-style="reise"] .sheetgo{background-image:var(--rgr),radial-gradient(60rem 28rem at 100% -8%,var(--g1),transparent 62%),radial-gradient(44rem 30rem at -12% 6%,var(--g2),transparent 60%)}
+:root[data-style="reise"] .brand span{background:none;color:var(--ink);padding:0}
+:root[data-style="reise"] .tagline{font-family:var(--f-hand);font-style:normal;font-size:1.3rem;color:var(--pen)}
+:root[data-style="reise"] .stitle,:root[data-style="reise"] .h2{font-size:2.05rem;font-weight:700;letter-spacing:.005em}
+:root[data-style="reise"] .pgi,:root[data-style="reise"] .lvlcard,:root[data-style="reise"] .stamp,:root[data-style="reise"] .stylecard,:root[data-style="reise"] .opt{border-radius:4px;border-width:1px;background:var(--sheet);box-shadow:var(--shadow)}
+:root[data-style="reise"] .pgbox{border-radius:4px;background:var(--pen-soft)}
+:root[data-style="reise"] .pg>.pgi:nth-child(odd){transform:rotate(-.35deg)}
+:root[data-style="reise"] .pg>.pgi:nth-child(even){transform:rotate(.3deg)}
+:root[data-style="reise"] .lvlcard{position:relative}
+:root[data-style="reise"] .lvlcard::before{content:"";position:absolute;top:-8px;left:50%;width:72px;height:18px;margin-left:-36px;background:rgba(201,162,74,.45);transform:rotate(-2.5deg);box-shadow:0 1px 2px rgba(0,0,0,.08)}
+:root[data-style="reise"] .btn{border-radius:10px;border-width:1px;letter-spacing:.01em}
+:root[data-style="reise"] .btn.pri{box-shadow:0 6px 14px -8px var(--pen)}
+:root[data-style="reise"] .row{border-bottom-style:solid;border-bottom-width:1px}
+:root[data-style="reise"] .tabs{border-top-width:1px}
+:root[data-style="reise"] .tab[aria-current]{color:var(--pen)}
+.stylecard[data-pv=reise] .prev i:nth-child(1){background:#F3EADA;border:1px solid #bbb}
+.stylecard[data-pv=reise] .prev i:nth-child(2){background:#7A2E1F}
+.stylecard[data-pv=reise] .prev i:nth-child(3){background:#0F1730;box-shadow:inset 0 0 0 3px #E2C47A}
+/* Übergänge: Tabs, Fenster, Listen, Knöpfe */
+@keyframes wpTabIn{from{opacity:0;translate:var(--tdx,0) 8px}to{opacity:1;translate:0 0}}
+@keyframes wpFade{from{opacity:0}to{opacity:1}}
+@keyframes wpRowIn{from{opacity:0;translate:0 10px}to{opacity:1;translate:0 0}}
+@keyframes wpShIn{from{opacity:0;translate:0 28px}to{opacity:1;translate:0 0}}
+@keyframes wpShOut{from{opacity:1;translate:0 0}to{opacity:0;translate:0 28px}}
+@keyframes wpPop{from{opacity:0;translate:0 40px;scale:.98}to{opacity:1;translate:0 0;scale:1}}
+#main.tabin:not(.mapmain)>*{animation:wpTabIn .34s cubic-bezier(.2,.8,.2,1) both}
+#main.tabin.mapmain>*{animation:wpFade .3s ease both}
+#main.tabin .pg>*{animation:wpRowIn .42s cubic-bezier(.2,.8,.2,1) both}
+#main.tabin .pg>:nth-child(2){animation-delay:.04s}#main.tabin .pg>:nth-child(3){animation-delay:.08s}#main.tabin .pg>:nth-child(4){animation-delay:.12s}#main.tabin .pg>:nth-child(5){animation-delay:.16s}#main.tabin .pg>:nth-child(6){animation-delay:.2s}#main.tabin .pg>:nth-child(n+7){animation-delay:.24s}
+.sheet{animation:wpShIn .32s cubic-bezier(.2,.8,.2,1) both}
+.sheetgo{position:fixed;inset:0;z-index:20;overflow:hidden;background-color:var(--paper);pointer-events:none;animation:wpShOut .2s ease-in both}
+.scrim{animation:wpFade .2s ease both}
+.scrim>*{animation:wpPop .32s cubic-bezier(.2,.8,.2,1) both}
+.btn,.tab,.mtile,.stylecard,.opt,.row{transition:scale .12s ease,background-color .2s ease,border-color .2s ease,color .2s ease}
+.btn:active,.tab:active,.mtile:active,.stylecard:active,.opt:active,.row:active{scale:.97}
+.tab svg{transition:translate .25s cubic-bezier(.2,.8,.2,1)}.tab[aria-current] svg{translate:0 -2px}
+html,body{transition:background-color .35s ease,color .35s ease}
+@media (prefers-reduced-motion:reduce){#main.tabin>*,#main.tabin .pg>*,.sheet,.sheetgo,.scrim,.scrim>*{animation:none!important}}
 .people>*,.maptab>*{min-width:0}
 .people{grid-template-columns:minmax(0,1fr)}
 .drawwrap{border:1.5px dashed var(--line);border-radius:16px;background:#FFFDF7;overflow:hidden}
@@ -4617,7 +4659,8 @@ function openSheet(html,cls,rawMode){
 }
 function closeSheet(el){
   var i=stack.indexOf(el);if(i<0)return;
-  stack.splice(i,1);el.remove();
+  stack.splice(i,1);
+  if(el.classList.contains('sheet')&&!(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches)){var sc=el.scrollTop;el.classList.remove('sheet');el.classList.add('sheetgo');el.inert=true;el.removeAttribute('role');var ii=el.firstElementChild;if(ii&&sc)ii.style.marginTop=(-sc)+'px';setTimeout(function(){el.remove()},210)}else el.remove();
   var top=stack[stack.length-1];if(top)top.inert=false;else app.inert=false;
   try{if(el._prev&&el._prev.focus&&document.contains(el._prev))el._prev.focus({preventScroll:true})}catch(e){}
   if(el._onClose)el._onClose();
@@ -6220,7 +6263,7 @@ function openAddMail(){
   });
 }
 function addMailResult(){var r=null;try{r=localStorage.getItem('waypals-addmail-result');if(r)localStorage.removeItem('waypals-addmail-result')}catch(e){}if(!r)return;toast(r==='ok'?L('Fertig! Du kannst dich jetzt auch mit der neuen Adresse anmelden.','Done! You can now sign in with the new address too.'):(r==='auth/credential-already-in-use'||r==='auth/email-already-in-use'?L('Diese Adresse gehört schon zu einem anderen Waypals-Konto. Es wurde nichts verändert.','This address already belongs to another Waypals account. Nothing was changed.'):L('Das hat nicht geklappt. Bitte nochmal versuchen.','That did not work. Please try again.')))}
-var APP_VER=105;/* gleiche Nummer wie V in sw.js */
+var APP_VER=106;/* gleiche Nummer wie V in sw.js */
 function openSettings(){
   var el=openSheet('','settings');
   function chip(attr,val,label,cur){return '<button type="button" class="cb" '+attr+'="'+val+'" aria-pressed="'+(cur===val)+'">'+label+'</button>'}
@@ -6229,7 +6272,7 @@ function openSettings(){
     var h='<div class="sbar"><button type="button" class="btn ghost" data-act="close">'+ic('back')+L('Zurück','Back')+'</button></div><h2 class="stitle">'+L('Einstellungen','Settings')+'</h2>';
     h+='<section class="tell"><h3 class="who">'+L('App','App')+'</h3><div class="mtiles">'+(isStandalone()?'':tile('install','download',L('Als App speichern','Install as app'),L('Auf dem Startbildschirm, ohne Browserleiste','On your home screen, without browser bar')))+tile('push','bell',L('Benachrichtigungen','Notifications'),pushSub())+'</div></section>';
     h+='<section class="tell"><h3 class="who">'+L('Darstellung','Appearance')+'</h3><div class="styles">'+
-      [['bunt',L('Bunt','Colourful'),L('Der verspielte Standard','The playful default')],['minimal',L('Minimal','Minimal'),L('Schlicht, wenig Farbe','Plain, little colour')],['notebook',L('Notizbuch','Notebook'),L('Liniertes Papier, Handschrift','Ruled paper, handwriting')]].map(function(s){
+      [['bunt',L('Bunt','Colourful'),L('Der verspielte Standard','The playful default')],['minimal',L('Minimal','Minimal'),L('Schlicht, wenig Farbe','Plain, little colour')],['notebook',L('Notizbuch','Notebook'),L('Liniertes Papier, Handschrift','Ruled paper, handwriting')],['reise',L('Reise\u00ADtagebuch','Travel journal'),L('Papier, Polaroids, nachts Nachtblau mit Gold','Paper, polaroids, at night midnight blue with gold')]].map(function(s){
         return '<button type="button" class="stylecard" data-st="'+s[0]+'" data-pv="'+s[0]+'" aria-pressed="'+(st===s[0])+'"><span class="prev"><i></i><i></i><i></i></span><b>'+s[1]+'</b><small>'+s[2]+'</small></button>'}).join('')+'</div>'+
       '<div class="fl"><span>'+L('Hell oder dunkel','Light or dark')+'</span><div class="chips">'+chip('data-th','auto',L('Automatisch','Automatic'),th)+chip('data-th','light',L('Hell','Light'),th)+chip('data-th','dark',L('Dunkel','Dark'),th)+'</div></div>'+
       '<div class="fl"><span>'+L('Ton und Vibration','Sound and vibration')+'</span><div class="chips">'+chip('data-snd','on',L('An','On'),PREF.snd==='off'?'off':'on')+chip('data-snd','off',L('Aus','Off'),PREF.snd==='off'?'off':'on')+'</div></div>'+
@@ -8084,11 +8127,14 @@ function peopleTab(){
   paint();
 }
 function renderMain(){return WPLAG.time('Seite',renderMain0)}
+var TAB_ORD=['map','people','explore','me'],lastTab_=null;
 function renderMain0(){
   refreshPeople=null;
+  var tabChg=lastTab_!==null&&lastTab_!==S.tab,tdir=TAB_ORD.indexOf(S.tab)-TAB_ORD.indexOf(lastTab_);lastTab_=S.tab;
   if(S.tab==='map')mapTab();else if(S.tab==='explore')exploreTab();else if(S.tab==='me')meTab();else peopleTab();
   $('#app').classList.toggle('mapfull',S.tab==='map');main.classList.toggle('mapmain',S.tab==='map');
   $$('.tab').forEach(function(b){if(b.getAttribute('data-tab')===S.tab)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current')});
+  if(tabChg){main.style.setProperty('--tdx',(tdir>0?18:-18)+'px');main.classList.remove('tabin');void main.offsetWidth;main.classList.add('tabin');clearTimeout(renderMain0.t);renderMain0.t=setTimeout(function(){main.classList.remove('tabin')},700)}
   setBar();
 }
 function setBar(){if(window.wpMfst)wpMfst();var m=document.querySelector('meta[name="theme-color"]');if(!m)return;var c=(S.tab==='map'&&!layer.children.length)?'#070A22':getComputedStyle(document.documentElement).getPropertyValue('--paper').trim();if(c&&m.content!==c)m.content=c}
