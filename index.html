@@ -6270,7 +6270,7 @@ function openAddMail(){
   });
 }
 function addMailResult(){var r=null;try{r=localStorage.getItem('waypals-addmail-result');if(r)localStorage.removeItem('waypals-addmail-result')}catch(e){}if(!r)return;toast(r==='ok'?L('Fertig! Du kannst dich jetzt auch mit der neuen Adresse anmelden.','Done! You can now sign in with the new address too.'):(r==='auth/credential-already-in-use'||r==='auth/email-already-in-use'?L('Diese Adresse gehört schon zu einem anderen Waypals-Konto. Es wurde nichts verändert.','This address already belongs to another Waypals account. Nothing was changed.'):L('Das hat nicht geklappt. Bitte nochmal versuchen.','That did not work. Please try again.')))}
-var APP_VER=109;/* gleiche Nummer wie V in sw.js */
+var APP_VER=110;/* gleiche Nummer wie V in sw.js */
 function openSettings(){
   var el=openSheet('','settings');
   function chip(attr,val,label,cur){return '<button type="button" class="cb" '+attr+'="'+val+'" aria-pressed="'+(cur===val)+'">'+label+'</button>'}
@@ -9665,7 +9665,7 @@ function p3Live(box,skin,w,h){
 }
 
 /* ---------- 3D-Figuren (Mii-Stil): Raymarching in WebGL, ein Shader für alle, Werte per Uniform ---------- */
-var F3={prog:null,fail:false,reg:{},sheet:{},q:[],run:false};
+var F3={prog:null,fail:false,reg:{},sheet:{},q:[],run:false,sp:{},spw:{}};
 var F3_FS=[
 'precision highp float;',
 '#define WPV 96',
@@ -10080,30 +10080,41 @@ function f3Uni(a){
   return {skin:AV_SKIN[a.skin],hair:AV_HAIRC[a.hc],topc:tcc,topd:tcd,pants:pants,eye:AV_EYEC[a.ec]||AV_EYEC[0],hatc:hc,hatd:hd,acc:acc,bp:AV_BP[a.bc]||AV_BP[0],
     A:[a.hair,top,a.ey,a.br],B:[a.mo,a.no,a.be,a.ha],C:[cost,a.gl,(a.ac?1:0)+2*(a.jw||0),(a.bt?1:0)+2*(a.sh||0)],D:[sleeve,leg,wide,(a.fk?1:0)+2*(a.wd||0)+16*(a.tt||0)]};
 }
+var F3_UN=['uRes','uT','uYaw','uCam','uSkin','uHair','uTopC','uTopD','uPants','uEye','uHatC','uHatD','uAcc','uBP','uA','uB','uC','uD'];
+function f3Src(h){return F3_FS.replace('float hair=uA.x,','float hair='+h+'.,')}
+function f3Obj(pr){var gl=P3.gl,U={};F3_UN.forEach(function(n){U[n]=gl.getUniformLocation(pr,n)});return {pr:pr,U:U}}
+/* Kein Übersetzen mehr im Vordergrund: das große Programm ließ die App beim ersten Öffnen sekundenlang stehen */
 function f3Init(){
   if(F3.prog||F3.fail)return !F3.fail;
   if(!p3Init()){F3.fail=true;return false}
-  try{
-    var gl=P3.gl;function sh(t,s){var o=gl.createShader(t);gl.shaderSource(o,s);gl.compileShader(o);if(!gl.getShaderParameter(o,gl.COMPILE_STATUS)){F3.err=gl.getShaderInfoLog(o);throw new Error(F3.err)}return o}
-    var pr=gl.createProgram();gl.attachShader(pr,sh(gl.VERTEX_SHADER,P3_VS));gl.attachShader(pr,sh(gl.FRAGMENT_SHADER,F3_FS));gl.bindAttribLocation(pr,0,'a');gl.linkProgram(pr);
-    if(!gl.getProgramParameter(pr,gl.LINK_STATUS))throw new Error('link');
-    var U={},names=['uRes','uT','uYaw','uCam','uSkin','uHair','uTopC','uTopD','uPants','uEye','uHatC','uHatD','uAcc','uBP','uA','uB','uC','uD'];
-    names.forEach(function(n){U[n]=gl.getUniformLocation(pr,n)});F3.prog={pr:pr,U:U};return true;
-  }catch(e){F3.fail=true;return false}
+  f3Warm();return true;
 }
 function f3Ready(cb){if(F3.prog){cb(true);return}if(F3.fail){cb(false);return}(F3.wq=F3.wq||[]).push(cb);f3Warm()}
 function f3Warm(){
   if(F3.prog||F3.fail||F3.warm)return;F3.warm=1;
   function flush(){var q=F3.wq||[];F3.wq=[];q.forEach(function(f){try{f(!!F3.prog)}catch(e){}})}
   if(!p3Init()){F3.fail=true;flush();return}
-  glAsyncProg(P3_VS,F3_FS,function(pr){
+  var h0=0;try{h0=f3HK(f3Uni(f3Av(myFig())))}catch(e){}
+  glAsyncProg(P3_VS,f3Src(h0),function(pr){
     if(!pr)F3.fail=true;
-    else{var gl=P3.gl,U={};['uRes','uT','uYaw','uCam','uSkin','uHair','uTopC','uTopD','uPants','uEye','uHatC','uHatD','uAcc','uBP','uA','uB','uC','uD'].forEach(function(n){U[n]=gl.getUniformLocation(pr,n)});F3.prog={pr:pr,U:U}}
+    else{F3.prog=f3Obj(pr);F3.sp[h0]=F3.prog}
     flush();
   });
 }
+/* Je Frisur ein eigenes, zugeschnittenes Programm: der Grafiktreiber lässt dann alle anderen Frisuren weg (rund 9× schneller als das große Gesamtprogramm, gleiches Bild) */
+function f3HK(u){var h=+(u&&u.A&&u.A[0]);return isFinite(h)?Math.round(h):0}
+function f3Spec(h,cb){
+  if(F3.sp[h])return cb(F3.sp[h]);
+  if(F3.sp[h]===null||F3.fail)return cb(F3.prog);
+  if(!F3.prog){f3Ready(function(){f3Spec(h,cb)});return}
+  if(F3.spw[h]){F3.spw[h].push(cb);return}F3.spw[h]=[cb];
+  glAsyncProg(P3_VS,f3Src(h),function(pr){
+    var o=pr?f3Obj(pr):null;
+    F3.sp[h]=o;var c=F3.spw[h]||[];delete F3.spw[h];c.forEach(function(f){try{f(o||F3.prog)}catch(e){}});
+  });
+}
 function f3Draw(u,w,h,t,yaw,bust){
-  var gl=P3.gl,o=F3.prog,U=o.U;
+  var hk=f3HK(u),gl=P3.gl,o=F3.sp[hk]||F3.prog,U=o.U;if(F3.sp[hk]===undefined&&!F3.spw[hk])f3Spec(hk,function(){});
   if(P3.cv.width!==w||P3.cv.height!==h){P3.cv.width=w;P3.cv.height=h}
   gl.viewport(0,0,w,h);gl.clearColor(0,0,0,0);gl.clear(gl.COLOR_BUFFER_BIT);gl.useProgram(o.pr);
   if(!P3.buf){P3.buf=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,P3.buf);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,3,-1,-1,3]),gl.STATIC_DRAW)}else gl.bindBuffer(gl.ARRAY_BUFFER,P3.buf);
@@ -10164,13 +10175,13 @@ function f3Pump(){
     try{
       if(!f3Init())return end(null);
       var bust=k.slice(-2)==='#b',u=f3Uni(f3Av(F3.reg[k])),at=document.createElement('canvas');at.width=180*P3N;at.height=225;var x=at.getContext('2d');x.imageSmoothingQuality='high';
-      var i=0;(function step(){try{
+      var i=0;f3Spec(f3HK(u),function(){(function step(){try{
         /* Solange ein Finger auf dem Bildschirm ist (Karte drehen, scrollen), wird nicht gezeichnet: das Zeichnen belegt die Grafikeinheit und ließ sonst alles kurz stehen */
         if((F3.touch&&Date.now()-(F3.tdn||0)<8000)||Date.now()-(F3.tend||0)<500){setTimeout(step,200);return}
         var t0=performance.now();WPLAG.mark('Figur');f3Draw(u,360,450,i/P3N,0,bust);x.drawImage(P3.cv,0,0,360,450,i*180,0,180,225);i++;
         /* Immer nur ein Bild, danach doppelt so lange Pause, wie es gedauert hat */
         if(i<P3N){setTimeout(step,Math.max(30,Math.min(250,Math.round((performance.now()-t0)*2))));return}
-        if(at.toBlob)at.toBlob(function(b){if(b)f3CachePut(k,b);end(b?URL.createObjectURL(b):at.toDataURL('image/png'))},'image/png');else end(at.toDataURL('image/png'));}catch(e){F3.fail=true;end(null)}})();
+        if(at.toBlob)at.toBlob(function(b){if(b)f3CachePut(k,b);end(b?URL.createObjectURL(b):at.toDataURL('image/png'))},'image/png');else end(at.toDataURL('image/png'));}catch(e){F3.fail=true;end(null)}})()});
     }catch(e){F3.fail=true;end(null)}
   };
   f3Ready(function(){(window.requestAnimationFrame||setTimeout)(function(){setTimeout(go,0)})});
@@ -10189,7 +10200,8 @@ function f3Apply(el){
 function figCanvas(m,w,h,cb){
   if(F3.fail||!f3Init()){cb(null);return}
   f3Ready(function(ok){if(!ok){cb(null);return}
-    try{var u=f3Uni(f3Av(m));f3Draw(u,w,h,0,0,false);var c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(P3.cv,0,0,w,h,0,0,w,h);cb(c)}catch(e){cb(null)}});
+    var u;try{u=f3Uni(f3Av(m))}catch(e){cb(null);return}
+    f3Spec(f3HK(u),function(){try{f3Draw(u,w,h,0,0,false);var c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(P3.cv,0,0,w,h,0,0,w,h);cb(c)}catch(e){cb(null)}})});
 }
 function myFig(){var pr=store.post.profile||{};return {name:myCircleName()||pr.name||'',av:pr.av||null}}
 function stickerCanvas(cb){
@@ -10229,6 +10241,7 @@ function f3Live(box,m,w,h,bust){
   box.innerHTML='';box.appendChild(cv);box.classList.add('p3lv');
   var lp=liveLoop(cv,function(now){
     if(!drag){if(Math.abs(vel)>.002){yaw+=vel;vel*=.88}else{idle+=.033;yaw+=(.5*Math.sin(idle)-yaw)*.08}}
+    var hk=f3HK(u);if(!F3.sp[hk]&&F3.sp[hk]!==null){f3Spec(hk,function(){lp.wake()});return}
     f3Draw(u,w*2,h*2,((now-t0)/1800)%1,yaw,!!bust);x.clearRect(0,0,cv.width,cv.height);x.drawImage(P3.cv,0,0);
   });
   return {set:function(mm){u=f3Uni(f3Av(mm));lp.wake()},el:cv};
