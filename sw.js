@@ -1,5 +1,5 @@
 /* Offline-Cache für die App-Hülle. Firebase/Firestore kümmern sich selbst um Offline-Daten. */
-var V = 'waypals-v106';
+var V = 'waypals-v107';
 var FILES = ['./', 'index.html', 'fonts.css', 'fonts/nunito.woff', 'fonts/caveat.woff', 'fonts/patrickhand.woff', 'fonts/dm-sans-latin-wght-normal.woff2', 'fonts/cormorant-garamond-latin-600-normal.woff2', 'fonts/cormorant-garamond-latin-700-normal.woff2', 'shim.js', 'firebase-config.js', 'manifest.webmanifest', 'icons/icon-192.png', 'icons/icon-512.png', 'datenschutz.html', 'impressum.html'];
 /* Start ohne Warten: App-Hülle sofort aus dem Speicher, neue Fassung still im Hintergrund holen (gilt ab dem nächsten Start).
    Früher wurde index.html (über 800 KB) bei jedem Start zuerst vom Server geladen; bei schwachem Netz hing die App auf dem Startbild. */
@@ -7,7 +7,8 @@ var WAIT = 3500;
 var FB = /^https:\/\/www\.gstatic\.com\/firebasejs\/[0-9.]+\//;
 self.addEventListener('install', function (e) {
   e.waitUntil(caches.open(V).then(function (c) {
-    return Promise.all(FILES.map(function (f) { return fetch(new Request(f, { cache: 'reload' })).then(function (r) { if (r.ok) return c.put(f, r) }).catch(function () {}) }));
+    /* index.html muss da sein, sonst Installation abbrechen: die alte Fassung bleibt dann aktiv und offline nutzbar */
+    return Promise.all(FILES.map(function (f) { var must = f === './' || f === 'index.html'; return fetch(new Request(f, { cache: 'reload' })).then(function (r) { if (r.ok) return c.put(f, r); if (must) throw new Error(f) }).catch(function (e) { if (must) throw e }) }));
   }).then(function () { return self.skipWaiting() }));
 });
 self.addEventListener('activate', function (e) { e.waitUntil(caches.keys().then(function (ks) { return Promise.all(ks.filter(function (k) { return k !== V && k !== 'waypals-fb' && k !== 'waypals-fig' }).map(function (k) { return caches.delete(k) })) }).then(function () { return self.clients.claim() })) });
