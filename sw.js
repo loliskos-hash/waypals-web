@@ -1,5 +1,5 @@
 /* Offline-Cache für die App-Hülle. Firebase/Firestore kümmern sich selbst um Offline-Daten. */
-var V = 'waypals-v111';
+var V = 'waypals-v112';
 var FILES = ['./', 'index.html', 'fonts.css', 'fonts/nunito.woff', 'fonts/caveat.woff', 'fonts/patrickhand.woff', 'fonts/dm-sans-latin-wght-normal.woff2', 'fonts/cormorant-garamond-latin-600-normal.woff2', 'fonts/cormorant-garamond-latin-700-normal.woff2', 'shim.js', 'firebase-config.js', 'manifest.webmanifest', 'icons/icon-192.png', 'icons/icon-512.png', 'datenschutz.html', 'impressum.html'];
 /* Start ohne Warten: App-Hülle sofort aus dem Speicher, neue Fassung still im Hintergrund holen (gilt ab dem nächsten Start).
    Früher wurde index.html (über 800 KB) bei jedem Start zuerst vom Server geladen; bei schwachem Netz hing die App auf dem Startbild. */
@@ -21,7 +21,7 @@ self.addEventListener('fetch', function (e) {
     return;
   }
   if (new URL(r.url).origin !== location.origin) return;
-  if (/\/sprites\//.test(r.url)) { e.respondWith(caches.match(r).then(function (m) { return m || fetch(r).then(function (res) { return keep(r, res) }) })); return }
+  if (/\/(sprites|figur)\//.test(r.url)) { e.respondWith(caches.match(r).then(function (m) { return m || fetch(r).then(function (res) { return keep(r, res) }) })); return }
   var nav = r.mode === 'navigate';
   var net = fetch(r).then(function (res) { return keep(r, res) });
   var cached = caches.match(r, { ignoreSearch: nav }).then(function (m) { return m || (nav ? caches.match('index.html') : undefined) });

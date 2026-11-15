@@ -599,6 +599,32 @@ html[dir=rtl] .mtc,html[dir=rtl] .sbar .btn.ghost>svg.ic:first-child{transform:s
 .fkph figcaption{text-align:center;font-size:.8rem;min-width:0}.fkph small{display:block;color:var(--muted);overflow-wrap:anywhere}
 .dove.top{display:block;padding:0;width:56px;height:70px;margin:-29px 0 0 -28px;transform-origin:50% 42%}.dove.top .p3s{filter:drop-shadow(0 5px 3px rgba(0,0,0,.28))}
 .avdet .avprev{position:sticky;top:calc(58px + env(safe-area-inset-top,0px));z-index:1;margin-top:0;padding:4px;box-shadow:0 8px 10px -8px rgba(0,0,0,.35)}.avdet .avprev .p3,.avdet .avprev svg,.avdet .avprev canvas{height:132px;width:auto;max-width:100%}
+.ave{--avbg:var(--paper)}.avdet .ave{--avbg:var(--sheet)}
+.ave .avhead{position:sticky;top:calc(58px + env(safe-area-inset-top,0px));z-index:2;background:var(--avbg);padding:4px 0 10px;margin:0 -2px;box-shadow:0 10px 10px -12px rgba(0,0,0,.35)}
+.ave .avstg{position:relative;height:236px;border-radius:24px;border:1.5px solid var(--line);overflow:hidden;display:grid;place-items:end center;background:radial-gradient(ellipse 60% 18% at 50% 92%,rgba(60,40,10,.18),transparent 70%),radial-gradient(ellipse at 50% 85%,color-mix(in srgb,var(--marker) 26%,var(--sheet)) 0,color-mix(in srgb,var(--marker) 10%,var(--sheet)) 45%,var(--sheet) 100%)}
+.ave .avcv{display:grid;place-items:end center;height:100%;width:100%}.ave .avcv canvas{display:block;margin-bottom:2px}.ave .avcv svg{width:auto;height:220px}
+.ave .avhint{position:absolute;left:14px;top:12px;margin:0;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);pointer-events:none}.ave .no3d .avhint,.ave .no3d .avvw{display:none}
+.ave .avtool{position:absolute;right:10px;top:10px;display:flex;gap:6px}
+.ave .avib{width:38px;height:38px;border-radius:50%;border:1.5px solid var(--line);background:var(--sheet);color:var(--ink);display:grid;place-items:center;padding:0}.ave .avib .ic{width:19px;height:19px}.ave .avib:disabled{opacity:.4}
+.ave .avvw{position:absolute;left:50%;bottom:10px;transform:translateX(-50%);display:flex;gap:4px;padding:3px;border-radius:999px;background:color-mix(in srgb,var(--sheet) 88%,transparent);border:1px solid var(--line)}
+.ave .avvw button{border:0;background:none;color:var(--muted);font:600 11.5px var(--f-ui);padding:5px 11px;border-radius:999px;min-height:28px}.ave .avvw button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+.ave .avtabs{display:grid;grid-template-columns:repeat(4,1fr);gap:2px;margin:10px 0 0;padding:4px;border-radius:16px;background:color-mix(in srgb,var(--line) 70%,var(--paper))}
+.ave .avtabs button{border:0;background:none;border-radius:12px;padding:7px 0 6px;display:grid;justify-items:center;gap:2px;color:var(--muted);font:600 12px var(--f-ui);min-height:48px}.ave .avtabs .ic{width:20px;height:20px}
+.ave .avtabs button[aria-pressed="true"]{background:var(--sheet);color:var(--pen);box-shadow:0 1px 4px rgba(0,0,0,.12)}
+.ave .avopts{gap:16px;padding-top:12px}
+.ave .avsw{display:flex;flex-wrap:wrap;gap:10px}.ave .sw{width:36px;height:36px;border:2px solid var(--sheet);box-shadow:0 0 0 1.5px var(--line)}.ave .sw[aria-pressed="true"]{outline:0;box-shadow:0 0 0 3px var(--pen)}
+.ave .avch{display:flex;flex-wrap:wrap;gap:8px}.ave .avch .cb{background:var(--sheet);font-size:.88rem}.ave .avch .cb[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.ave .avgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.ave .avt{position:relative;display:grid;gap:3px;padding:4px 3px 6px;border:1.5px solid var(--line);border-radius:16px;background:var(--sheet);color:var(--ink);text-align:center;min-width:0}
+.ave .avt small{font-size:11px;line-height:1.15;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ave .avth,.ave .avno{display:block;width:100%;aspect-ratio:160/192;border-radius:12px;background-color:color-mix(in srgb,var(--marker) 12%,var(--sheet))}
+.ave .avth{background-image:url(figur/thumbs.webp?v=1);background-size:1000% 800%;background-repeat:no-repeat}
+.ave .avno{position:relative}.ave .avno:after{content:'';position:absolute;left:50%;top:50%;width:34%;aspect-ratio:1;transform:translate(-50%,-50%);border:2px solid var(--muted);border-radius:50%;opacity:.55;background:linear-gradient(135deg,transparent 46%,var(--muted) 46%,var(--muted) 54%,transparent 54%)}
+.ave .avt[aria-pressed="true"]{border-color:var(--pen);box-shadow:0 0 0 2px color-mix(in srgb,var(--pen) 22%,transparent)}
+.ave .avt[aria-pressed="true"]:after{content:'✓';position:absolute;top:5px;right:6px;width:18px;height:18px;border-radius:50%;background:var(--pen);color:var(--on-pen);font-size:11px;line-height:18px;text-align:center}
+.ave .avt.avlk{opacity:.62}.ave .avt.avlk .avth{filter:grayscale(.7)}.ave .avt em{position:absolute;top:5px;right:5px;font:700 9.5px var(--f-ui);font-style:normal;background:var(--sheet);border:1px solid var(--line);border-radius:9px;padding:1px 5px 1px 3px;display:flex;align-items:center;gap:2px}.ave .avt em .ic{width:10px;height:10px}
+.ave .avt.nw:before{content:'';position:absolute;top:6px;left:6px;width:8px;height:8px;border-radius:50%;background:var(--marker,#E9C46A);box-shadow:0 0 0 2px var(--sheet)}
+@media (min-width:560px){.ave .avgrid{grid-template-columns:repeat(5,minmax(0,1fr))}}
 #app.mapfull{max-width:none;padding-inline:0}
 #app.mapfull header.top{display:contents}#app.mapfull header.top>div,#app.mapfull header.top #sync{display:none}#app.mapfull .bellb{position:fixed;left:12px;top:calc(env(safe-area-inset-top,0px) + 100px);z-index:6;margin:0;background:rgba(255,255,255,.95);color:#222;border:0;width:44px;height:44px;box-shadow:0 2px 8px rgba(0,0,0,.25)}
 #app.mapfull .tabs{padding-inline:20px;background:#070A22;border-top-color:rgba(255,255,255,.08);position:relative;z-index:7}
@@ -4144,15 +4170,24 @@ function figSVG2D(m,id,o){
   P+='<g class="armR">'+arm(-1)+'</g>';
   return '<svg viewBox="0 0 60 100" aria-hidden="true" style="overflow:visible">'+P+'</svg>';
 }
-var AV_EN={Ringelshirt:'Striped top',Karohemd:'Flannel shirt',Norweger:'Nordic sweater',Rollkragen:'Turtleneck',Lederjacke:'Leather jacket',Mantel:'Coat',Statur:'Build',schlank:'slim','kräftig':'broad','Körper':'Body',Mann:'Man',Frau:'Woman',Divers:'Non-binary',Oberweite:'Bust',Pferdeschwanz:'Ponytail',Seitenscheitel:'Side parting',Stachelhaar:'Spiky',Bob:'Bob','Lange Wellen':'Long waves','Lange Locken':'Long curls',Undercut:'Undercut',Halbglatze:'Receding',Zwei:'Two','Zwei Dutts':'Space buns',Flechtzopf:'Braid',Rastas:'Dreadlocks','Low Taper':'Low taper','Buzz Cut':'Buzz cut','French Crop':'French crop','Locken-Taper':'Curly taper',Schulterlang:'Shoulder length','Zurückgegelt':'Slick back','Scheitel-Fade':'Side part fade','Männerdutt':'Man bun',Fransig:'Textured fringe','Crew Cut':'Crew cut',Mittelscheitel:'Curtains','Wolf Cut':'Wolf cut',Pixie:'Pixie',Haut:'Skin',Frisur:'Hair style',Haarfarbe:'Hair colour',Oberteil:'Top',Farbe:'Colour',Hose:'Trousers',Hosenfarbe:'Trouser colour',Kurz:'Short',Lang:'Long',Locken:'Curly',Dutt:'Bun',Glatze:'Bald',Wellig:'Wavy','T-Shirt':'T-shirt',Hoodie:'Hoodie',Jacke:'Jacket',
+var AV_EN={'Zum Drehen ziehen':'Drag to turn','Rückgängig':'Undo',Vorne:'Front',Seite:'Side',Hinten:'Back',Ringelshirt:'Striped top',Karohemd:'Flannel shirt',Norweger:'Nordic sweater',Rollkragen:'Turtleneck',Lederjacke:'Leather jacket',Mantel:'Coat',Statur:'Build',schlank:'slim','kräftig':'broad','Körper':'Body',Mann:'Man',Frau:'Woman',Divers:'Non-binary',Oberweite:'Bust',Pferdeschwanz:'Ponytail',Seitenscheitel:'Side parting',Stachelhaar:'Spiky',Bob:'Bob','Lange Wellen':'Long waves','Lange Locken':'Long curls',Undercut:'Undercut',Halbglatze:'Receding',Zwei:'Two','Zwei Dutts':'Space buns',Flechtzopf:'Braid',Rastas:'Dreadlocks','Low Taper':'Low taper','Buzz Cut':'Buzz cut','French Crop':'French crop','Locken-Taper':'Curly taper',Schulterlang:'Shoulder length','Zurückgegelt':'Slick back','Scheitel-Fade':'Side part fade','Männerdutt':'Man bun',Fransig:'Textured fringe','Crew Cut':'Crew cut',Mittelscheitel:'Curtains','Wolf Cut':'Wolf cut',Pixie:'Pixie',Haut:'Skin',Frisur:'Hair style',Haarfarbe:'Hair colour',Oberteil:'Top',Farbe:'Colour',Hose:'Trousers',Hosenfarbe:'Trouser colour',Kurz:'Short',Lang:'Long',Locken:'Curly',Dutt:'Bun',Glatze:'Bald',Wellig:'Wavy','T-Shirt':'T-shirt',Hoodie:'Hoodie',Jacke:'Jacket',
   Gesicht:'Face',Haare:'Hair',Kleidung:'Clothes',Extras:'Extras',Augen:'Eyes',Augenfarbe:'Eye colour',Augenbrauen:'Eyebrows',Mund:'Mouth',Nase:'Nose',Sommersprossen:'Freckles',Bart:'Beard',Kopfbedeckung:'Headwear',Hutfarbe:'Hat colour',Brille:'Glasses',Rucksack:'Backpack',Rucksackfarbe:'Backpack colour',
   Rund:'Round','Lächelnd':'Smiling','Groß':'Big','Müde':'Sleepy',Punkte:'Dots',Zwinkern:'Wink',Normal:'Normal',Hoch:'Raised',Streng:'Stern',Keine:'None',Kein:'None',Offen:'Open',Sanft:'Soft',Grinsen:'Grin',Neutral:'Neutral',Staunen:'Wow',Zunge:'Tongue',Schief:'Smirk',Klein:'Small',Nein:'No',Ja:'Yes',
   Stoppeln:'Stubble',Vollbart:'Full beard',Schnurrbart:'Moustache',Ziegenbart:'Goatee','Kinn + Schnurr':'Goatee + moustache','Langer Bart':'Long beard',Piloten:'Aviators',Katzenauge:'Cat eye',Schmuck:'Jewellery',Schuhe:'Shoes','Sneaker weiß':'White sneakers','Sneaker bunt':'Colour sneakers',Stiefel:'Boots',Tattoo:'Tattoo',Armband:'Band','Ärmel':'Sleeve',Herz:'Heart',Ohrstecker:'Studs',Creolen:'Hoops',Kette:'Necklace','Creolen + Kette':'Hoops + necklace',Pony:'Bob',Zöpfe:'Pigtails',Afro:'Afro',Irokese:'Mohawk',Tanktop:'Tank top',Pullover:'Sweater',Hemd:'Shirt',Kleid:'Dress',Cap:'Cap','Mütze':'Beanie',Strohhut:'Straw hat',Eckig:'Square',Sonne:'Sunglasses','Zufällig':'Surprise me',Landestracht:'Traditional outfit',Dirndl:'Dirndl',Lederhose:'Lederhosen',Kimono:'Kimono',Poncho:'Poncho',Sari:'Sari',Kilt:'Kilt',Dschellaba:'Djellaba',Dashiki:'Dashiki',Hanbok:'Hanbok',Flamenco:'Flamenco',Qipao:'Qipao',Hawaiihemd:'Aloha shirt',Sombrero:'Sombrero',Chullo:'Chullo','Typisch für':'Typical for'};
+var AV_TH_OFF={hair:0,top:35,cl:47,ha:59,gl:64,be:69};
+var AV_IC={face:'<circle cx="12" cy="12" r="8"/><path d="M9 10h.01M15 10h.01M9 14.5c1.6 1.4 4.4 1.4 6 0"/>',hair:'<path d="M5 14a7 7 0 0 1 14 0"/><path d="M5 14c0 3 1 5.5 2.5 6.5M19 14c0 3-1 5.5-2.5 6.5"/><path d="M8.5 9.5c2.2 1.8 5 1.6 7.5-1.2"/>',clo:'<path d="M9 4 4 7l2 4 2-1v10h8V10l2 1 2-4-5-3a3 3 0 0 1-6 0z"/>',ext:'<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/><path d="M18 16l.7 1.8 1.8.7-1.8.7L18 21l-.7-1.8-1.8-.7 1.8-.7z"/>',undo:'<path d="M9 6 4 11l5 5"/><path d="M4 11h10a5 5 0 0 1 0 10h-3"/>',dice:'<rect x="4" y="4" width="16" height="16" rx="3.5"/><path d="M9 9h.01M15 9h.01M12 12h.01M9 15h.01M15 15h.01"/>'};
+function avIc(n){return '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true">'+AV_IC[n]+'</svg>'}
 function avatarEditor(host,st){
-  var tab='face',lv=null;
+  var tab='face',lv=null,hist=[],view=0,wdHold=false;
   function tr(x){return st.lang==='en'&&AV_EN[x]?AV_EN[x]:x}
-  function sw(k,vals,label){label=tr(label);return '<div class="avrow" role="group" aria-label="'+esc(label)+'"><span>'+esc(label)+'</span><div>'+vals.map(function(c,i){return '<button type="button" class="sw" data-k="'+k+'" data-v="'+i+'" style="--c:'+c+'" aria-label="'+esc(label)+' '+(i+1)+'"></button>'}).join('')+'</div></div>'}
-  function tx(k,vals,label){label=tr(label);return '<div class="avrow" role="group" aria-label="'+esc(label)+'"><span>'+esc(label)+'</span><div>'+vals.map(function(c,i){return '<button type="button" class="cb" data-k="'+k+'" data-v="'+i+'">'+esc(tr(c))+'</button>'}).join('')+'</div></div>'}
+  function th(k,v){var i=AV_TH_OFF[k]+v;return 'background-position:'+((i%10)/9*100).toFixed(3)+'% '+(Math.floor(i/10)/7*100).toFixed(3)+'%'}
+  function grp(label,inner){return '<div class="avrow" role="group" aria-label="'+esc(label)+'"><span>'+esc(label)+'</span>'+inner+'</div>'}
+  function sw(k,vals,label){label=tr(label);return grp(label,'<div class="avsw">'+vals.map(function(c,i){return '<button type="button" class="sw" data-k="'+k+'" data-v="'+i+'" style="--c:'+c+'" aria-label="'+esc(label)+' '+(i+1)+'"></button>'}).join('')+'</div>')}
+  function tx(k,vals,label){label=tr(label);return grp(label,'<div class="avch">'+vals.map(function(c,i){return '<button type="button" class="cb" data-k="'+k+'" data-v="'+i+'">'+esc(tr(c))+'</button>'}).join('')+'</div>')}
+  function tl(k,vals,label,none,lockFn){label=tr(label);return grp(label,'<div class="avgrid">'+vals.map(function(c,i){
+    var img=none&&i===0?'<i class="avno" aria-hidden="true"></i>':'<i class="avth" style="'+th(k,i)+'" aria-hidden="true"></i>',lk=lockFn?lockFn(i):0;
+    if(lk>0)return '<button type="button" class="avt avlk" data-avlock="'+lk+'" aria-disabled="true">'+img+'<small>'+esc(tr(c))+'</small><em>'+ic('lock')+'Lv '+lk+'</em></button>';
+    return '<button type="button" class="avt'+(lk<0?' nw':'')+'" data-k="'+k+'" data-v="'+i+'">'+img+'<small>'+esc(tr(c))+'</small></button>'}).join('')+'</div>')}
   var TABS=[['face','Gesicht'],['hair','Haare'],['clo','Kleidung'],['ext','Extras']];
   function opts(full){
     var h='',en=st.lang==='en';
@@ -4161,44 +4196,60 @@ function avatarEditor(host,st){
       if(st.photo)h+='<p class="hint">'+(en?'Your photo is the face. Remove the photo to design eyes and mouth.':'Dein Foto ist das Gesicht. Ohne Foto kannst du Augen und Mund gestalten.')+'</p>';
       else h+=tx('ey',AV_EYES,'Augen')+sw('ec',AV_EYEC,'Augenfarbe')+tx('br',AV_BROWS,'Augenbrauen')+tx('mo',AV_MOUTHS,'Mund')+tx('no',AV_NOSE,'Nase')+tx('fk',['Nein',_t('Ja')],'Sommersprossen');
     }else if(tab==='hair'){
-      h+=tx('hair',AV_HAIRS,'Frisur')+sw('hc',AV_HAIRC,'Haarfarbe');
-      if(!st.photo)h+=tx('be',AV_BEARD,'Bart');
+      h+=sw('hc',AV_HAIRC,'Haarfarbe')+tl('hair',AV_HAIRS,'Frisur');
+      if(!st.photo)h+=tl('be',AV_BEARD,'Bart',true);
     }else if(tab==='clo'){
       var cy=st.countryFn?st.countryFn():'',rc=COST_BY[cy];
-      if(rc)h+='<div class="avrow"><span>'+esc(tr('Typisch für')+' '+cy)+'</span><div><button type="button" class="cb" data-avcost="'+rc[0]+'" data-avhat="'+rc[1]+'">'+esc(tr(AV_COST[rc[0]]))+'</button></div></div>';
-      h+=tx('cl',AV_COST,'Landestracht');
-      if(!full.cl){var mylv=st.lvl!=null?st.lvl:levelOf(xpMe().total).level;h+=tx('top',AV_TOPS,'Oberteil').replace(/<button type="button" class="cb" data-k="top" data-v="(\d+)">([^<]*)<\/button>/g,function(m0,v,lab){var need=avTopLv(+v);if(!need||mylv>=need||+full.top===+v)return need?m0.replace('class="cb"','class="cb nw"'):m0;return '<button type="button" class="cb avlk" data-avlock="'+need+'" aria-disabled="true">'+ic('lock')+lab+' · Lv '+need+'</button>'});}
+      if(rc)h+=grp(tr('Typisch für')+' '+cy,'<div class="avch"><button type="button" class="cb" data-avcost="'+rc[0]+'" data-avhat="'+rc[1]+'">'+esc(tr(AV_COST[rc[0]]))+'</button></div>');
+      if(!full.cl){var mylv=st.lvl!=null?st.lvl:levelOf(xpMe().total).level;h+=tl('top',AV_TOPS,'Oberteil',false,function(v){var need=avTopLv(v);if(!need)return 0;if(mylv>=need||+full.top===v)return -1;return need})}
       h+=sw('tc',full.cl&&COST_PAL[full.cl]?COST_PAL[full.cl].map(function(c){return c[0]}):AV_TOPC.map(function(c){return c.c}),'Farbe');
+      h+=tl('cl',AV_COST,'Landestracht',true);
       if(!full.cl&&full.top!==6)h+=tx('bt',['Lang','Kurz'],'Hose')+sw('pants',AV_PANTS,'Hosenfarbe');
       h+=tx('sh',['Schuhe','Sneaker weiß','Sneaker bunt','Stiefel'],'Schuhe');
-      h+=tx('ha',AV_HATS,'Kopfbedeckung');
+      h+=tl('ha',AV_HATS,'Kopfbedeckung',true);
       if(full.ha)h+=sw('hk',AV_TOPC.map(function(c){return c.c}),'Hutfarbe');
     }else{
-      h+=tx('gl',AV_GLASS,'Brille')+tx('jw',AV_JEWEL,'Schmuck')+tx('tt',['Kein','Armband','Ärmel','Herz'],'Tattoo')+tx('ac',['Nein',_t('Ja')],'Rucksack');
+      h+=tl('gl',AV_GLASS,'Brille',true)+tx('jw',AV_JEWEL,'Schmuck')+tx('tt',['Kein','Armband','Ärmel','Herz'],'Tattoo')+tx('ac',['Nein',_t('Ja')],'Rucksack');
       if(full.ac)h+=sw('bc',AV_BP,'Rucksackfarbe');
     }
     return h;
   }
+  var VIEWS=[['Vorne',0],['Seite',Math.PI/2],['Hinten',Math.PI]];
   function build(){
-    host.innerHTML='<div class="avprev"></div><div class="avtabs" role="group">'+TABS.map(function(t){return '<button type="button" class="cb" data-avt="'+t[0]+'">'+esc(tr(t[1]))+'</button>'}).join('')+'<button type="button" class="cb" data-avrand>'+esc(tr('Zufällig'))+'</button></div><div class="avopts"></div>';
+    host.classList.add('ave');lv=null;
+    host.innerHTML='<div class="avhead"><div class="avstg"><div class="avcv"></div><p class="avhint">'+esc(tr('Zum Drehen ziehen'))+'</p>'+
+      '<div class="avtool"><button type="button" class="avib" data-avundo aria-label="'+esc(tr('Rückgängig'))+'" title="'+esc(tr('Rückgängig'))+'">'+avIc('undo')+'</button><button type="button" class="avib" data-avrand aria-label="'+esc(tr('Zufällig'))+'" title="'+esc(tr('Zufällig'))+'">'+avIc('dice')+'</button></div>'+
+      '<div class="avvw" role="group">'+VIEWS.map(function(v,i){return '<button type="button" data-avview="'+i+'">'+esc(tr(v[0]))+'</button>'}).join('')+'</div></div>'+
+      '<div class="avtabs" role="group">'+TABS.map(function(t){return '<button type="button" data-avt="'+t[0]+'">'+avIc(t[0])+'<span>'+esc(tr(t[1]))+'</span></button>'}).join('')+'</div></div><div class="avopts"></div>';
     paint();
   }
+  function fig(){return {name:st.name||'?',photo:st.photo,av:avFull(st.av,st.name)}}
+  function stage(){
+    var pv=$('.avcv',host),fm=fig();
+    if(!st.photo&&!F3.fail&&F3.prog){if(!lv||!lv.el.isConnected){lv=f3Live(pv,fm,184,230,false);if(lv&&lv.view)lv.view(VIEWS[view][1])}else lv.set(fm)}
+    else{lv=null;pv.innerHTML=figSVG2D(fm,'ed'+Math.random().toString(36).slice(2,6));if(!st.photo&&!F3.fail)f3Ready(function(ok){if(ok&&pv.isConnected)stage()})}
+    $('.avstg',host).classList.toggle('no3d',!lv);
+  }
   function paint(){
-    var full=avFull(st.av,st.name);
-    var pv=$('.avprev',host),fm={name:st.name||'?',photo:st.photo,av:full};
-    if(!st.photo&&!F3.fail&&F3.prog){if(!lv||!lv.el.isConnected)lv=f3Live(pv,fm,190,238,false);else lv.set(fm)}else{lv=null;pv.innerHTML=figSVG2D(fm,'ed'+Math.random().toString(36).slice(2,6));if(!st.photo&&!F3.fail)f3Ready(function(ok){if(ok&&pv.isConnected)paint()})}
+    var full=avFull(st.av,st.name);stage();
     $('.avopts',host).innerHTML=opts(full);
     $$('[data-avt]',host).forEach(function(b){b.setAttribute('aria-pressed',String(b.getAttribute('data-avt')===tab))});
+    $$('[data-avview]',host).forEach(function(b){b.setAttribute('aria-pressed',String(+b.getAttribute('data-avview')===view))});
+    var u=$('[data-avundo]',host);if(u)u.disabled=!hist.length;
     $$('[data-k]',host).forEach(function(b){b.setAttribute('aria-pressed',String(full[b.getAttribute('data-k')]===+b.getAttribute('data-v')))});
   }
+  function push(){hist.push(st.av?JSON.stringify(st.av):null);if(hist.length>40)hist.shift()}
   function rnd(n){return Math.floor(Math.random()*n)}
-  host.addEventListener('input',function(e){var w=e.target.closest('[data-avwd]');if(!w)return;st.av=avFull(st.av,st.name);st.av.wd=[1,2,0,3,4][+w.value]||0;var fm={name:st.name||'?',photo:st.photo,av:avFull(st.av,st.name)};if(lv&&lv.el&&lv.el.isConnected)lv.set(fm);else{var pv=$('.avprev',host);pv.innerHTML=figSVG2D(fm,'ed'+Math.random().toString(36).slice(2,6))}});
+  host.addEventListener('input',function(e){var w=e.target.closest('[data-avwd]');if(!w)return;if(!wdHold){push();wdHold=true}st.av=avFull(st.av,st.name);st.av.wd=[1,2,0,3,4][+w.value]||0;var fm=fig();if(lv&&lv.el&&lv.el.isConnected)lv.set(fm);else stage();var u=$('[data-avundo]',host);if(u)u.disabled=false});
+  host.addEventListener('change',function(e){if(e.target.closest('[data-avwd]'))wdHold=false});
   host.addEventListener('click',function(e){
     var t=e.target.closest('[data-avt]');if(t){tab=t.getAttribute('data-avt');paint();return}
+    var vw=e.target.closest('[data-avview]');if(vw){view=+vw.getAttribute('data-avview');if(lv&&lv.view)lv.view(VIEWS[view][1]);$$('[data-avview]',host).forEach(function(b){b.setAttribute('aria-pressed',String(+b.getAttribute('data-avview')===view))});return}
+    if(e.target.closest('[data-avundo]')){if(!hist.length)return;var o=hist.pop();st.av=o?JSON.parse(o):null;paint();return}
     var lk=e.target.closest('[data-avlock]');if(lk){toast(LT('Wird ab Level {0} freigeschaltet. XP gibt es für Einträge, Momente und Challenges.','Unlocks at level {0}. You earn XP for entries, moments and challenges.',[lk.getAttribute('data-avlock')]));return}
-    if(e.target.closest('[data-avrand]')){var ob=avFull(st.av,st.name);st.av={bd:ob.bd,bu:ob.bu,skin:rnd(6),hair:rnd(AV_HAIRS.length),hc:rnd(8),top:rnd(7),tc:rnd(AV_TOPC.length),pants:rnd(AV_PANTS.length),bt:rnd(2),ey:rnd(AV_EYES.length),ec:rnd(AV_EYEC.length),br:rnd(AV_BROWS.length),mo:rnd(AV_MOUTHS.length),no:rnd(3),fk:rnd(3)===0?1:0,be:rnd(5)===0?1+rnd(AV_BEARD.length-1):0,gl:rnd(3)===0?1+rnd(AV_GLASS.length-1):0,jw:rnd(4)===0?1+rnd(AV_JEWEL.length-1):0,sh:rnd(4),tt:rnd(5)===0?1+rnd(3):0,ha:rnd(3)===0?1+rnd(3):0,hk:rnd(AV_TOPC.length),ac:rnd(3)===0?1:0,bc:rnd(AV_BP.length),cl:rnd(4)===0?1+rnd(12):0};paint();return}
-    var ct=e.target.closest('[data-avcost]');if(ct){st.av=avFull(st.av,st.name);st.av.cl=+ct.getAttribute('data-avcost');var hh=+ct.getAttribute('data-avhat');if(hh)st.av.ha=hh;paint();return}
-    var b=e.target.closest('[data-k]');if(!b)return;st.av=avFull(st.av,st.name);st.av[b.getAttribute('data-k')]=+b.getAttribute('data-v');paint();
+    if(e.target.closest('[data-avrand]')){push();var ob=avFull(st.av,st.name);st.av={bd:ob.bd,bu:ob.bu,skin:rnd(6),hair:rnd(AV_HAIRS.length),hc:rnd(8),top:rnd(7),tc:rnd(AV_TOPC.length),pants:rnd(AV_PANTS.length),bt:rnd(2),ey:rnd(AV_EYES.length),ec:rnd(AV_EYEC.length),br:rnd(AV_BROWS.length),mo:rnd(AV_MOUTHS.length),no:rnd(3),fk:rnd(3)===0?1:0,be:rnd(5)===0?1+rnd(AV_BEARD.length-1):0,gl:rnd(3)===0?1+rnd(AV_GLASS.length-1):0,jw:rnd(4)===0?1+rnd(AV_JEWEL.length-1):0,sh:rnd(4),tt:rnd(5)===0?1+rnd(3):0,ha:rnd(3)===0?1+rnd(3):0,hk:rnd(AV_TOPC.length),ac:rnd(3)===0?1:0,bc:rnd(AV_BP.length),cl:rnd(4)===0?1+rnd(12):0};paint();return}
+    var ct=e.target.closest('[data-avcost]');if(ct){push();st.av=avFull(st.av,st.name);st.av.cl=+ct.getAttribute('data-avcost');var hh=+ct.getAttribute('data-avhat');if(hh)st.av.ha=hh;paint();return}
+    var b=e.target.closest('[data-k]');if(!b)return;var k=b.getAttribute('data-k'),v=+b.getAttribute('data-v'),cur=avFull(st.av,st.name);if(cur[k]===v)return;push();st.av=cur;st.av[k]=v;paint();
   });
   build();
   return {get:function(){return st.av?avFull(st.av,st.name):null},set:function(o){Object.assign(st,o);if(o.lang)build();else paint()}};
@@ -6286,7 +6337,7 @@ function openAddMail(){
   });
 }
 function addMailResult(){var r=null;try{r=localStorage.getItem('waypals-addmail-result');if(r)localStorage.removeItem('waypals-addmail-result')}catch(e){}if(!r)return;toast(r==='ok'?L('Fertig! Du kannst dich jetzt auch mit der neuen Adresse anmelden.','Done! You can now sign in with the new address too.'):(r==='auth/credential-already-in-use'||r==='auth/email-already-in-use'?L('Diese Adresse gehört schon zu einem anderen Waypals-Konto. Es wurde nichts verändert.','This address already belongs to another Waypals account. Nothing was changed.'):L('Das hat nicht geklappt. Bitte nochmal versuchen.','That did not work. Please try again.')))}
-var APP_VER=111;/* gleiche Nummer wie V in sw.js */
+var APP_VER=112;/* gleiche Nummer wie V in sw.js */
 function openSettings(){
   var el=openSheet('','settings');
   function chip(attr,val,label,cur){return '<button type="button" class="cb" '+attr+'="'+val+'" aria-pressed="'+(cur===val)+'">'+label+'</button>'}
@@ -10326,17 +10377,17 @@ function openSticker(){
 function f3Live(box,m,w,h,bust){
   if(!box||F3.fail||!f3Init())return null;
   var cv=document.createElement('canvas');cv.width=w*2;cv.height=h*2;cv.className='p3live-c';cv.style.cssText='width:'+w+'px;height:'+h+'px;touch-action:none;cursor:grab;max-width:100%';
-  var x=cv.getContext('2d'),yaw=0,vel=0,drag=false,lx=0,t0=performance.now(),idle=0,u=f3Uni(f3Av(m));
+  var x=cv.getContext('2d'),yaw=0,base=0,vel=0,drag=false,lx=0,t0=performance.now(),idle=0,u=f3Uni(f3Av(m));
   cv.addEventListener('pointerdown',function(e){drag=true;lx=e.clientX;vel=0;try{cv.setPointerCapture(e.pointerId)}catch(_){}e.stopPropagation()});
   cv.addEventListener('pointermove',function(e){if(!drag)return;var d=(e.clientX-lx)*.012;lx=e.clientX;yaw+=d;vel=d});
   var up=function(){drag=false};cv.addEventListener('pointerup',up);cv.addEventListener('pointercancel',up);
   box.innerHTML='';box.appendChild(cv);box.classList.add('p3lv');
   var lp=liveLoop(cv,function(now){
-    if(!drag){if(Math.abs(vel)>.002){yaw+=vel;vel*=.88}else{idle+=.033;yaw+=(.5*Math.sin(idle)-yaw)*.08}}
+    if(!drag){if(Math.abs(vel)>.002){yaw+=vel;vel*=.88}else{idle+=.033;yaw+=(base+(base?.25:.5)*Math.sin(idle)-yaw)*.08}}
     var hk=f3HK(u);if(!F3.sp[hk]&&F3.sp[hk]!==null){f3Spec(hk,function(){lp.wake()});return}
     f3Draw(u,w*2,h*2,((now-t0)/1800)%1,yaw,!!bust);x.clearRect(0,0,cv.width,cv.height);x.drawImage(P3.cv,0,0);
   });
-  return {set:function(mm){u=f3Uni(f3Av(mm));lp.wake()},el:cv};
+  return {set:function(mm){u=f3Uni(f3Av(mm));lp.wake()},view:function(y){base=y;vel=0;lp.wake()},el:cv};
 }
 
 /* ---------- Detail ---------- */
