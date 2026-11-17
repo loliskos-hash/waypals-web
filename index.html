@@ -271,6 +271,14 @@ textarea.ruled:focus{box-shadow:none}
 .wnav{position:sticky;bottom:0;z-index:2;display:flex;align-items:center;gap:8px;padding:12px 0 calc(12px + env(safe-area-inset-bottom,0px));background:var(--paper);border-top:1px solid var(--line);margin:0 -16px;padding-left:16px;padding-right:16px}
 .wnav>span{flex:1}.wnav .btn.pri{min-width:120px}
 .wizon .stitle{font-size:1.15rem}
+.guest .gbar{position:relative;z-index:3}.lsel{position:relative}
+.lcur{display:inline-flex;align-items:center;gap:6px;padding:6px 12px 6px 10px;min-height:40px;border:1.5px solid var(--line);border-radius:999px;background:var(--sheet);color:var(--ink);font:600 .92rem var(--f-ui)}
+.lcur svg{width:18px;height:18px}.lcur i{font-style:normal;font-size:.75rem;color:var(--muted)}
+.lang.lpop{position:absolute;right:0;top:calc(100% + 6px);display:grid;gap:2px;min-width:180px;padding:6px;background:var(--sheet);border:1.5px solid var(--line);border-radius:16px;box-shadow:0 14px 30px -12px rgba(0,0,0,.35)}
+.lang.lpop[hidden]{display:none}.lang.lpop{display:grid;gap:2px;justify-content:stretch}.lang.lpop button{border:0;border-radius:10px;text-align:start;padding:8px 12px;min-height:40px}
+.guest.wizon .gtitle{font-size:2.3rem}
+.guest.wizon:not(.wfirst) .gtitle,.guest.wizon:not(.wfirst) [data-t=sub],.guest.wizon:not(.wfirst) [data-remote],.guest.wizon:not(.wfirst) [data-mine],.guest.wizon:not(.wfirst) [data-acc]{display:none}
+.guest.wizon:not(.wfirst) [data-acc]{display:none}
 :root[data-style="notebook"] .wq{font-family:var(--f-hand);font-size:2rem;font-weight:700}
 .wstep>.avdet{border:0;padding:0;background:none}.wstep>.avdet>summary{display:none}
 @media (prefers-reduced-motion:reduce){.wstep.win{animation:none}}
@@ -3926,6 +3934,7 @@ var ICONS={
   lock:'<rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>'
 };
 (function(x){for(var k in x)if(!ICONS[k])ICONS[k]=x[k]})({"heart": "<path d=\"M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.5A4 4 0 0 1 19 10c0 5.6-7 10-7 10Z\"/>", "passport": "<rect x=\"5\" y=\"3\" width=\"14\" height=\"18\" rx=\"2.5\"/><circle cx=\"12\" cy=\"10\" r=\"3\"/><path d=\"M9 17h6\"/>", "clock": "<circle cx=\"12\" cy=\"12\" r=\"8.5\"/><path d=\"M12 7.5V12l3 2\"/>", "spark": "<path d=\"M11 4.5 12.8 10l5.7 1.8-5.7 1.9L11 19.5l-1.8-5.8-5.7-1.9L9.2 10 11 4.5Z\"/><path d=\"M19 3.5v4M17 5.5h4\"/>", "smile": "<circle cx=\"12\" cy=\"12\" r=\"8.5\"/><path d=\"M8.5 14a4 4 0 0 0 7 0\"/><path d=\"M9 9.5v.6M15 9.5v.6\"/>", "flag": "<path d=\"M6 21V4\"/><path d=\"M6 5h11l-2 4 2 4H6\"/>", "podium": "<path d=\"M3 20h18\"/><path d=\"M9 20V8h6v12\"/><path d=\"M3.5 20v-7H9\"/><path d=\"M15 11.5h5.5V20\"/>", "users": "<circle cx=\"9\" cy=\"9\" r=\"3.2\"/><path d=\"M3 19c.6-3 3-4.5 6-4.5s5.4 1.5 6 4.5\"/><circle cx=\"17\" cy=\"8\" r=\"2.4\"/><path d=\"M17 13.5c2 .2 3.4 1.4 4 3.5\"/>", "gift": "<rect x=\"4.5\" y=\"10\" width=\"15\" height=\"10\" rx=\"1.5\"/><path d=\"M3 7h18v3H3zM12 7v13\"/><path d=\"M12 7c-1-3-5-3.5-5-1.2C7 7 10 7 12 7Zm0 0c1-3 5-3.5 5-1.2C17 7 14 7 12 7Z\"/>", "grid": "<rect x=\"4\" y=\"4\" width=\"7\" height=\"7\" rx=\"1.8\"/><rect x=\"13\" y=\"4\" width=\"7\" height=\"7\" rx=\"1.8\"/><rect x=\"4\" y=\"13\" width=\"7\" height=\"7\" rx=\"1.8\"/><rect x=\"13\" y=\"13\" width=\"7\" height=\"7\" rx=\"1.8\"/>", "at": "<circle cx=\"12\" cy=\"12\" r=\"3.5\"/><path d=\"M15.5 8.5v5a2.3 2.3 0 0 0 4.5 0V12a8 8 0 1 0-3.2 6.4\"/>", "qr": "<rect x=\"4\" y=\"4\" width=\"6\" height=\"6\" rx=\"1\"/><rect x=\"14\" y=\"4\" width=\"6\" height=\"6\" rx=\"1\"/><rect x=\"4\" y=\"14\" width=\"6\" height=\"6\" rx=\"1\"/><path d=\"M14 14h2.5v2.5H14zM20 14v6h-3M14 20h.5\"/>", "download": "<path d=\"M12 4v10m0 0-4-4m4 4 4-4\"/><path d=\"M5 19h14\"/>", "bolt": "<path d=\"M13 3 5 13.5h6L10 21l8-10.5h-6L13 3Z\"/>", "route": "<circle cx=\"6\" cy=\"18\" r=\"2.2\"/><circle cx=\"18\" cy=\"6\" r=\"2.2\"/><path d=\"M8 17.5c6-.5 2-10.5 8-11\"/>"});
+ICONS.globe='<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3.2 3.5 3.2 14.5 0 18M12 3c-3.2 3.5-3.2 14.5 0 18"/>';
 function ic(n,c){return '<svg class="ic '+(c||'')+'" viewBox="0 0 24 24" aria-hidden="true">'+ICONS[n]+'</svg>'}
 
 /* ---------- Globus: Orthografische Projektion, eigene Zeichnung auf Canvas ---------- */
@@ -6337,7 +6346,7 @@ function openAddMail(){
   });
 }
 function addMailResult(){var r=null;try{r=localStorage.getItem('waypals-addmail-result');if(r)localStorage.removeItem('waypals-addmail-result')}catch(e){}if(!r)return;toast(r==='ok'?L('Fertig! Du kannst dich jetzt auch mit der neuen Adresse anmelden.','Done! You can now sign in with the new address too.'):(r==='auth/credential-already-in-use'||r==='auth/email-already-in-use'?L('Diese Adresse gehört schon zu einem anderen Waypals-Konto. Es wurde nichts verändert.','This address already belongs to another Waypals account. Nothing was changed.'):L('Das hat nicht geklappt. Bitte nochmal versuchen.','That did not work. Please try again.')))}
-var APP_VER=112;/* gleiche Nummer wie V in sw.js */
+var APP_VER=113;/* gleiche Nummer wie V in sw.js */
 function openSettings(){
   var el=openSheet('','settings');
   function chip(attr,val,label,cur){return '<button type="button" class="cb" '+attr+'="'+val+'" aria-pressed="'+(cur===val)+'">'+label+'</button>'}
@@ -10648,7 +10657,7 @@ function invReplyHint(f){
 function openGuest(prep){
   var lang=/^(de|en|es|fr|it|pt|sq|ar)$/.test(prep.lang)?prep.lang:'de',photo='',photoP=null;if(!T.es)T.xlate();
   var el=openSheet(
-    _t('<div class="gbar"><div class="lang" role="group" aria-label="Language"><button type="button" data-lang="de">Deutsch</button><button type="button" data-lang="en">English</button><button type="button" data-lang="es">Español</button><button type="button" data-lang="fr">Français</button><button type="button" data-lang="it">Italiano</button><button type="button" data-lang="pt">Português</button><button type="button" data-lang="sq">Shqip</button><button type="button" data-lang="ar">العربية</button></div></div>')+
+    _t('<div class="gbar"><div class="lsel"><button type="button" class="lcur" data-lsel aria-haspopup="true" aria-expanded="false">')+ic('globe')+'<span data-lcur></span><i aria-hidden="true">▾</i></button><div class="lang lpop" role="group" aria-label="Language" hidden>'+_t('<button type="button" data-lang="de">Deutsch</button><button type="button" data-lang="en">English</button><button type="button" data-lang="es">Español</button><button type="button" data-lang="fr">Français</button><button type="button" data-lang="it">Italiano</button><button type="button" data-lang="pt">Português</button><button type="button" data-lang="sq">Shqip</button><button type="button" data-lang="ar">العربية</button></div></div></div>')+
     '<h2 class="gtitle" data-t="title"></h2><p class="hint" data-t="sub"></p>'+(prep.remote?'<p class="banner" data-remote></p>':'')+
     '<form class="form" novalidate autocomplete="off">'+
     '<div class="photoblock"><div data-ph></div><div class="pcol"><label class="btn" for="g-photo">'+ic('cam')+'<span data-t="photo"></span></label><input id="g-photo" type="file" accept="image/*" capture="user"><label class="btn sm" for="g-photo2"><span data-t="gallery"></span></label><input id="g-photo2" type="file" accept="image/*"><button type="button" class="btn ghost sm" data-act="nophoto"><span data-t="nophoto"></span></button></div></div><details class="avdet" open><summary data-t="figure"></summary><div data-av></div></details>'+
@@ -10698,7 +10707,7 @@ function openGuest(prep){
     var lt=$('[data-later]',el);if(lt)lt.textContent=invLang(lang,'Später weiter ausfüllen','Continue later');
     var mn=$('[data-mine]',el);if(mn)mn.textContent=invLang(lang,'Deine Angaben aus „Mein Profil“ sind schon eingetragen. Du kannst alles ändern und den Rest ergänzen.','Your details from “My profile” are already filled in. You can change everything and fill in the rest.');
     $$('[data-tp]',el).forEach(function(n){n.placeholder=T[lang][n.getAttribute('data-tp')]});
-    $$('[data-lang]',el).forEach(function(b){b.setAttribute('aria-pressed',String(b.getAttribute('data-lang')===lang))});
+    $$('[data-lang]',el).forEach(function(b){var on=b.getAttribute('data-lang')===lang;b.setAttribute('aria-pressed',String(on));if(on){var lc=$('[data-lcur]',el);if(lc)lc.textContent=b.textContent}});
     document.documentElement.lang=lang;document.documentElement.setAttribute('dir',lang==='ar'?'rtl':'ltr');
     if(!err.hidden)err.textContent=T[lang].needName;
     if(el._wiz)el._wiz.lang(lang);
@@ -10729,12 +10738,14 @@ function openGuest(prep){
       {t:G('page'),nodes:[F('like'),F('motto'),F('dream')],opt:1},
       {t:G('draw'),nodes:[Q('[data-draw]').closest('.fl'),Q('.sigwrap').closest('.fl')],opt:1},
       {t:G('cap'),nodes:[F('cap'),Q('[data-t=privacy]')],opt:1}
-    ],{lang:lang,after:[err,sb,Q('[data-later]')],doneLabel:Tt('done'),focus:false,done:function(){if(form.requestSubmit)form.requestSubmit();else form.dispatchEvent(new Event('submit',{cancelable:true}))}});
+    ],{lang:lang,after:[err,sb,Q('[data-later]')],doneLabel:Tt('done'),focus:false,onStep:function(i){el.classList.toggle('wfirst',i===0)},done:function(){if(form.requestSubmit)form.requestSubmit();else form.dispatchEvent(new Event('submit',{cancelable:true}))}});
     el.classList.add('wizon');
   })();
   el._onClose=function(){document.documentElement.lang=APP_LANG==='ar'?'ar':'de';document.documentElement.setAttribute('dir',APP_LANG==='ar'?'rtl':'ltr')};
   el.addEventListener('click',function(e){
-    var l=e.target.closest('[data-lang]');if(l){lang=l.getAttribute('data-lang');applyLang();return}
+    var ls=e.target.closest('[data-lsel]'),lp=$('.lpop',el);if(ls){lp.hidden=!lp.hidden;ls.setAttribute('aria-expanded',String(!lp.hidden));return}
+    var l=e.target.closest('[data-lang]');if(l){lang=l.getAttribute('data-lang');lp.hidden=true;$('[data-lsel]',el).setAttribute('aria-expanded','false');applyLang();return}
+    if(lp&&!lp.hidden&&!e.target.closest('.lsel')){lp.hidden=true;$('[data-lsel]',el).setAttribute('aria-expanded','false')}
     if(e.target.closest('[data-act=sigclear]'))pad_.clear();
   });
   [$('#g-photo',el),$('#g-photo2',el)].forEach(function(inp){inp.addEventListener('change',function(e){var file=e.target.files&&e.target.files[0];if(!file)return;photoP=readPhoto(file).then(function(u){photo=u;paintPhoto()}).catch(function(){})})});
