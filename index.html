@@ -6732,7 +6732,7 @@ function openFlightImport(){
     rows=fiTrips(fl,home);out.innerHTML='<p class="hint">…</p>';
     var miss=rows.filter(function(r){return !r.city}).map(function(r){return r.code}).filter(function(c,i,a){return a.indexOf(c)===i});
     Promise.all(miss.map(function(c){return fiLookup(c).then(function(p){rows.forEach(function(r){if(r.code===c&&p){r.city=p;r.sure=false}})})})).then(function(){
-      rows.forEach(function(r){r.dup=dup(r);r.on=!!r.city&&!r.dup&&miss.indexOf(r.code)<0});paint();
+      rows.forEach(function(r){r.dup=dup(r);r.on=!!r.city&&!r.dup&&miss.indexOf(r.code)<0&&(r.sure||r.from!==r.to)});paint();
     });
   }
   el.addEventListener('change',function(e){
