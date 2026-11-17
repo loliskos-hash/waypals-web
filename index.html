@@ -653,7 +653,7 @@ html[dir=rtl] .mtc,html[dir=rtl] .sbar .btn.ghost>svg.ic:first-child{transform:s
 .mbar{display:flex;gap:8px;flex-wrap:wrap}
 .mpill{display:inline-flex;align-items:center;gap:6px;border:0;border-radius:999px;background:rgba(255,255,255,.95);color:#2D2A3E;padding:10px 14px;font:700 .84rem/1 var(--f-ui);box-shadow:0 4px 14px rgba(0,0,0,.35)}
 .mpill b{font-weight:900}
-.cstats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:6px 0 2px}.cst{background:var(--paper,#f4efe6);border-radius:14px;padding:8px 6px;text-align:center;display:grid;gap:2px}.cst b{font:600 1.35rem/1 var(--f-serif)}.cst small{font-size:.72rem;opacity:.7}.ctrips{list-style:none;margin:0;padding:0;display:grid;gap:6px}.ctrips li{display:grid;gap:2px;font-size:.9rem}.ctrips small{opacity:.7}.cadd{border:1.5px solid var(--line);background:none;color:var(--ink);border-radius:999px;padding:0 14px;font:700 1rem var(--f-ui)}.cform{display:flex;gap:6px}.cform input{flex:1;min-width:0;border:1.5px dashed var(--line);border-radius:999px;padding:8px 12px;font:500 .9rem var(--f-ui);background:none;color:var(--ink)}.clist{list-style:none;margin:0 0 4px;padding:0;display:grid;gap:4px}.clist li{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:.95rem}.cdel{border:0;background:none;color:var(--ink);opacity:.5;font-size:1.1rem;padding:2px 6px}
+.cstats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:6px 0 2px}.cst{background:var(--paper,#f4efe6);border-radius:14px;padding:8px 6px;text-align:center;display:grid;gap:2px}.cst b{font:600 1.35rem/1 var(--f-serif)}.cst small{font-size:.72rem;opacity:.7}.fimp{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:8px}.fimp li{display:grid;grid-template-columns:auto 1fr;gap:4px 10px;align-items:center;padding:8px 10px;border:1px solid var(--line);border-radius:12px}.fimp li.off{opacity:.55}.fimp li div{display:grid;gap:2px;min-width:0}.fimp small{opacity:.7}.fimp .fid{grid-column:2;display:flex;gap:6px}.fimp .fid input{flex:1 1 0;min-width:0;width:auto;height:auto;font:inherit;font-size:.85rem;padding:4px 6px;border:1px solid var(--line);border-radius:8px;background:transparent;color:inherit}.ctrips{list-style:none;margin:0;padding:0;display:grid;gap:6px}.ctrips li{display:grid;gap:2px;font-size:.9rem}.ctrips small{opacity:.7}.cadd{border:1.5px solid var(--line);background:none;color:var(--ink);border-radius:999px;padding:0 14px;font:700 1rem var(--f-ui)}.cform{display:flex;gap:6px}.cform input{flex:1;min-width:0;border:1.5px dashed var(--line);border-radius:999px;padding:8px 12px;font:500 .9rem var(--f-ui);background:none;color:var(--ink)}.clist{list-style:none;margin:0 0 4px;padding:0;display:grid;gap:4px}.clist li{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:.95rem}.cdel{border:0;background:none;color:var(--ink);opacity:.5;font-size:1.1rem;padding:2px 6px}
 .mpop{position:relative;max-height:58vh;overflow:auto;background:var(--sheet);color:var(--ink);border-radius:24px;padding:16px 14px 12px;box-shadow:0 12px 40px rgba(0,0,0,.5);display:grid;gap:10px;animation:mpin .18s ease-out}
 .mpop .infocard{border:0;padding:0;background:transparent}
 .mx{position:absolute;right:10px;top:8px;width:34px;height:34px;border-radius:50%;border:0;background:var(--pen-soft);color:var(--ink);font-size:1.3rem;line-height:1;z-index:2}
@@ -6346,7 +6346,7 @@ function openAddMail(){
   });
 }
 function addMailResult(){var r=null;try{r=localStorage.getItem('waypals-addmail-result');if(r)localStorage.removeItem('waypals-addmail-result')}catch(e){}if(!r)return;toast(r==='ok'?L('Fertig! Du kannst dich jetzt auch mit der neuen Adresse anmelden.','Done! You can now sign in with the new address too.'):(r==='auth/credential-already-in-use'||r==='auth/email-already-in-use'?L('Diese Adresse gehört schon zu einem anderen Waypals-Konto. Es wurde nichts verändert.','This address already belongs to another Waypals account. Nothing was changed.'):L('Das hat nicht geklappt. Bitte nochmal versuchen.','That did not work. Please try again.')))}
-var APP_VER=113;/* gleiche Nummer wie V in sw.js */
+var APP_VER=114;/* gleiche Nummer wie V in sw.js */
 function openSettings(){
   var el=openSheet('','settings');
   function chip(attr,val,label,cur){return '<button type="button" class="cb" '+attr+'="'+val+'" aria-pressed="'+(cur===val)+'">'+label+'</button>'}
@@ -6651,6 +6651,110 @@ function flashbackCheck(){
   if(fresh.length)openFlashbacks(fresh);
 }
 
+/* ---------- Flüge als Reisen importieren ---------- */
+var AIRPORTS=(function(){var o={};('MUC|München|Munich|48.137|11.575;FMM|Memmingen||47.984|10.181;NUE|Nürnberg|Nuremberg|49.452|11.077;STR|Stuttgart||48.776|9.183;FRA|Frankfurt||50.110|8.682;HHN|Hahn||49.948|7.264;CGN|Köln|Cologne|50.938|6.960;DUS|Düsseldorf||51.227|6.773;NRN|Weeze||51.660|6.140;DTM|Dortmund||51.514|7.468;FMO|Münster||51.960|7.626;PAD|Paderborn||51.719|8.754;HAM|Hamburg||53.551|9.994;BRE|Bremen||53.079|8.802;HAJ|Hannover||52.375|9.732;BER|Berlin||52.520|13.405;LEJ|Leipzig||51.340|12.375;DRS|Dresden||51.050|13.738;FDH|Friedrichshafen||47.650|9.480;FKB|Karlsruhe||49.007|8.404;SCN|Saarbrücken||49.240|6.997;' +
+'SZG|Salzburg||47.809|13.055;INN|Innsbruck||47.269|11.404;VIE|Wien|Vienna|48.208|16.373;GRZ|Graz||47.071|15.439;LNZ|Linz||48.306|14.286;KLU|Klagenfurt||46.624|14.308;ZRH|Zürich|Zurich|47.377|8.541;BSL|Basel||47.560|7.589;GVA|Genf|Geneva|46.204|6.143;BRN|Bern||46.948|7.447;' +
+'AMS|Amsterdam||52.370|4.895;EIN|Eindhoven||51.441|5.470;RTM|Rotterdam||51.924|4.478;BRU|Brüssel|Brussels|50.850|4.352;CRL|Charleroi||50.411|4.444;LUX|Luxemburg|Luxembourg|49.611|6.130;' +
+'CDG|Paris||48.857|2.352;ORY|Paris||48.857|2.352;BVA|Paris||48.857|2.352;NCE|Nizza|Nice|43.710|7.262;MRS|Marseille||43.296|5.370;LYS|Lyon||45.764|4.836;TLS|Toulouse||43.605|1.444;BOD|Bordeaux||44.838|-0.579;NTE|Nantes||47.218|-1.554;BIQ|Biarritz||43.483|-1.559;MPL|Montpellier||43.611|3.877;AJA|Ajaccio||41.920|8.739;BIA|Bastia||42.697|9.451;' +
+'LHR|London||51.507|-0.128;LGW|London||51.507|-0.128;STN|London||51.507|-0.128;LTN|London||51.507|-0.128;LCY|London||51.507|-0.128;MAN|Manchester||53.481|-2.243;EDI|Edinburgh||55.953|-3.188;GLA|Glasgow||55.864|-4.252;BHX|Birmingham||52.486|-1.890;BRS|Bristol||51.455|-2.588;LPL|Liverpool||53.408|-2.991;DUB|Dublin||53.350|-6.260;ORK|Cork||51.897|-8.470;SNN|Shannon||52.702|-8.864;' +
+'BCN|Barcelona||41.385|2.173;MAD|Madrid||40.417|-3.704;PMI|Palma||39.570|2.650;IBZ|Ibiza||38.907|1.432;MAH|Menorca||39.889|4.262;AGP|Málaga||36.721|-4.421;SVQ|Sevilla|Seville|37.389|-5.984;GRX|Granada||37.177|-3.599;VLC|Valencia||39.470|-0.376;ALC|Alicante||38.345|-0.481;BIO|Bilbao||43.263|-2.935;SDR|Santander||43.462|-3.810;SCQ|Santiago de Compostela||42.880|-8.546;GRO|Girona||41.979|2.821;REU|Reus||41.155|1.107;XRY|Jerez||36.686|-6.137;LEI|Almería|Almeria|36.834|-2.464;TFS|Teneriffa|Tenerife|28.291|-16.629;TFN|Teneriffa|Tenerife|28.291|-16.629;LPA|Gran Canaria||28.124|-15.430;ACE|Lanzarote||29.046|-13.590;FUE|Fuerteventura||28.358|-14.054;SPC|La Palma||28.684|-17.765;' +
+'LIS|Lissabon|Lisbon|38.722|-9.139;OPO|Porto||41.158|-8.629;FAO|Faro||37.019|-7.930;FNC|Madeira||32.650|-16.908;PDL|Ponta Delgada||37.741|-25.676;' +
+'FCO|Rom|Rome|41.903|12.496;CIA|Rom|Rome|41.903|12.496;MXP|Mailand|Milan|45.464|9.190;LIN|Mailand|Milan|45.464|9.190;BGY|Bergamo||45.698|9.677;VCE|Venedig|Venice|45.441|12.316;TSF|Treviso||45.667|12.243;VRN|Verona||45.438|10.992;BLQ|Bologna||44.494|11.343;FLR|Florenz|Florence|43.770|11.256;PSA|Pisa||43.723|10.402;NAP|Neapel|Naples|40.852|14.268;BRI|Bari||41.117|16.872;BDS|Brindisi||40.632|17.936;TRN|Turin|Turin|45.070|7.687;GOA|Genua|Genoa|44.405|8.946;CTA|Catania||37.507|15.083;PMO|Palermo||38.116|13.361;CAG|Cagliari||39.224|9.122;OLB|Olbia||40.923|9.498;AHO|Alghero||40.558|8.319;TRS|Triest|Trieste|45.650|13.777;SUF|Lamezia Terme||38.966|16.309;' +
+'MLA|Malta||35.899|14.514;ATH|Athen|Athens|37.984|23.728;SKG|Thessaloniki||40.640|22.944;HER|Heraklion||35.339|25.144;CHQ|Chania||35.514|24.018;RHO|Rhodos|Rhodes|36.434|28.218;CFU|Korfu|Corfu|39.624|19.920;JTR|Santorini||36.393|25.461;JMK|Mykonos||37.446|25.329;KGS|Kos||36.893|27.288;ZTH|Zakynthos||37.787|20.900;JSI|Skiathos||39.162|23.490;KLX|Kalamata||37.039|22.114;' +
+'TIA|Tirana||41.328|19.819;PRN|Pristina||42.663|21.165;SKP|Skopje||41.997|21.428;BEG|Belgrad|Belgrade|44.787|20.457;TGD|Podgorica||42.441|19.263;TIV|Tivat||42.436|18.696;SJJ|Sarajevo||43.856|18.413;ZAG|Zagreb||45.815|15.982;SPU|Split||43.508|16.440;DBV|Dubrovnik||42.650|18.094;ZAD|Zadar||44.119|15.231;PUY|Pula||44.867|13.850;LJU|Ljubljana||46.056|14.506;' +
+'BUD|Budapest||47.498|19.040;PRG|Prag|Prague|50.076|14.438;BTS|Bratislava||48.149|17.107;KRK|Krakau|Krakow|50.065|19.945;WAW|Warschau|Warsaw|52.230|21.012;WMI|Warschau|Warsaw|52.230|21.012;GDN|Danzig|Gdansk|54.352|18.646;WRO|Breslau|Wroclaw|51.108|17.039;KTW|Kattowitz|Katowice|50.264|19.024;POZ|Posen|Poznan|52.406|16.925;' +
+'OTP|Bukarest|Bucharest|44.426|26.103;CLJ|Cluj-Napoca||46.771|23.624;TSR|Timișoara||45.749|21.208;IAS|Iași||47.159|27.601;SOF|Sofia||42.698|23.322;VAR|Warna|Varna|43.214|27.915;BOJ|Burgas||42.505|27.462;KIV|Chișinău||47.011|28.864;' +
+'RIX|Riga||56.950|24.105;TLL|Tallinn||59.437|24.754;VNO|Vilnius||54.687|25.280;KUN|Kaunas||54.899|23.904;HEL|Helsinki||60.170|24.938;RVN|Rovaniemi||66.503|25.729;ARN|Stockholm||59.329|18.069;NYO|Stockholm||59.329|18.069;GOT|Göteborg|Gothenburg|57.709|11.975;OSL|Oslo||59.914|10.752;BGO|Bergen||60.391|5.322;TOS|Tromsø||69.649|18.956;CPH|Kopenhagen|Copenhagen|55.676|12.568;BLL|Billund||55.731|9.112;AAL|Aalborg||57.048|9.919;KEF|Reykjavík||64.147|-21.942;' +
+'IST|Istanbul||41.008|28.978;SAW|Istanbul||41.008|28.978;AYT|Antalya||36.897|30.713;ESB|Ankara||39.933|32.860;ADB|Izmir||38.424|27.143;DLM|Dalaman||36.766|28.802;BJV|Bodrum||37.034|27.430;LCA|Larnaka|Larnaca|34.917|33.630;PFO|Paphos||34.772|32.430;TBS|Tiflis|Tbilisi|41.716|44.783;KUT|Kutaissi|Kutaisi|42.270|42.700;BUS|Batumi||41.617|41.637;EVN|Jerewan|Yerevan|40.179|44.499;GYD|Baku||40.409|49.867;' +
+'TLV|Tel Aviv||32.085|34.782;AMM|Amman||31.954|35.911;CAI|Kairo|Cairo|30.044|31.236;HRG|Hurghada||27.258|33.812;SSH|Scharm El-Scheich|Sharm El Sheikh|27.916|34.330;RAK|Marrakesch|Marrakesh|31.630|-7.981;FEZ|Fès|Fez|34.033|-5.000;CMN|Casablanca||33.573|-7.590;AGA|Agadir||30.421|-9.598;TNG|Tanger|Tangier|35.760|-5.834;RBA|Rabat||34.020|-6.841;TUN|Tunis||36.806|10.181;DJE|Djerba||33.807|10.857;NBE|Enfidha||36.137|10.383;ALG|Algier|Algiers|36.754|3.059;' +
+'DXB|Dubai||25.205|55.271;AUH|Abu Dhabi||24.454|54.377;DOH|Doha||25.286|51.531;MCT|Maskat|Muscat|23.588|58.383;' +
+'JFK|New York||40.713|-74.006;LGA|New York||40.713|-74.006;EWR|New York||40.713|-74.006;BOS|Boston||42.360|-71.059;IAD|Washington||38.907|-77.037;DCA|Washington||38.907|-77.037;ORD|Chicago||41.878|-87.630;DTW|Detroit||42.331|-83.046;ATL|Atlanta||33.749|-84.388;MIA|Miami||25.762|-80.192;MCO|Orlando||28.538|-81.379;LAX|Los Angeles||34.052|-118.244;SFO|San Francisco||37.775|-122.419;SEA|Seattle||47.606|-122.332;LAS|Las Vegas||36.170|-115.140;DEN|Denver||39.739|-104.990;YYZ|Toronto||43.653|-79.383;YUL|Montreal||45.502|-73.567;YVR|Vancouver||49.283|-123.121;MEX|Mexiko-Stadt|Mexico City|19.433|-99.133;CUN|Cancún||21.162|-86.851;' +
+'GRU|São Paulo||-23.551|-46.633;GIG|Rio de Janeiro||-22.907|-43.173;EZE|Buenos Aires||-34.604|-58.382;SCL|Santiago de Chile||-33.449|-70.669;LIM|Lima||-12.046|-77.043;BOG|Bogotá||4.711|-74.072;' +
+'BKK|Bangkok||13.756|100.502;HKT|Phuket||7.880|98.392;SIN|Singapur|Singapore|1.352|103.820;KUL|Kuala Lumpur||3.139|101.687;DPS|Bali||-8.340|115.092;CGK|Jakarta||-6.209|106.846;HKG|Hongkong|Hong Kong|22.320|114.169;NRT|Tokio|Tokyo|35.676|139.650;HND|Tokio|Tokyo|35.676|139.650;KIX|Osaka||34.694|135.502;ICN|Seoul||37.567|126.978;PEK|Peking|Beijing|39.904|116.407;PVG|Shanghai||31.230|121.474;DEL|Delhi||28.614|77.209;BOM|Mumbai||19.076|72.878;CMB|Colombo||6.927|79.861;MLE|Malé|Male|4.175|73.509;HAN|Hanoi||21.028|105.834;SGN|Ho-Chi-Minh-Stadt|Ho Chi Minh City|10.823|106.630;MNL|Manila||14.600|120.984;' +
+'SYD|Sydney||-33.869|151.209;MEL|Melbourne||-37.814|144.963;AKL|Auckland||-36.849|174.763;JNB|Johannesburg||-26.204|28.047;CPT|Kapstadt|Cape Town|-33.925|18.424;NBO|Nairobi||-1.292|36.822;ZNZ|Sansibar|Zanzibar|-6.165|39.199;MRU|Mauritius||-20.160|57.501'
+).split(';').forEach(function(r){var p=r.split('|');o[p[0]]={de:p[1],en:p[2]||p[1],lat:+p[3],lon:+p[4]}});return o})();
+function fiCity(code){var a=AIRPORTS[code];return a?{name:APP_LANG==='de'?a.de:a.en,lat:a.lat,lon:a.lon,tz:''}:null}
+function fiDate(s){var m=/(\d{4})-(\d{2})-(\d{2})/.exec(s)||/(\d{1,2})\.(\d{1,2})\.(\d{4})/.exec(s)||/(\d{1,2})\/(\d{1,2})\/(\d{4})/.exec(s);if(!m)return '';if(m[1].length===4)return m[1]+'-'+m[2]+'-'+m[3];return m[3]+'-'+('0'+m[2]).slice(-2)+'-'+('0'+m[1]).slice(-2)}
+/* Eine Zeile pro Flug: die ersten zwei Felder aus drei Großbuchstaben sind Abflug und Ziel, die ersten zwei Daten Abflug- und Ankunftstag. */
+function fiParse(text){
+  var out=[];String(text||'').split(/\r?\n/).forEach(function(line){
+    var cells=line.split(/[,;\t]/).map(function(c){return c.replace(/^\s*"?|"?\s*$/g,'')}),codes=[],dates=[],key='',fc='';
+    cells.forEach(function(c){if(/^[A-Z]{3}$/.test(c)&&codes.length<2)codes.push(c);else if(!fc&&/^[A-Z0-9]{2}\d{1,4}$/.test(c))fc=c;var d=fiDate(c);if(d&&/\d{4}/.test(c)){if(!dates.length)key=d+((/\d{1,2}:\d{2}/.exec(c)||[''])[0].padStart(5,'0'));dates.push(d)}});
+    if(codes.length<2){var t=line.match(/\b[A-Z]{3}\b/g)||[];codes=t.filter(function(c){return AIRPORTS[c]}).slice(0,2)}
+    if(codes.length===2&&dates.length)out.push({code:fc,from:codes[0],to:codes[1],dep:dates[0],k:key,arr:dates[1]&&dates[1]>=dates[0]?dates[1]:dates[0]});
+  });
+  return out.sort(function(a,b){return a.k<b.k?-1:a.k>b.k?1:0});
+}
+function fiAddDays(iso,n){var d=new Date(iso+'T12:00:00Z');d.setUTCDate(d.getUTCDate()+n);return d.toISOString().slice(0,10)}
+/* Aufenthalt = Ankunft bis zum nächsten Abflug vom selben Ort. Umsteigen (Weiterflug am selben Tag vom selben Ort) zählt nicht. */
+function fiTrips(fl,home,homeKm){
+  homeKm=homeKm||150;var res=[];
+  function isHome(c){var a=AIRPORTS[c];return !!(home&&a&&haversine(home,a)<=homeKm)}
+  function near(a,b){var A=AIRPORTS[a],B=AIRPORTS[b];return a===b||!!(A&&B&&haversine(A,B)<=60)}
+  fl.forEach(function(f,i){
+    var pv=fl[i-1];
+    if(!isHome(f.from)&&!(pv&&near(pv.to,f.from)))res.push({code:f.from,city:fiCity(f.from),from:f.dep,to:f.dep,flights:[f.code].filter(Boolean),sure:false});
+    if(isHome(f.to))return;var nx=fl[i+1],city=fiCity(f.to);
+    if(nx&&near(nx.from,f.to)&&nx.dep<=f.arr)return;
+    var t={code:f.to,city:city,from:f.arr,to:f.arr,flights:[f.code].filter(Boolean),sure:false};
+    if(nx&&near(nx.from,f.to)&&nx.dep<=fiAddDays(f.arr,120)){t.to=nx.dep;t.sure=true;if(nx.code)t.flights.push(nx.code)}
+    else if(nx&&!isHome(nx.from)&&nx.dep<=fiAddDays(f.arr,30)){t.to=nx.dep;t.overland=nx.from}
+    res.push(t);
+  });
+  return res;
+}
+function fiLookup(code){
+  return fetch('https://photon.komoot.io/api/?limit=1&osm_tag=aeroway:aerodrome&q='+encodeURIComponent(code+' airport')).then(function(r){return r.json()}).then(function(j){
+    var f=j&&j.features&&j.features[0];if(!f)return null;var p=f.properties||{},g=f.geometry.coordinates;
+    return {name:p.city||p.county||p.name,lat:g[1],lon:g[0],tz:''};
+  }).catch(function(){return null});
+}
+function openFlightImport(){
+  var rows=[],el=openSheet('<div class="sbar"><button type="button" class="btn ghost" data-act="close">'+ic('back')+L('Zurück','Back')+'</button><div class="sbar-r"><button type="button" class="btn pri" data-act="go" hidden>'+L('Importieren','Import')+'</button></div></div>'+
+    '<h2 class="stitle">'+L('Flüge als Reisen importieren','Import flights as trips')+'</h2>'+
+    '<p class="hint">'+L('Lade die Flugliste aus deiner Flug-App (CSV, z. B. byAir, Flighty, App in the Air) oder füge sie unten ein. Aus Hin- und Rückflug wird eine Reise, Umstiege werden übersprungen. Du siehst alles vorher und kannst Daten ändern oder Reisen abwählen.','Load the flight list from your flight app (CSV, e.g. byAir, Flighty, App in the Air) or paste it below. Outbound and return become one trip, layovers are skipped. You see everything first and can change dates or untick trips.')+'</p>'+
+    (store.post.me&&store.post.me.lat!=null?'':'<p class="banner">'+L('Tipp: Trag zuerst deinen Wohnort ein, dann erkennt der Import deine Heimflüge.','Tip: set your home town first so the import recognises flights home.')+'</p>')+
+    '<div class="form"><label class="btn"><input type="file" accept=".csv,.txt,text/csv,text/plain" hidden>'+L('Datei wählen','Choose file')+'</label>'+
+    '<label class="fl"><span>'+L('Oder Liste einfügen','Or paste list')+'</span><textarea name="fitext" rows="4" placeholder="FR2541,AGP,FMM,2026-10-27"></textarea></label>'+
+    '<button type="button" class="btn" data-act="prev">'+L('Vorschau','Preview')+'</button></div><div class="fiout"></div>','fsheet');
+  var out=$('.fiout',el),go=$('[data-act=go]',el);
+  function dup(t){return (store.post.trips||[]).some(function(x){return x.who==='me'&&x.from===t.from&&t.city&&NORM(x.dest&&x.dest.name)===NORM(t.city.name)})}
+  function paint(){
+    if(!rows.length){out.innerHTML='<p class="banner">'+L('Keine Flüge erkannt. Jede Zeile braucht zwei Flughafen-Kürzel (z. B. MUC, PMI) und ein Datum.','No flights found. Each line needs two airport codes (e.g. MUC, PMI) and a date.')+'</p>';go.hidden=true;return}
+    var n=rows.filter(function(r){return r.on}).length;
+    out.innerHTML='<p class="hint">'+LT('{0} Reisen erkannt, {1} ausgewählt. Ein „?“ heißt: Ende geschätzt, bitte prüfen.','{0} trips found, {1} selected. A “?” means: end date estimated, please check.',[rows.length,n])+'</p><ul class="fimp">'+rows.map(function(r,i){
+      return '<li class="'+(r.on?'':'off')+'"><input type="checkbox" data-i="'+i+'"'+(r.on?' checked':'')+(r.city?'':' disabled')+'><div><b>'+esc(r.city?r.city.name:r.code)+(r.sure?'':' ?')+'</b><small>'+esc(r.code)+(r.flights.length?' · '+esc(r.flights.join(', ')):'')+(r.dup?' · '+L('schon eingetragen','already saved'):'')+(r.city?'':' · '+L('Ort unbekannt','unknown place'))+(r.overland?' · '+LT('weiter ab {0}','onward from {0}',[r.overland]):'')+'</small></div>'+
+        '<span class="fid"><input type="date" data-f="'+i+'" value="'+esc(r.from)+'"><input type="date" data-t="'+i+'" value="'+esc(r.to)+'"></span></li>'}).join('')+'</ul>';
+    go.hidden=!n;go.textContent=LT('{0} importieren','Import {0}',[n]);
+  }
+  function build(text){
+    var fl=fiParse(text),home=store.post.me&&store.post.me.lat!=null?store.post.me:null;
+    rows=fiTrips(fl,home);out.innerHTML='<p class="hint">…</p>';
+    var miss=rows.filter(function(r){return !r.city}).map(function(r){return r.code}).filter(function(c,i,a){return a.indexOf(c)===i});
+    Promise.all(miss.map(function(c){return fiLookup(c).then(function(p){rows.forEach(function(r){if(r.code===c&&p){r.city=p;r.sure=false}})})})).then(function(){
+      rows.forEach(function(r){r.dup=dup(r);r.on=!!r.city&&!r.dup&&miss.indexOf(r.code)<0});paint();
+    });
+  }
+  el.addEventListener('change',function(e){
+    var t=e.target;
+    if(t.type==='file'&&t.files&&t.files[0]){var fr=new FileReader();fr.onload=function(){build(String(fr.result||''))};fr.readAsText(t.files[0]);return}
+    if(t.hasAttribute('data-i')){rows[+t.getAttribute('data-i')].on=t.checked;paint()}
+    else if(t.hasAttribute('data-f'))rows[+t.getAttribute('data-f')].from=t.value;
+    else if(t.hasAttribute('data-t'))rows[+t.getAttribute('data-t')].to=t.value;
+  });
+  el.addEventListener('click',function(e){
+    var a=e.target.closest('[data-act]');if(!a)return;var act=a.getAttribute('data-act');
+    if(act==='close')closeSheet(el);
+    else if(act==='prev')build($('[name=fitext]',el).value);
+    else if(act==='go'){
+      var add=rows.filter(function(r){return r.on&&r.city&&r.from}).map(function(r){var f=r.from,t=r.to||r.from;if(t<f){var x=f;f=t;t=x}
+        return {id:uid(),who:'me',dest:{name:r.city.name,lat:r.city.lat,lon:r.city.lon,tz:r.city.tz||''},from:f,to:t,kind:'trip',note:r.flights.length?L('Flug ','Flight ')+r.flights.join(', '):'',src:'flight'}});
+      if(!add.length)return;
+      store.post.trips=(store.post.trips||[]).concat(add);store.savePost();closeSheet(el);
+      toast(LT('{0} Reisen importiert','{0} trips imported',[add.length]));try{circlePublish()}catch(e){}
+    }
+  });
+}
 function tripCard(F,t,extra){
   return '<button type="button" class="pgi tripi" '+(F?'data-open="'+esc(F.id)+'"':'data-act="edit-trip" data-id="'+esc(t.id)+'"')+'><b>'+(F?esc(first(F.name))+' · ':'')+esc(t.dest.name)+'</b><small>'+esc(tripWhen(t))+(t.kind==='work'?_t(' · Arbeit'):'')+(t.note?' · '+esc(t.note):'')+(extra?' · '+esc(extra):'')+'</small></button>';
 }
@@ -6681,6 +6785,7 @@ function tripsHTML(){
   var rd=radar();
   h+=_t('<section class="tell"><h3 class="who">Wiedersehens-Chancen</h3>')+(rd.length?'<div class="pg">'+rd.map(function(r){return '<button type="button" class="pgi tripi radar" data-open="'+esc(r.f.id)+'"><b>'+ic('pin')+' '+esc(r.place)+'</b><small>'+esc(fmtRange(r.from,r.to))+'</small><span>'+esc(r.why)+'</span></button>'}).join('')+'</div>':_t('<p class="hint">Trag deine nächsten Reisen ein. Sobald dein Ziel in der Nähe von jemandem aus deinem Buch liegt, steht es hier.</p>'))+'</section>';
   if(soon.length)h+=_t('<section class="tell"><h3 class="who">Bald auf Reisen</h3><div class="pg">')+soon.map(function(x){return tripCard(x[0],x[1])}).join('')+'</div></section>';
+  h=h.replace('<div class="sbar-r">','<div class="sbar-r"><button type="button" class="btn sm" data-act="fimp">'+ic('plane')+L('Flüge importieren','Import flights')+'</button>');
   var mine=tripsAllOf('me').slice().reverse();
   h+=_t('<section class="tell"><h3 class="who">Meine Reisen</h3>')+(mine.length?'<div class="pg">'+mine.map(function(t){return tripCard(null,t,isActive(t,today)?_t('gerade dort'):t.to<today?tw(6):'')}).join('')+'</div>':_t('<p class="hint">Noch keine Reise. Du kannst auch vergangene Reisen eintragen, zum Beispiel „war vom 3. bis 17. März in Peru".</p>'))+'</section>';
   return h;
@@ -6696,6 +6801,7 @@ function openTrips(){
     var a=e.target.closest('[data-act]');if(!a)return;var act=a.getAttribute('data-act');
     if(act==='close')closeSheet(el);
     else if(act==='add')openTripForm(null,null);
+    else if(act==='fimp')openFlightImport();
     else if(act==='edit-trip')editTrip(a.getAttribute('data-id'));
   });
 }
