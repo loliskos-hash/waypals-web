@@ -4456,13 +4456,13 @@ function Globe(opts){
     raw=gs||[];sel=s||null;style=style||'fig';curStyle=style;lastExp=expOn();groups=explodeFor(raw);var keep={},i,g,m;
     groups.forEach(function(g){
       keep[g.key]=1;
-      var lead=g.draft?null:(g.members.find(function(m){return m.photo})||g.members[0]);
+      var lead=g.draft?null:(g.members.find(function(m){return m.photo})||g.members[0]||{name:g.name});
       var sig=g.draft?'draft':[style,g.trv||0,g.count,lead.name,JSON.stringify(lead.av||0),lead.photo?lead.photo.length+lead.photo.slice(-24):'',g.name].join('|');
       var e=els[g.key];
       if(e&&sigs[g.key]===sig)return;
       if(e)e.el.remove();
       var b=document.createElement('button');b.type='button';b.className='fig'+(g.draft?' draft':'')+(g.base?' xp':'');b.setAttribute('data-key',g.key);b.setAttribute('data-base',g.base||g.key);
-      b.setAttribute('aria-label',g.draft?_t('Gewählter Ort'):(g.count>1?g.name+', '+g.count+_t(' Menschen'):lead.name+', '+g.name));
+      b.setAttribute('aria-label',g.draft?_t('Gewählter Ort'):(g.count>1?g.name+', '+g.count+_t(' Menschen'):g.count?lead.name+', '+g.name:g.name));
       var asPin=g.draft||style==='pin';if(asPin&&!g.draft)b.classList.add('small');var lab=(g.draft||g.base)?'':esc((asPin||g.count>1)?g.name:first(lead.name));
       b.innerHTML=(g.draft?PIN_SVG:asPin?pinSVG(1):figSVG(lead,uid()))+(lab?'<span class="lab">'+lab+'</span>':'')+'<span class="bd" hidden></span>'+(g.trv?'<span class="trv">'+ic('plane')+'</span>':'');
       fl.appendChild(b);els[g.key]={el:b,pin:asPin,small:asPin&&!g.draft,bd:$('.bd',b),lab:$('.lab',b),hid:false,bdt:null,labOn:null};
@@ -8196,6 +8196,12 @@ function groups(){
     var ol=tp?f.homeLat:home?f.lat:f.homeLat,oo=tp?f.homeLon:home?f.lon:f.homeLon;
     if(ol!=null&&oo!=null)g.links.push({lat:ol,lon:oo});
   });
+  if(!home){var td=todayISO();tripsAllOf('me').forEach(function(t){
+    var d=t.dest;if(t.example||!d||d.lat==null||d.lon==null||!(t.from<=td))return;
+    var hit=out.find(function(x){return haversine({lat:x.lat,lon:x.lon},d)<40});if(hit){hit.tr=(hit.tr||0)+1;return}
+    var key=d.lat.toFixed(2)+','+d.lon.toFixed(2);if(m[key])return;
+    out.push(m[key]={key:key,lat:d.lat,lon:d.lon,name:placeLabel(d.name)||L('Ort','Place'),count:0,members:[],links:[],trv:0,tr:1});
+  })}
   return out;
 }
 function pigeonsInFlight(){var n=Date.now();return store.post.pigeons.filter(function(p){return !p.mail&& n<p.sent+p.dur})}
@@ -8226,7 +8232,7 @@ function cityHTML(g){
   var lst=function(k,ph){var a=Array.isArray(cd[k])?cd[k]:[];return (a.length?'<ul class="clist">'+a.map(function(x,i){return '<li><span>'+esc(x.t||'')+'</span><button type="button" class="cdel" data-cdel="'+k+'|'+i+'" aria-label="'+L('Entfernen','Remove')+'">\u00D7</button></li>'}).join('')+'</ul>':'')+'<form class="cform" data-ck="'+esc(ck)+'" data-k="'+k+'"><input name="t" maxlength="80" autocomplete="off" placeholder="'+ph+'"><button type="submit" class="cadd">+</button></form>'};
   return '<div class="infocard"><h3>'+ic('pin')+esc(g.name)+(c?'<span class="count">'+esc(cn(c))+'</span>':'')+'</h3>'+
     '<div class="cstats">'+st(g.count,g.count===1?L('neuer Mensch','new person'):L('neue Menschen','new people'))+st(trips.length,trips.length===1?L('Reise','trip'):L('Reisen','trips'))+st(ds.length?esc(fmtDate(ds[0]).replace(/^\d+\.?\s*/,'')):'–',L('zuerst hier','first here'))+'</div>'+
-    sec(L('Neu kennengelernt','Met here'),'<ul class="plist">'+sorted(g.members).map(rowHTML).join('')+'</ul>')+
+    (g.members.length?sec(L('Neu kennengelernt','Met here'),'<ul class="plist">'+sorted(g.members).map(rowHTML).join('')+'</ul>'):'')+
     (trips.length?sec(L('Reisen','Trips'),'<ul class="ctrips">'+trips.map(function(t){return '<li><b>'+esc(fmtDate(t.from))+(t.to&&t.to!==t.from?' – '+esc(fmtDate(t.to)):'')+'</b>'+(t.note?'<small>'+esc(t.note)+'</small>':'')+'</li>'}).join('')+'</ul>'):'')+
     sec(L('Gegessen','Food'),lst('food',L('Gericht eintragen','Add a dish')))+
     sec(L('Besuchte Plätze','Places visited'),lst('spots',L('Platz eintragen','Add a place')))+
