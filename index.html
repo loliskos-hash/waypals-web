@@ -405,7 +405,7 @@ textarea.ruled:focus{box-shadow:none}
 .fig.small .lab{transform:translateX(-50%) scale(1.6);transform-origin:50% 0;margin-top:1px}
 .fig.small .bd{transform:scale(1.6);transform-origin:100% 0}
 .fig.small .trv{transform:scale(1.5);transform-origin:0 0}
-.fig.cty svg path{fill:#C9473A}.fig.cty .lab{font-weight:900;letter-spacing:.02em}
+.fig.cty .lab{font-weight:900;letter-spacing:.02em}
 .stats2{display:grid;gap:6px;margin:2px 0 4px;padding:0;list-style:none}
 label.chk{display:flex!important;flex-direction:row!important;gap:12px;align-items:flex-start;font-weight:600;text-align:left}.chk input[type=checkbox]{width:22px;height:22px;min-width:22px;flex:none;margin:1px 0 0;padding:0;border:0;accent-color:var(--pen)}
 
@@ -4400,17 +4400,13 @@ function Globe(opts){
     updPlat(it);drawLinks();placeDoves();
   }
   /* Wo ich war: beim Rauszoomen Pins eines Landes zu einem Länder-Marker (Zahl = Städte) zusammenfassen */
-  var CS={};
   function ctryMerge(it){
     var by={},keepC={},c,k;
-    if(curStyle==='pin'){
-      var far=6371/(base*v.zoom)>7;
+    if(curStyle==='pin'&&6371/(base*v.zoom)>7){
       it.forEach(function(a){var t=a.g.cty;if(!t||a.g.draft||a.z<=0.03)return;(by[t]=by[t]||[]).push(a)});
-      for(c in by){var Lc=by[c],nm={},md=1e9,x,y;
+      for(c in by){var Lc=by[c],nm={};
         Lc.forEach(function(a){nm[a.g.name]=1});
-        if(Lc.length<2||Lc.some(function(a){return a.g.key===sel})){CS[c]=false;continue}
-        for(x=0;x<Lc.length;x++)for(y=x+1;y<Lc.length;y++)md=Math.min(md,Math.hypot(Lc[x].x-Lc[y].x,Lc[x].y-Lc[y].y));
-        var on=far||md<(CS[c]?52:40);CS[c]=on;if(!on)continue;
+        if(Lc.some(function(a){return a.g.key===sel}))continue;
         var sx=0,sy=0,sz=0;Lc.forEach(function(a){var q=vec(a.g.lat,a.g.lon);sx+=q[0];sy+=q[1];sz+=q[2];a.z=-1});
         var ln=Math.hypot(sx,sy,sz)||1,P=proj([sx/ln,sy/ln,sz/ln]),n=Object.keys(nm).length;
         k='@'+c;keepC[k]=1;var e=els[k],lat=Math.asin(sy/ln)/D2R,lon=Math.atan2(sx/ln,sz/ln)/D2R;
