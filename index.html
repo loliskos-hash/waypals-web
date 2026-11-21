@@ -580,6 +580,30 @@ html,body{transition:background-color .35s ease,color .35s ease}
 .todayi .mti .egg{width:22px;height:28px}
 html[dir=rtl] .mtc,html[dir=rtl] .sbar .btn.ghost>svg.ic:first-child{transform:scaleX(-1);display:inline-block}
 .todayi{display:flex;align-items:center;gap:10px;text-align:left;border:0;background:var(--sheet);border-radius:12px;padding:8px 10px;min-height:44px;color:var(--ink);font:inherit}.todayi>span:nth-child(2){flex:1;min-width:0}
+.tour{position:fixed;inset:0;z-index:9000;touch-action:none;-webkit-tap-highlight-color:transparent}
+.tour-ring{position:fixed;border-radius:18px;box-shadow:0 0 0 3px var(--marker),0 0 0 200vmax rgba(8,12,30,.76);pointer-events:none;transition:left .28s,top .28s,width .28s,height .28s}
+.tour-ring.rnd{border-radius:50%}
+.tour.full{background:rgba(8,12,30,.76)}
+.tour-b{position:fixed;left:14px;right:14px;max-width:440px;margin:0 auto;background:var(--sheet);color:var(--ink);border:1px solid var(--line);border-radius:20px;padding:16px 16px 12px;box-shadow:0 18px 40px -12px rgba(0,0,0,.6);font-family:var(--f-ui);outline:0;transition:top .28s;animation:tourIn .3s ease both}
+.tour-b.mid{top:50%;transform:translateY(-50%);transition:none;animation:none}
+.tour-b h3{font-family:var(--f-serif);font-size:1.55rem;line-height:1.1;margin:0 0 6px;font-weight:600}
+.tour-b p{margin:0;font-size:.95rem;line-height:1.45;color:var(--muted)}
+.tour-top{display:flex;gap:12px;align-items:flex-start}
+.tour-pg{flex:0 0 64px;width:64px;height:80px;background:url(sprites/0-0.webp?v=54) 0 0/768px 80px no-repeat;margin-top:-6px;animation:tourPg 1.4s steps(12) infinite}
+.tour-pg.big{display:block;flex:none;width:96px;height:120px;background-size:1152px 120px;margin:0 auto 4px;animation-name:tourPgB}
+.tour-wel{text-align:center;padding:6px 4px 6px}.tour-wel h3{font-size:1.9rem}
+.tour-col{display:grid;gap:12px;justify-items:center;margin-top:18px}
+.tour-ft{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:12px}
+.tour-dots{display:flex;gap:5px}.tour-dots i{width:7px;height:7px;border-radius:50%;background:var(--line)}.tour-dots i.on{background:var(--pen);width:18px;border-radius:4px}
+.tour-tap{display:inline-flex;align-items:center;gap:6px;border:0;background:none;padding:8px 0;font:600 .92rem var(--f-ui);color:var(--pen);text-align:end;cursor:pointer}
+.tour-tap .ic{width:20px;height:20px;flex:none;animation:tourTap 1.2s ease-in-out infinite}
+.tour-end{text-align:center;margin-top:4px}
+.tour-skip{border:0;background:none;padding:8px 10px;font:500 .85rem var(--f-ui);color:var(--muted);text-decoration:underline;cursor:pointer}
+.tour-arr{position:fixed;width:20px;height:20px;background:var(--sheet);border:1px solid var(--line);transform:rotate(45deg);pointer-events:none;z-index:1;transition:left .28s,top .28s}
+.tour-arr.up{border-right:0;border-bottom:0}.tour-arr.dn{border-left:0;border-top:0}
+@keyframes tourPg{to{background-position:-768px 0}}@keyframes tourPgB{to{background-position:-1152px 0}}
+@keyframes tourIn{from{opacity:0}to{opacity:1}}@keyframes tourTap{50%{transform:translateY(-3px)}}
+@media (prefers-reduced-motion:reduce){.tour-pg,.tour-tap .ic,.tour-b{animation:none}.tour-ring,.tour-b,.tour-arr{transition:none}}
 .tutwel{display:grid;gap:12px;justify-items:center;text-align:center;padding:18px 0 8px}.tutwel img{border-radius:24px;box-shadow:var(--shadow)}.tutwel .who{margin:0}.tutwel p{max-width:32ch;margin:0}
 .tuttitle{margin-top:2px}.tuttext{margin:8px 0 14px;max-width:46ch;line-height:1.45}
 .tutimg{position:relative;height:min(38vh,380px);aspect-ratio:1/2;max-width:100%;margin:0 auto;border-radius:22px;overflow:hidden;border:2px solid var(--line);box-shadow:var(--shadow);background:var(--sheet)}
@@ -6396,7 +6420,7 @@ function openAddMail(){
   });
 }
 function addMailResult(){var r=null;try{r=localStorage.getItem('waypals-addmail-result');if(r)localStorage.removeItem('waypals-addmail-result')}catch(e){}if(!r)return;toast(r==='ok'?L('Fertig! Du kannst dich jetzt auch mit der neuen Adresse anmelden.','Done! You can now sign in with the new address too.'):(r==='auth/credential-already-in-use'||r==='auth/email-already-in-use'?L('Diese Adresse gehört schon zu einem anderen Waypals-Konto. Es wurde nichts verändert.','This address already belongs to another Waypals account. Nothing was changed.'):L('Das hat nicht geklappt. Bitte nochmal versuchen.','That did not work. Please try again.')))}
-var APP_VER=123;/* gleiche Nummer wie V in sw.js */
+var APP_VER=124;/* gleiche Nummer wie V in sw.js */
 function openSettings(){
   var el=openSheet('','settings');
   function chip(attr,val,label,cur){return '<button type="button" class="cb" '+attr+'="'+val+'" aria-pressed="'+(cur===val)+'">'+label+'</button>'}
@@ -6438,7 +6462,7 @@ function openSettings(){
     if(act==='close')closeSheet(el);
     else if(act==='install'||act==='push')mainAct(act);
     else if(act==='export')exportAll();
-    else if(act==='intro')openIntro();
+    else if(act==='intro')startTour();
     else if(act==='legal')openLegal();
     else if(act==='addmail')openAddMail();
     else if(act==='signout')window.WAYPALS_AUTH.signOut();
@@ -6494,7 +6518,79 @@ function openIntro(){
   });
   paint();
 }
-function maybeIntro(){var seen=false;try{seen=!!localStorage.getItem('waypals-intro')}catch(e){}if(!seen&&!store.friends.length&&!document.querySelector('.sheet,.fsheet'))openIntro()}
+var TOUR_TXT={"de":["Willkommen bei Waypals","Dein Freundebuch für unterwegs. Ich zeige dir in einer Minute, wie alles funktioniert. Du tippst dabei selbst durch die App.","Tour starten","Später, ich schaue mich selbst um","Menschen eintragen","Mit dem Plus trägst du jemanden ein, den du unterwegs getroffen hast: wer, wo und wann.","Dein Freundebuch","Hier sammeln sich alle Menschen, die du eingetragen hast. Du kannst nach Name, Ort oder Tag suchen.","Eure Weltkugel","Auf der Karte siehst du, wo ihr euch begegnet seid. Ziehe zum Drehen, zwei Finger zum Zoomen.","Entdecken","Hier findest du Reisen, Treffen mit Freunden, Challenges und deine Erinnerungen.","Brieftauben verschicken","Deine Tauben fliegen mit Foto und Gruß zu Freunden. Je weiter der Weg, desto länger die Reise.","Dein Bereich","Unter „Ich“ liegen dein Profil, deine Figur, dein Level und die Einstellungen.","Tauben sammeln","Für jedes Land, in dem du wirklich warst, gibt es Tauben. Im Taubendex siehst du deine Sammlung.","Das war die Tour","Jetzt bist du dran: Wen hast du zuletzt unterwegs getroffen? Die Tour findest du jederzeit wieder unter Ich, Einstellungen.","Ersten Menschen eintragen","Später","Tippe auf „{0}“","Tour beenden","Weiter"],"en":["Welcome to Waypals","Your friend book for the road. In one minute I will show you how everything works. You tap through the app yourself.","Start the tour","Later, I will look around myself","Add people","Use the plus to add someone you met on the road: who, where and when.","Your friend book","Everyone you have added is collected here. You can search by name, place or tag.","Your globe","The map shows where you met each other. Drag to rotate, use two fingers to zoom.","Explore","Here you find trips, meetups with friends, challenges and your memories.","Send carrier pigeons","Your pigeons fly to friends with a photo and a greeting. The longer the distance, the longer the journey.","Your space","Under “Me” you find your profile, your figure, your level and the settings.","Collect pigeons","You get pigeons for every country you have really visited. The Pigeondex shows your collection.","That was the tour","Now it is your turn: who did you last meet on the road? You can replay the tour any time under Me, Settings.","Add your first person","Later","Tap “{0}”","End tour","Next"],"es":["Bienvenido a Waypals","Tu libro de amigos para el camino. En un minuto te enseño cómo funciona todo. Tú mismo vas tocando por la app.","Empezar el recorrido","Más tarde, prefiero explorar por mi cuenta","Añadir personas","Con el más añades a alguien que conociste en el camino: quién, dónde y cuándo.","Tu libro de amigos","Aquí se reúnen todas las personas que has añadido. Puedes buscar por nombre, lugar o etiqueta.","Vuestro globo","En el mapa ves dónde os habéis encontrado. Arrastra para girar y usa dos dedos para acercar.","Explorar","Aquí encuentras viajes, encuentros con amigos, retos y tus recuerdos.","Enviar palomas mensajeras","Tus palomas vuelan hasta tus amigos con una foto y un saludo. Cuanto más lejos, más dura el viaje.","Tu espacio","En «Yo» están tu perfil, tu figura, tu nivel y los ajustes.","Coleccionar palomas","Por cada país en el que has estado de verdad recibes palomas. En la Palomadex ves tu colección.","Ese fue el recorrido","Ahora te toca a ti: ¿a quién conociste por última vez en el camino? Puedes repetir el recorrido cuando quieras en Yo, Ajustes.","Añadir a la primera persona","Más tarde","Toca «{0}»","Terminar el recorrido","Siguiente"],"fr":["Bienvenue sur Waypals","Ton carnet d’amis pour la route. En une minute, je te montre comment tout fonctionne. Tu parcours toi-même l’appli.","Commencer la visite","Plus tard, je préfère découvrir seul","Ajouter des personnes","Avec le plus, tu ajoutes quelqu’un que tu as rencontré en route : qui, où et quand.","Ton carnet d’amis","Toutes les personnes que tu as ajoutées se retrouvent ici. Tu peux chercher par nom, lieu ou étiquette.","Votre globe","La carte montre où vous vous êtes rencontrés. Fais glisser pour tourner, deux doigts pour zoomer.","Découvrir","Ici tu trouves les voyages, les rencontres entre amis, les défis et tes souvenirs.","Envoyer des pigeons voyageurs","Tes pigeons volent vers tes amis avec une photo et un message. Plus le trajet est long, plus le voyage dure.","Ton espace","Sous « Moi » se trouvent ton profil, ta figurine, ton niveau et les réglages.","Collectionner des pigeons","Pour chaque pays où tu es vraiment allé, tu reçois des pigeons. Le Pigeondex montre ta collection.","C’était la visite","À toi de jouer : qui as-tu rencontré en dernier sur la route ? Tu peux revoir la visite à tout moment sous Moi, Réglages.","Ajouter la première personne","Plus tard","Touche « {0} »","Quitter la visite","Suivant"],"it":["Benvenuto/a su Waypals","Il tuo libro degli amici in viaggio. In un minuto ti mostro come funziona tutto. Sei tu a toccare e a muoverti nell’app.","Inizia il tour","Più tardi, do un’occhiata da solo","Aggiungere persone","Con il più aggiungi qualcuno che hai incontrato in viaggio: chi, dove e quando.","Il tuo libro degli amici","Qui si raccolgono tutte le persone che hai aggiunto. Puoi cercare per nome, luogo o etichetta.","Il vostro globo","Sulla mappa vedi dove vi siete incontrati. Trascina per ruotare, due dita per ingrandire.","Scopri","Qui trovi viaggi, incontri con gli amici, sfide e i tuoi ricordi.","Inviare piccioni viaggiatori","I tuoi piccioni volano dagli amici con una foto e un saluto. Più è lontano, più dura il viaggio.","Il tuo spazio","In «Io» trovi il tuo profilo, la tua figura, il tuo livello e le impostazioni.","Collezionare piccioni","Per ogni paese in cui sei stato davvero ricevi dei piccioni. Nel Piccionedex vedi la tua collezione.","Questo era il tour","Ora tocca a te: chi hai incontrato per ultimo in viaggio? Puoi rivedere il tour quando vuoi in Io, Impostazioni.","Aggiungi la prima persona","Più tardi","Tocca «{0}»","Termina il tour","Avanti"],"pt":["Bem-vindo ao Waypals","O seu livro de amigos para a estrada. Num minuto mostro-lhe como tudo funciona. É você que vai tocando pela app.","Começar a visita","Mais tarde, prefiro explorar sozinho","Adicionar pessoas","Com o mais adiciona alguém que conheceu pelo caminho: quem, onde e quando.","O seu livro de amigos","Aqui ficam todas as pessoas que adicionou. Pode procurar por nome, local ou etiqueta.","O vosso globo","No mapa vê onde se encontraram. Arraste para rodar e use dois dedos para ampliar.","Explorar","Aqui encontra viagens, encontros com amigos, desafios e as suas memórias.","Enviar pombos-correio","Os seus pombos voam até aos amigos com uma foto e uma saudação. Quanto maior a distância, mais longa a viagem.","O seu espaço","Em «Eu» estão o seu perfil, a sua figura, o seu nível e as definições.","Colecionar pombos","Por cada país onde esteve de verdade recebe pombos. No Pombodex vê a sua coleção.","Esta foi a visita","Agora é a sua vez: quem conheceu por último pelo caminho? Pode rever a visita a qualquer momento em Eu, Definições.","Adicionar a primeira pessoa","Mais tarde","Toque em «{0}»","Terminar a visita","Seguinte"],"sq":["Mirë se vini në Waypals","Libri yt i miqve për rrugën. Për një minutë të tregoj si funksionon gjithçka. Ti vetë prek dhe lëviz nëpër aplikacion.","Fillo turin","Më vonë, do të shikoj vetë","Shto njerëz","Me plusin shton dikë që ke takuar rrugës: kush, ku dhe kur.","Libri yt i miqve","Këtu mblidhen të gjithë njerëzit që ke shtuar. Mund të kërkosh sipas emrit, vendit ose etiketës.","Globi juaj","Në hartë sheh ku jeni takuar. Tërhiq për ta rrotulluar, dy gishta për zmadhim.","Zbulo","Këtu gjen udhëtime, takime me miq, sfida dhe kujtimet e tua.","Dërgo pëllumba postarë","Pëllumbat e tu fluturojnë te miqtë me një foto dhe një përshëndetje. Sa më larg, aq më gjatë zgjat udhëtimi.","Hapësira jote","Te «Unë» ndodhen profili yt, figura jote, niveli yt dhe cilësimet.","Mblidh pëllumba","Për çdo shtet ku ke qenë vërtet merr pëllumba. Te Pëllumbdex sheh koleksionin tënd.","Ky ishte turi","Tani e ke ti radhën: kë ke takuar së fundmi rrugës? Turin mund ta shohësh sërish kurdo te Unë, Cilësimet.","Shto personin e parë","Më vonë","Prek «{0}»","Mbyll turin","Vazhdo"],"ar":["مرحباً بك في Waypals","دفتر أصدقائك في السفر. سأريك خلال دقيقة كيف يعمل كل شيء، وأنت من ينقر ويتنقل داخل التطبيق.","ابدأ الجولة","لاحقاً، سأستكشف بنفسي","إضافة أشخاص","بزر الإضافة تسجّل شخصاً التقيته في الطريق: من هو، وأين، ومتى.","دفتر أصدقائك","هنا يجتمع كل من أضفتهم. يمكنك البحث بالاسم أو المكان أو الوسم.","كرتكم الأرضية","على الخريطة ترى أين التقيتم. اسحب للتدوير واستخدم إصبعين للتكبير.","استكشف","هنا تجد الرحلات واللقاءات مع الأصدقاء والتحديات وذكرياتك.","إرسال الحمام الزاجل","يطير حمامك إلى أصدقائك حاملاً صورة وتحية. كلما بعدت المسافة طالت الرحلة.","مساحتك","في «أنا» تجد ملفك الشخصي وشخصيتك ومستواك والإعدادات.","جمع الحمام","تحصل على حمام عن كل بلد زرته فعلاً. في دليل الحمام ترى مجموعتك.","انتهت الجولة","الآن دورك: من آخر شخص التقيته في الطريق؟ يمكنك إعادة الجولة في أي وقت من أنا، الإعدادات.","أضف أول شخص","لاحقاً","انقر على «{0}»","إنهاء الجولة","التالي"]};
+/* Geführte Tour auf der echten App: Lichtrahmen um echte Knöpfe, Taube erklärt. Legt keine Daten an. */
+function openTour(){
+  if(document.querySelector('.tour'))return;
+  var T=TOUR_TXT[APP_LANG]||TOUR_TXT.en;
+  var ST=[{c:1},{s:'.fab',rnd:1,k:4},{s:'.tab[data-tab=people]',tab:'people',k:6},{s:'.tab[data-tab=map]',tab:'map',k:8},{s:'.tab[data-tab=explore]',tab:'explore',k:10},{s:'#main [data-act=mail]',k:12,need:'explore'},{s:'.tab[data-tab=me]',tab:'me',k:14},{s:'#main [data-act=dex]',k:16,need:'me'},{c:2}];
+  var N=ST.length-2,i=0,rect=null,tms=[],done=false;
+  var prevFocus=document.activeElement;
+  var ov=document.createElement('div');ov.className='tour';ov.setAttribute('role','dialog');ov.setAttribute('aria-modal','true');
+  ov.innerHTML='<div class="tour-ring" hidden></div><i class="tour-arr" hidden></i><div class="tour-b" tabindex="-1"></div>';
+  var ring=ov.firstChild,arr=ring.nextSibling,bub=ov.lastChild;
+  document.body.appendChild(ov);app.inert=true;
+  function mark(){try{localStorage.setItem('waypals-intro','1')}catch(x){}try{var d=dexState();if(!d.welcome){d.welcome=1;store.savePost()}}catch(x){}}
+  function end(add){
+    if(done)return;done=true;mark();tms.forEach(clearTimeout);
+    window.removeEventListener('resize',place);window.removeEventListener('scroll',place,true);document.removeEventListener('keydown',key,true);
+    ov.remove();app.inert=!!stack.length;
+    try{if(prevFocus&&prevFocus.focus&&document.contains(prevFocus))prevFocus.focus({preventScroll:true})}catch(x){}
+    if(add){var f=document.querySelector('.fab');if(f)f.click()}
+  }
+  function key(e){if(e.key==='Escape'){e.preventDefault();end()}}
+  function tgt(){var st=ST[i];return st&&st.s?document.querySelector(st.s):null}
+  function place(){
+    if(done)return;
+    var st=ST[i],el=tgt();
+    ov.classList.toggle('full',!el);
+    if(!el){rect=null;ring.hidden=true;arr.hidden=true;bub.style.top='';bub.classList.add('mid');return}
+    var r=el.getBoundingClientRect(),pad=st.rnd?7:5,vh=window.innerHeight,vw=window.innerWidth;
+    rect={l:r.left-pad,t:r.top-pad,r:r.right+pad,b:r.bottom+pad};
+    ring.hidden=false;ring.className='tour-ring'+(st.rnd?' rnd':'');
+    ring.style.left=rect.l+'px';ring.style.top=rect.t+'px';ring.style.width=(rect.r-rect.l)+'px';ring.style.height=(rect.b-rect.t)+'px';
+    bub.classList.remove('mid');
+    var bh=bub.offsetHeight,below=(r.top+r.height/2)<vh/2,top=below?rect.b+16:rect.t-16-bh;
+    top=Math.max(10,Math.min(vh-bh-10,top));bub.style.top=top+'px';
+    var cx=Math.max(36,Math.min(vw-36,r.left+r.width/2));
+    arr.hidden=false;arr.className='tour-arr '+(below?'up':'dn');arr.style.left=(cx-10)+'px';arr.style.top=(below?top-9:top+bh-11)+'px';
+  }
+  function later(){tms.forEach(clearTimeout);tms=[60,260,520,900].map(function(ms){return setTimeout(place,ms)})}
+  function show(){
+    var st=ST[i],h;
+    if(st.need&&S.tab!==st.need){S.tab=st.need;renderMain()}
+    if(st.c){
+      var a=st.c===1;
+      h='<div class="tour-wel"><i class="tour-pg big" aria-hidden="true"></i><h3>'+esc(T[a?0:18])+'</h3><p>'+esc(T[a?1:19])+'</p><div class="tour-col"><button type="button" class="btn pri big" data-tour="'+(a?'next':'add')+'">'+esc(T[a?2:20])+'</button><button type="button" class="tour-skip" data-tour="end">'+esc(T[a?3:21])+'</button></div></div>';
+    }else{
+      var el=tgt();
+      if(!el){i++;show();return}
+      try{if(st.s.charAt(0)==='#')el.scrollIntoView({block:'center'})}catch(x){}
+      var dots='';for(var k=1;k<=N;k++)dots+='<i'+(k===i?' class="on"':'')+'></i>';
+      var lb=st.tab?(el.querySelector('.lbl')||el).textContent.trim():'';
+      h='<div class="tour-top"><i class="tour-pg" aria-hidden="true"></i><div><h3>'+esc(T[st.k])+'</h3><p>'+esc(T[st.k+1])+'</p></div></div>'+
+        '<div class="tour-ft"><span class="tour-dots" aria-hidden="true">'+dots+'</span>'+(st.tab?'<button type="button" class="tour-tap" data-tour="next">'+'<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 11V5.5a1.5 1.5 0 0 1 3 0V11m0-1.5a1.5 1.5 0 0 1 3 0V12m0-1a1.5 1.5 0 0 1 3 0v4.5c0 3-2 5.5-5 5.5h-1.5c-2 0-3.2-.9-4.3-2.6L5 15.5c-.6-1 .6-2.2 1.7-1.4L9 16"/></svg>'+'<span>'+esc(T[22].replace('{0}',lb))+'</span></button>':'<button type="button" class="btn pri" data-tour="next">'+esc(T[24])+'</button>')+'</div>'+
+        '<div class="tour-end"><button type="button" class="tour-skip" data-tour="end">'+esc(T[23])+'</button></div>';
+    }
+    bub.innerHTML=h;place();later();
+    try{bub.focus({preventScroll:true})}catch(x){}
+  }
+  function next(){
+    var st=ST[i];
+    if(st.tab&&S.tab!==st.tab){S.tab=st.tab;renderMain()}
+    i++;if(i>=ST.length){end();return}
+    show();
+  }
+  ov.addEventListener('click',function(e){
+    var a=e.target.closest('[data-tour]');
+    if(a){var act=a.getAttribute('data-tour');if(act==='end')end();else if(act==='add')end(true);else next();return}
+    if(rect&&e.clientX>=rect.l&&e.clientX<=rect.r&&e.clientY>=rect.t&&e.clientY<=rect.b)next();
+  });
+  window.addEventListener('resize',place);window.addEventListener('scroll',place,true);document.addEventListener('keydown',key,true);
+  show();
+}
+function startTour(){var n=stack.length;stack.slice().reverse().forEach(function(s){try{closeSheet(s)}catch(x){}});setTimeout(openTour,n?260:0)}
+function maybeIntro(){var seen=false;try{seen=!!localStorage.getItem('waypals-intro')}catch(e){}if(!seen&&!store.friends.length&&!document.querySelector('.sheet,.fsheet,.scrim'))openTour()}
 function openLegal(){
   var p=cfgProv(),de=APP_LANG!=='en',cloud=window.WAYPALS_AUTH?'Firebase (Google Cloud, EU)':L('der Speicher der Plattform, auf der du die App geöffnet hast','the storage of the platform on which you opened the app');
   var h='<div class="sbar"><button type="button" class="btn ghost" data-act="close">'+ic('back')+L('Zurück','Back')+'</button></div><h2 class="stitle">'+L('Datenschutz & Rechtliches','Privacy & legal')+'</h2>';
