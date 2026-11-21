@@ -6379,7 +6379,7 @@ function openAddMail(){
   });
 }
 function addMailResult(){var r=null;try{r=localStorage.getItem('waypals-addmail-result');if(r)localStorage.removeItem('waypals-addmail-result')}catch(e){}if(!r)return;toast(r==='ok'?L('Fertig! Du kannst dich jetzt auch mit der neuen Adresse anmelden.','Done! You can now sign in with the new address too.'):(r==='auth/credential-already-in-use'||r==='auth/email-already-in-use'?L('Diese Adresse gehört schon zu einem anderen Waypals-Konto. Es wurde nichts verändert.','This address already belongs to another Waypals account. Nothing was changed.'):L('Das hat nicht geklappt. Bitte nochmal versuchen.','That did not work. Please try again.')))}
-var APP_VER=120;/* gleiche Nummer wie V in sw.js */
+var APP_VER=121;/* gleiche Nummer wie V in sw.js */
 function openSettings(){
   var el=openSheet('','settings');
   function chip(attr,val,label,cur){return '<button type="button" class="cb" '+attr+'="'+val+'" aria-pressed="'+(cur===val)+'">'+label+'</button>'}
@@ -6392,7 +6392,7 @@ function openSettings(){
         return '<button type="button" class="stylecard" data-st="'+s[0]+'" data-pv="'+s[0]+'" aria-pressed="'+(st===s[0])+'"><span class="prev"><i></i><i></i><i></i></span><b>'+s[1]+'</b><small>'+s[2]+'</small></button>'}).join('')+'</div>'+
       '<div class="fl"><span>'+L('Hell oder dunkel','Light or dark')+'</span><div class="chips">'+chip('data-th','auto',L('Automatisch','Automatic'),th)+chip('data-th','light',L('Hell','Light'),th)+chip('data-th','dark',L('Dunkel','Dark'),th)+'</div></div>'+
       '<div class="fl"><span>'+L('Ton und Vibration','Sound and vibration')+'</span><div class="chips">'+chip('data-snd','on',L('An','On'),PREF.snd==='off'?'off':'on')+chip('data-snd','off',L('Aus','Off'),PREF.snd==='off'?'off':'on')+'</div></div>'+
-      '<div class="fl"><span>'+L('3D-Figuren (bei langsamen Geräten ausschalten)','3D figures (turn off on slow devices)')+'</span><div class="chips">'+chip('data-d3','1',L('An','On'),PREF.d3==='0'?'0':'1')+chip('data-d3','0',L('Aus','Off'),PREF.d3==='0'?'0':'1')+'</div></div>'+
+      '<div class="fl"><span>'+L('3D-Figuren (bei langsamen Geräten ausschalten)','3D figures (turn off on slow devices)')+'</span><div class="chips">'+chip('data-d3','1',L('An','On'),d3On()?'1':'0')+chip('data-d3','0',L('Aus','Off'),d3On()?'1':'0')+'</div></div>'+
       '<div class="fl"><span>'+L('Sprache','Language')+'</span><div class="chips">'+chip('data-lg','de',_t('Deutsch'),APP_LANG)+chip('data-lg','en','English',APP_LANG)+chip('data-lg','es','Español',APP_LANG)+chip('data-lg','fr','Français',APP_LANG)+chip('data-lg','it','Italiano',APP_LANG)+chip('data-lg','pt','Português',APP_LANG)+chip('data-lg','sq','Shqip',APP_LANG)+chip('data-lg','ar','العربية',APP_LANG)+'</div></div></section>';
     h+='<section class="tell"><h3 class="who">'+L('Feiertage (freiwillig)','Holidays (optional)')+'</h3><p class="hint">'+L('Wähle, welche religiösen Feste du feiern möchtest. Dann bekommst du zu diesen Festen besondere Tauben. Wenn du nichts wählst, gibt es nur Silvester und Sommer. Deine Auswahl bleibt nur auf diesem Gerät und wird nirgends hochgeladen.','Choose which religious festivals you would like to celebrate. You then get special pigeons for them. If you choose nothing, there are only New Year’s Eve and summer. Your choice stays on this device only and is never uploaded.')+'</p><div class="chips">'+FAITHS.map(function(f){return '<button type="button" class="cb" data-faith="'+f[0]+'" aria-pressed="'+(faithSel().indexOf(f[0])>=0)+'">'+esc(L(f[1][0],f[1][1]))+'</button>'}).join('')+'</div></section>';
     h+='<section class="tell"><h3 class="who">'+L('Meine Daten','My data')+'</h3><p class="hint">'+L('Sichere deine Einträge als Datei. So kannst du sie auf ein neues Gerät mitnehmen oder wiederherstellen.','Save your entries as a file. This lets you move them to a new device or restore them.')+'</p><div class="btnrow"><button type="button" class="btn pri sm" data-act="export">'+L('Backup speichern','Save backup')+'</button><label class="btn sm" for="imp-file">'+L('Backup laden','Load backup')+'</label><input id="imp-file" type="file" accept="application/json,.json" hidden></div></section>';
@@ -10146,7 +10146,12 @@ function p3Live(box,skin,w,h){
 
 /* ---------- 3D-Figuren (Mii-Stil): Raymarching in WebGL, ein Shader für alle, Werte per Uniform ---------- */
 /* Schalter „3D-Figuren“ (Einstellungen → Darstellung) und schwache Geräte: dann einfache 2D-Figuren. Stand früher vor dieser Zeile und griff deshalb nie */
-var F3={prog:null,fail:(function(){try{return PREF.d3==='0'||(PREF.d3!=='1'&&((navigator.deviceMemory&&navigator.deviceMemory<=2)||(navigator.hardwareConcurrency&&navigator.hardwareConcurrency<=2)))}catch(e){return false}})(),reg:{},sheet:{},q:[],run:false,sp:{},spw:{}};
+/* 3D-Figuren: wer den Schalter selbst gestellt hat, behält seine Wahl. Ohne eigene Wahl sind sie nur in der installierten App an
+   (dort bleiben die fertigen Bilder gespeichert); im Browser zunächst aus, weil das erste Zeichnen schwächere Handys ausbremst. */
+function d3On(){try{if(PREF.d3==='1')return true;if(PREF.d3==='0')return false;
+  if((navigator.deviceMemory&&navigator.deviceMemory<=2)||(navigator.hardwareConcurrency&&navigator.hardwareConcurrency<=2))return false;
+  return !!((window.matchMedia&&(matchMedia('(display-mode: standalone)').matches||matchMedia('(display-mode: fullscreen)').matches))||navigator.standalone===true||/^android-app:/.test(document.referrer||''))}catch(e){return false}}
+var F3={prog:null,fail:!d3On(),reg:{},sheet:{},q:[],run:false,sp:{},spw:{}};
 var F3_FS=[
 'precision highp float;',
 '#define WPV 97',
@@ -10594,10 +10599,12 @@ function f3Spec(h,cb){
     F3.sp[h]=o;var c=F3.spw[h]||[];delete F3.spw[h];c.forEach(function(f){try{f(o||F3.prog)}catch(e){}});
   });
 }
-function f3Draw(u,w,h,t,yaw,bust){
+function f3Draw(u,w,h,t,yaw,bust,sc){
   var hk=f3HK(u),gl=P3.gl,o=F3.sp[hk]||F3.prog,U=o.U;if(F3.sp[hk]===undefined&&!F3.spw[hk])f3Spec(hk,function(){});
   if(P3.cv.width!==w||P3.cv.height!==h){P3.cv.width=w;P3.cv.height=h}
-  gl.viewport(0,0,w,h);gl.clearColor(0,0,0,0);gl.clear(gl.COLOR_BUFFER_BIT);gl.useProgram(o.pr);
+  gl.viewport(0,0,w,h);
+  /* sc=[unten,Höhe]: nur diesen Streifen rechnen (kurze Häppchen statt eines großen Bildes) */
+  if(sc){gl.enable(gl.SCISSOR_TEST);gl.scissor(0,sc[0],w,sc[1])}gl.clearColor(0,0,0,0);gl.clear(gl.COLOR_BUFFER_BIT);gl.useProgram(o.pr);
   if(!P3.buf){P3.buf=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,P3.buf);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,3,-1,-1,3]),gl.STATIC_DRAW)}else gl.bindBuffer(gl.ARRAY_BUFFER,P3.buf);
   gl.enableVertexAttribArray(0);gl.vertexAttribPointer(0,2,gl.FLOAT,false,0,0);
   function c3(n,hex){var c=p3Hex(hex);gl.uniform3f(U[n],c[0],c[1],c[2])}
@@ -10606,6 +10613,7 @@ function f3Draw(u,w,h,t,yaw,bust){
   c3('uSkin',u.skin);c3('uHair',u.hair);c3('uTopC',u.topc);c3('uTopD',u.topd);c3('uPants',u.pants);c3('uEye',u.eye);c3('uHatC',u.hatc);c3('uHatD',u.hatd);c3('uAcc',u.acc);c3('uBP',u.bp);
   gl.uniform4f(U.uA,u.A[0],u.A[1],u.A[2],u.A[3]);gl.uniform4f(U.uB,u.B[0],u.B[1],u.B[2],u.B[3]);gl.uniform4f(U.uC,u.C[0],u.C[1],u.C[2],u.C[3]);gl.uniform4f(U.uD,u.D[0],u.D[1],u.D[2],u.D[3]);
   gl.drawArrays(gl.TRIANGLES,0,3);
+  if(sc)gl.disable(gl.SCISSOR_TEST);
 }
 /* ---- Sprite-Sheets (8 Bilder, CSS-animiert) ---- */
 function f3Wrap(m,id,o){
@@ -10656,14 +10664,21 @@ function f3Pump(){
     try{
       if(!f3Init())return end(null);
       var bust=k.slice(-2)==='#b',u=f3Uni(f3Av(F3.reg[k])),at=document.createElement('canvas');at.width=180*P3N;at.height=225;var x=at.getContext('2d');x.imageSmoothingQuality='high';
-      var i=0;f3Spec(f3HK(u),function(){(function step(){try{
+      var i=0,y=0;f3Spec(f3HK(u),function(){(function step(){try{
         /* Solange ein Finger auf dem Bildschirm ist (Karte drehen, scrollen), wird nicht gezeichnet: das Zeichnen belegt die Grafikeinheit und ließ sonst alles kurz stehen */
         if((F3.touch&&Date.now()-(F3.tdn||0)<8000)||Date.now()-(F3.tend||0)<500){setTimeout(step,200);return}
-        var t0=performance.now();WPLAG.mark('Figur');f3Draw(u,360,450,i/P3N,0,bust);F3.pend=1;
-        /* Zeichnen und Abholen getrennt: die Grafikeinheit rechnet, während die App weiterläuft; sonst wartete die ganze App auf das Bild */
-        setTimeout(function(){try{x.drawImage(P3.cv,0,0,360,450,i*180,0,180,225)}catch(e){}F3.pend=0;i++;
-        if(i<P3N){var dt=performance.now()-t0,nx=function(){setTimeout(step,Math.max(60,Math.min(600,Math.round(dt*3))))};if(window.requestIdleCallback)requestIdleCallback(nx,{timeout:800});else nx();return}
-        if(at.toBlob)at.toBlob(function(b){if(b)f3CachePut(k,b);end(b?URL.createObjectURL(b):at.toDataURL('image/png'))},'image/png');else end(at.toDataURL('image/png'));},24)}catch(e){F3.pend=0;F3.fail=true;end(null)}})()});
+        /* In schmalen Streifen zeichnen: ein ganzes Bild belegte die Grafikeinheit auf manchen Handys so lange, dass die App stand.
+           Die Streifenhöhe passt sich an (Ziel rund 8 ms je Häppchen), dazwischen Pause, damit Tippen und Scrollen flüssig bleiben. */
+        var sh=Math.min(F3.sh||24,450-y),t0=performance.now(),top=450-y-sh;WPLAG.mark('Figur');
+        f3Draw(u,360,450,i/P3N,0,bust,[y,sh]);
+        try{P3.gl.readPixels(0,y,1,1,P3.gl.RGBA,P3.gl.UNSIGNED_BYTE,F3.px||(F3.px=new Uint8Array(4)))}catch(e){}
+        x.drawImage(P3.cv,0,top,360,sh,i*180,top/2,180,sh/2);
+        var dt=performance.now()-t0,nh=sh*8/Math.max(dt,.5);
+        F3.sh=Math.max(8,Math.min(450,2*Math.round(Math.min(nh,sh*1.5)/2)));
+        y+=sh;if(y>=450){y=0;i++}
+        if(i<P3N){setTimeout(step,Math.max(10,Math.min(250,Math.round(dt*1.5))));return}
+        if(at.toBlob)at.toBlob(function(b){if(b)f3CachePut(k,b);end(b?URL.createObjectURL(b):at.toDataURL('image/png'))},'image/png');else end(at.toDataURL('image/png'));
+      }catch(e){F3.fail=true;end(null)}})()});
     }catch(e){F3.fail=true;end(null)}
   };
   f3Ready(function(){(window.requestAnimationFrame||setTimeout)(function(){setTimeout(go,0)})});
