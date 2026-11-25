@@ -1,7 +1,7 @@
 {
   "name": "Waypals",
   "short_name": "Waypals",
-  "description": "Your friend book for the road: keep the people you meet while travelling on a world map.",
+  "description": "Your friend book for the road: the people you meet while travelling.",
   "id": "./",
   "start_url": "./index.html",
   "scope": "./",
