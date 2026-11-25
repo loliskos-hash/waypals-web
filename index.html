@@ -691,6 +691,23 @@ h2,.h2{font-size:1.75rem}
 h3{font-family:var(--f-serif);font-weight:700;letter-spacing:.01em}
 .who,.count{letter-spacing:.06em}
 body{letter-spacing:.005em}
+.sc-sheet .stitle{font-family:var(--f-serif,serif);font-weight:600;font-size:1.7rem;margin:4px 0 6px}
+.sc-two{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0}
+.sc-card{border:1px solid var(--line);border-radius:14px;padding:12px 12px 10px;background:var(--paper);min-width:0}
+.sc-card.acc{border-color:var(--pen);background:var(--pen-soft)}
+.sc-h{display:flex;align-items:center;gap:6px;font-size:.85rem;color:var(--muted);margin-bottom:6px}.sc-h b{color:var(--ink);font-weight:600}.sc-h .ic{width:16px;height:16px}
+.sc-lv{font-family:var(--f-serif,serif);font-size:2.4rem;font-weight:600;line-height:1;margin:2px 0 8px;color:var(--ink)}.sc-lv span{display:block;font-family:var(--f-ui,sans-serif);font-size:.72rem;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:2px}
+.sc-r{display:flex;justify-content:space-between;gap:8px;padding:4px 0;border-top:1px solid var(--line);font-size:.92rem}.sc-r span{color:var(--muted)}.sc-r b{font-variant-numeric:tabular-nums;font-weight:600}
+.sc-at{font-size:.75rem;color:var(--muted);margin-top:6px;line-height:1.3}
+.sc-opts{display:grid;gap:8px;margin:6px 0 14px}
+.sc-opt{display:flex;gap:10px;align-items:flex-start;text-align:start;width:100%;border:1px solid var(--line);border-radius:12px;padding:11px 12px;background:var(--sheet);color:var(--ink);font:inherit;cursor:pointer}
+.sc-opt.on{border-color:var(--pen);box-shadow:0 0 0 1px var(--pen) inset}
+.sc-dot{flex:none;width:18px;height:18px;border-radius:50%;border:2px solid var(--line);margin-top:1px;box-sizing:border-box}.sc-opt.on .sc-dot{border:5px solid var(--pen)}
+.sc-tx b{font-weight:600}.sc-tx em{font-style:normal;font-size:.72rem;background:var(--pen-soft);color:var(--pen);border-radius:99px;padding:2px 7px;margin-inline-start:4px;vertical-align:1px}.sc-tx small{display:block;color:var(--muted);font-size:.84rem;margin-top:3px;line-height:1.35}
+.sc-step2{margin:10px 0 16px}.sc-q{font-family:var(--f-serif,serif);font-size:1.25rem;font-weight:600;margin:0 0 8px}
+.sc-diff{border:1px solid var(--line);border-radius:12px;padding:4px 12px;margin:8px 0}.sc-diff .sc-r:first-child{border-top:0}.sc-diff .sc-r.ch b{color:var(--pen)}.sc-diff .sc-r.dn b{color:var(--danger)}.sc-diff s{color:var(--muted);font-weight:400}
+.sc-warn{background:color-mix(in srgb,var(--danger) 12%,transparent);color:var(--danger);border-radius:10px;padding:10px 12px;font-weight:600}
+.sc-act{display:grid;gap:6px}.btn.sc-danger{background:var(--danger);border-color:var(--danger);color:#fff;box-shadow:none}
 </style>
 
 <div id="splash" role="presentation"><div class="sp-in"><svg class="sp-pin" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s7-6.2 7-12a7 7 0 1 0-14 0c0 5.8 7 12 7 12Z" fill="#FF6B5B"/><circle cx="12" cy="10" r="2.6" fill="#FFF8EE"/></svg><div class="sp-name"><span style="--i:0">W</span><span style="--i:1">a</span><span style="--i:2">y</span><span style="--i:3">p</span><span style="--i:4">a</span><span style="--i:5">l</span><span style="--i:6">s</span></div><div class="sp-by"><i></i><span>by Ludeldoo</span><i></i></div><div class="sp-prog" aria-live="polite"><div class="sp-track"><i id="sp-b"></i></div><div class="sp-meta"><span id="sp-l"></span><span id="sp-p"></span></div></div></div></div>
@@ -4673,11 +4690,12 @@ var store={
           var bkKey='wegmarken-backup-'+id,bk=lsJ(bkKey);
           if(bk&&Array.isArray(bk.friends)){var have={};self.friends.forEach(function(f){have[f.id]=1});bk.friends.forEach(function(f){if(f&&f.id&&!have[f.id])self.friends.push(f)})}
           if(bk&&bk.post&&!hasPost(self.post))self.post=normPost(bk.post);
-          try{localStorage.setItem('wegmarken-owner',id)}catch(e){}
+          if(prevOwner)try{localStorage.setItem('wegmarken-owner',id)}catch(e){}
           var synKey='wegmarken-synced-'+id,synced=lsJ(synKey)||{},merged=false,postDone=false;
           var postBase={};Object.keys(self.post).forEach(function(k){postBase[k]=JSON.stringify(self.post[k])});
-          var lastCache=null;
-          self.col.onSnapshot({includeMetadataChanges:true},function(snap){
+          var lastCache=null,lastSnap=null,devFr0=self.friends.filter(function(f){return f&&f.id&&!f.example}),devPost0=self.post;
+          function onSnap(snap){
+            if(self.choosing){lastSnap=snap;return}
             var cache=!!(snap.metadata&&snap.metadata.fromCache);
             /* Nur Metadaten geändert (z. B. Schreibvorgang bestätigt): nichts neu zeichnen, spart Rechenzeit */
             var nch=1;try{nch=snap.docChanges().length}catch(e){}
@@ -4689,7 +4707,33 @@ var store={
             /* Nur lokal vorhandene Einträge: nie still verwerfen. Weg nur, wenn sie schon einmal im Konto waren (also anderswo gelöscht wurden). */
             var localOnly=self.friends.filter(function(f){return f&&f.id&&!f.example&&!inCloud[f.id]});
             var keep=cache?localOnly:localOnly.filter(function(f){return !synced[f.id]});
-            if(!cache){
+            /* Erstes Anmelden auf einem Gerät, das schon einen eigenen Stand hat, und das Konto hat auch einen: fragen statt überschreiben */
+            if(!cache&&!merged&&!prevOwner&&!self.choiceMade){
+              var pdc=snap.docs.find(function(d){return d.id==='_post'}),cpo=normPost(pdc&&pdc.data()||{});
+              var pcmp=function(p){var o=normPost(p);delete o.savedAt;return JSON.stringify(o)};
+              var devHas=keep.length>0||hasPost(self.post),accHas=cloud.length>0||hasPost(cpo);
+              if(devHas&&accHas&&(keep.length>0||pcmp(self.post)!==pcmp(cpo))){
+                self.choosing=true;lastSnap=snap;
+                var dev={friends:devFr0,post:devPost0},acc={friends:cloud,post:cpo};
+                lsW('wegmarken-geraet-sicherung',{friends:dev.friends,post:dev.post,at:Date.now(),uid:id});
+                var mail='';try{mail=(window.WAYPALS_AUTH&&WAYPALS_AUTH.email)||''}catch(e){}
+                openStateChoice(dev,acc,mail,function(pick){
+                  if(pick==='acc'){self.friends=self.friends.filter(function(f){return f&&inCloud[f.id]});self.post=cpo;self.postDirty=false}
+                  else{
+                    devFr0.forEach(function(f){if(!self.friends.some(function(g){return g&&g.id===f.id}))self.friends.push(f)});
+                    if(pick==='dev'){var ok=false;try{localStorage.setItem('wegmarken-konto-sicherung-'+id,JSON.stringify({friends:cloud,post:cpo,at:Date.now()}));ok=true}catch(e){}
+                      if(!ok)try{saveFile('waypals-konto-'+todayISO()+'.json',JSON.stringify({app:'waypals',v:1,at:new Date().toISOString(),friends:cloud,post:cpo}),'application/json')}catch(e){}
+                      self.post=normPost(devPost0);self.post.savedAt=Date.now()}
+                    else self.post=mergePosts(cpo,devPost0);
+                  }
+                  postBase={};Object.keys(self.post).forEach(function(k){postBase[k]=JSON.stringify(self.post[k])});
+                  try{localStorage.setItem('wegmarken-owner',id)}catch(e){}
+                  self.choosing=false;self.choiceMade=true;lastCache=null;onSnap(lastSnap);
+                });
+                return;
+              }
+            }
+            if(!cache){if(!prevOwner)try{localStorage.setItem('wegmarken-owner',id)}catch(e){}
               if(!merged){merged=true;keep.forEach(function(f){var d=JSON.parse(JSON.stringify(f));delete d.id;self.col.doc(f.id).set(d).catch(function(){})});lsW(bkKey,null)}
               synced={};cloud.forEach(function(f){synced[f.id]=1});lsW(synKey,synced);
             }
@@ -4712,7 +4756,8 @@ var store={
             if(nch===0&&idsBefore===self.friends.map(function(f){return f&&f.id}).join('|')){}
             else WPLAG.time('Freunde sichern',function(){self.saveLocal()});
             WPLAG.time('Anzeige',onChange);
-          },function(){self.mode='local';self.col=null;onChange()});
+          }
+          self.col.onSnapshot({includeMetadataChanges:true},onSnap,function(){self.mode='local';self.col=null;onChange()});
         }else{self.mode='local'}
         onChange();
       });
@@ -4735,6 +4780,68 @@ var store={
     return this.col.doc(id).delete().catch(function(){toast(_t('Löschen im Konto hat nicht geklappt.'))});
   }
 };
+
+/* ---------- Anmelden mit anderem Stand auf dem Gerät: nie still überschreiben, sondern fragen ---------- */
+function stateStats(fr,post){
+  var of=store.friends,op=store.post,r={people:0,countries:0,cities:0,pigeons:0,trips:0,level:1,at:+(post&&post.savedAt)||0};
+  try{
+    store.friends=(fr||[]).filter(function(f){return f&&!f.example});store.post=normPost(post||{});
+    var x=xpMe();r.level=levelOf(x.total).level;r.countries=x._k||0;r.cities=x._c||0;
+    r.people=store.friends.length;r.pigeons=(store.post.pigeons||[]).length;r.trips=(store.post.trips||[]).length;
+  }catch(e){}
+  store.friends=of;store.post=op;return r;
+}
+function mergeVal(a,b,d){
+  if(a==null)return b;if(b==null)return a;
+  if(Array.isArray(a)&&Array.isArray(b)){var seen={},out=[];a.concat(b).forEach(function(x){var k=x&&typeof x==='object'&&x.id!=null?'i'+x.id:'j'+JSON.stringify(x);if(!seen[k]){seen[k]=1;out.push(x)}});return out}
+  if(d<2&&typeof a==='object'&&typeof b==='object'&&!Array.isArray(a)&&!Array.isArray(b)){var o=Object.assign({},b);Object.keys(a).forEach(function(k){o[k]=mergeVal(a[k],b[k],d+1)});return o}
+  return a;
+}
+/* Konto-Stand (a) bleibt Grundlage; was nur auf dem Gerät (b) ist, kommt dazu */
+function mergePosts(a,b){var o={};Object.keys(Object.assign({},b,a)).forEach(function(k){o[k]=mergeVal(a[k],b[k],0)});o.savedAt=Date.now();return normPost(o)}
+function openStateChoice(dev,acc,mail,done){
+  var sD=stateStats(dev.friends,dev.post),sA=stateStats(acc.friends,acc.post);
+  var allFr=acc.friends.concat(dev.friends.filter(function(f){return !acc.friends.some(function(g){return g.id===f.id})}));
+  var sM=stateStats(allFr,mergePosts(acc.post,dev.post)),sT=stateStats(allFr,dev.post);
+  function dt(t){if(!t)return '–';try{return new Date(t).toLocaleDateString(APP_LOC,{day:'numeric',month:'short',year:'numeric'})}catch(e){return ''}}
+  var rows=[['level',L('Level','Level')],['countries',L('Länder','Countries')],['cities',L('Städte','Cities')],['people',L('Menschen','People')],['pigeons',L('Tauben','Pigeons')],['trips',L('Reisen','Trips')]];
+  function card(t,icn,s,cls){return '<div class="sc-card '+cls+'"><div class="sc-h">'+icn+'<b>'+t+'</b></div><div class="sc-lv"><span>'+L('Level','Level')+'</span>'+s.level+'</div>'+
+    rows.slice(1).map(function(r){return '<div class="sc-r"><span>'+r[1]+'</span><b>'+s[r[0]]+'</b></div>'}).join('')+
+    '<div class="sc-at">'+L('Zuletzt geändert','Last changed')+'<br>'+dt(s.at)+'</div></div>'}
+  var opts=[
+    ['acc',L('Konto-Stand behalten','Keep account data'),L('Empfohlen','Recommended'),L('Du machst mit dem Stand aus deinem Konto weiter. Der Stand dieses Geräts wird nicht hochgeladen, bleibt aber hier als Sicherung liegen.','You continue with the data from your account. The data on this device is not uploaded but kept here as a backup.')],
+    ['merge',L('Beide zusammenführen','Merge both'),'',L('Menschen, Tauben, Reisen und Beiträge aus beiden Ständen werden vereint. Profil und Einstellungen kommen aus dem Konto.','People, pigeons, trips and posts from both are combined. Profile and settings come from the account.')],
+    ['dev',L('Stand dieses Geräts übernehmen','Use this device’s data'),'',L('Level, Tauben, Reisen und Profil im Konto werden durch den Stand dieses Geräts ersetzt. Menschen im Konto bleiben erhalten.','Level, pigeons, trips and profile in the account are replaced by this device’s data. People in the account are kept.')]
+  ];
+  var FILE=L('Beide Stände vorher als Datei sichern','Save both as a file first');
+  var el=openSheet('<h2 class="stitle">'+L('Zwei verschiedene Stände','Two different versions')+'</h2>'+
+    '<p class="hint">'+(mail?LT('Mit {0} ist schon ein Stand verbunden. Auf diesem Gerät liegt ein anderer.','{0} already has saved data. This device has different data.',['<b>'+esc(mail)+'</b>']):L('Mit diesem Konto ist schon ein Stand verbunden. Auf diesem Gerät liegt ein anderer.','This account already has saved data. This device has different data.'))+' '+L('Wähle, womit du weitermachst. Ohne deine Bestätigung wird nichts überschrieben.','Choose which one to continue with. Nothing is overwritten without your confirmation.')+'</p>'+
+    '<div class="sc-two">'+card(L('Dieses Gerät','This device'),ic('phone'),sD,'dev')+card(L('Dein Konto','Your account'),ic('mail'),sA,'acc')+'</div>'+
+    '<div class="sc-opts" role="radiogroup">'+opts.map(function(o,i){return '<button type="button" role="radio" class="sc-opt'+(i===0?' on':'')+'" aria-checked="'+(i===0)+'" data-o="'+o[0]+'"><span class="sc-dot"></span><span class="sc-tx"><b>'+o[1]+'</b>'+(o[2]?' <em>'+o[2]+'</em>':'')+'<small>'+o[3]+'</small></span></button>'}).join('')+'</div>'+
+    '<div class="sc-step2" hidden></div>'+
+    '<div class="sc-act"><button type="button" class="btn pri big" data-go="next">'+L('Weiter','Continue')+'</button><button type="button" class="btn ghost" data-go="file">'+FILE+'</button></div>','fsheet lock sc-sheet');
+  var pick='acc';
+  function diff(a,b){return rows.map(function(r){var ch=a[r[0]]!==b[r[0]];return '<div class="sc-r'+(ch?(b[r[0]]<a[r[0]]?' ch dn':' ch'):'')+'"><span>'+r[1]+'</span><b>'+(ch?'<s>'+a[r[0]]+'</s> → ':'')+b[r[0]]+'</b></div>'}).join('')}
+  function step2(){
+    var h,s2=$('.sc-step2',el),res=pick==='acc'?sA:pick==='merge'?sM:sT;
+    if(pick==='acc')h='<h3 class="sc-q">'+L('Das passiert beim Ja','What happens if you confirm')+'</h3><p>'+L('Dieses Gerät zeigt danach den Konto-Stand:','This device will then show the account data:')+'</p><div class="sc-diff">'+diff(sD,res)+'</div><p class="hint">'+L('Dein Konto bleibt genau so, wie es ist. Der bisherige Stand dieses Geräts bleibt hier als Sicherung liegen.','Your account stays exactly as it is. The previous data on this device is kept here as a backup.')+'</p>';
+    else h='<h3 class="sc-q">'+L('Das passiert beim Ja','What happens if you confirm')+'</h3>'+(pick==='dev'?'<p class="sc-warn">'+L('Achtung: Dein Konto-Stand wird überschrieben. Auf allen Geräten siehst du danach den Stand dieses Geräts.','Warning: your account data will be overwritten. All your devices will then show this device’s data.')+'</p>':'')+'<p>'+L('So ändert sich dein Konto:','This is how your account changes:')+'</p><div class="sc-diff">'+diff(sA,res)+'</div><p class="hint">'+(pick==='dev'?L('Der bisherige Konto-Stand wird auf diesem Gerät als Sicherung aufbewahrt.','The previous account data is kept on this device as a backup.'):L('Es geht nichts verloren.','Nothing is lost.'))+'</p>';
+    s2.innerHTML=h;s2.hidden=false;$('.sc-opts',el).hidden=true;$('.sc-two',el).hidden=true;
+    var b=$('[data-go=next]',el);b.setAttribute('data-go','ok');b.classList.toggle('sc-danger',pick==='dev');
+    b.textContent=pick==='acc'?L('Ja, Konto-Stand nehmen','Yes, use account data'):pick==='merge'?L('Ja, zusammenführen','Yes, merge'):L('Ja, Konto überschreiben','Yes, overwrite account');
+    var f=$('[data-go=file]',el);f.setAttribute('data-go','back');f.textContent=L('Zurück','Back');
+    try{el.scrollTop=0}catch(e){}
+  }
+  function back(){$('.sc-step2',el).hidden=true;$('.sc-opts',el).hidden=false;$('.sc-two',el).hidden=false;var b=$('[data-go=ok]',el);b.setAttribute('data-go','next');b.classList.remove('sc-danger');b.textContent=L('Weiter','Continue');var f=$('[data-go=back]',el);f.setAttribute('data-go','file');f.textContent=FILE}
+  el.addEventListener('click',function(e){
+    var o=e.target.closest('[data-o]');if(o){pick=o.getAttribute('data-o');$$('.sc-opt',el).forEach(function(x){var on=x===o;x.classList.toggle('on',on);x.setAttribute('aria-checked',String(on))});return}
+    var g=e.target.closest('[data-go]');if(!g)return;var k=g.getAttribute('data-go');
+    if(k==='next')step2();else if(k==='back')back();
+    else if(k==='file'){saveFile('waypals-zwei-staende-'+todayISO()+'.json',JSON.stringify({app:'waypals',v:1,at:new Date().toISOString(),friends:dev.friends,post:dev.post,account:{friends:acc.friends,post:acc.post}}),'application/json');toast(L('Backup wird erstellt.','Creating backup.'))}
+    else if(k==='ok'){closeSheet(el);done(pick)}
+  });
+  return el;
+}
 
 /* ---------- Beispieldaten (nur Anzeige, werden nie gespeichert) ---------- */
 var DEMO=[];
