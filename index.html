@@ -144,6 +144,7 @@ textarea.ruled:focus{box-shadow:none}
 .seg input:checked+span{background:var(--pen);color:var(--on-pen);border-color:var(--pen)}
 .seg input:focus-visible+span{outline:3px solid var(--pen);outline-offset:2px}
 .chips{display:flex;flex-wrap:wrap;gap:8px}
+.cpw{position:relative;display:grid;gap:8px}.cpl:empty{display:none}.cpc{color:var(--ink);font-size:.85rem;padding:3px 4px 3px 6px}.cpc .av{width:22px;height:22px;font-size:.7rem}.cpc small{color:var(--muted)}.cpc button{border:0;background:none;color:var(--muted);font-size:1.05rem;line-height:1;padding:0 4px;cursor:pointer}.cpsug{display:grid;gap:4px}.cpsug:empty{display:none}.cps{display:flex;align-items:center;gap:10px;text-align:left;border:1px solid var(--line);background:var(--sheet);border-radius:12px;padding:7px 10px;color:var(--ink);font:inherit;cursor:pointer}.cps .av{width:30px;height:30px}.cps span{display:grid}.cps small{color:var(--muted);font-size:.75rem}.cpat{width:30px;height:30px;border-radius:50%;display:inline-grid!important;place-items:center;background:var(--line);font-weight:600}.cps .ic{width:30px}.cphint{color:var(--muted);font-size:.75rem}
 .cb{padding:7px 14px;border:1.5px solid var(--line);border-radius:999px;background:transparent;min-height:40px;font-size:.92rem}
 .cb[aria-pressed="true"]{background:var(--pen);color:var(--on-pen);border-color:var(--pen)}
 
@@ -7047,7 +7048,7 @@ function openFlightImport(){
   });
 }
 function tripCard(F,t,extra){
-  return '<button type="button" class="pgi tripi" '+(F?'data-open="'+esc(F.id)+'"':'data-act="edit-trip" data-id="'+esc(t.id)+'"')+'><b>'+(F?esc(first(F.name))+' · ':'')+esc(t.dest.name)+'</b><small>'+esc(tripWhen(t))+(t.kind==='work'?_t(' · Arbeit'):'')+(t.note?' · '+esc(t.note):'')+(extra?' · '+esc(extra):'')+'</small></button>';
+  return '<button type="button" class="pgi tripi" '+(F?'data-open="'+esc(F.id)+'"':'data-act="edit-trip" data-id="'+esc(t.id)+'"')+'><b>'+(F?esc(first(F.name))+' · ':'')+esc(t.dest.name)+'</b><small>'+esc(tripWhen(t))+(t.kind==='work'?_t(' · Arbeit'):'')+(withList(t).length?' · '+esc(withText(t)):'')+(t.note?' · '+esc(t.note):'')+(extra?' · '+esc(extra):'')+'</small></button>';
 }
 function tripStatsHTML(){
   var today=todayISO(),home=myCountry(),me=store.post.me,tr=tripsAllOf('me').filter(function(x){return x.from<=today}),cs={},pl={},days=0,longest=null,far=null;
@@ -7101,15 +7102,58 @@ function editTrip(id){
   if(t.example){toast(_t('Das ist nur ein Beispiel.'));return}
   openTripForm(null,t);
 }
+/* Mitreisende einer Reise: t.with=[{n:Name, fid?:Eintrag im Buch, u?:Benutzername, uid?}]; optional, bleibt nur beim Eintragenden (wird nicht veröffentlicht) */
+function withList(t){return Array.isArray(t&&t.with)?t.with.filter(function(x){return x&&(x.n||x.u)}):[]}
+function withName(x){var f=x.fid&&store.friends.find(function(y){return y.id===x.fid});return f?first(f.name):x.n?first(x.n):'@'+x.u}
+function withText(t){var w=withList(t);if(!w.length)return '';var a=w.map(withName);return LT('mit {0}','with {0}',[a.length>1?a.slice(0,-1).join(', ')+' '+L('und','and')+' '+a[a.length-1]:a[0]])}
+function companionPicker(host,init){
+  var list=withList({with:init}).map(function(x){return Object.assign({},x)}),seq=0;
+  host.innerHTML='<div class="fl"><span>'+L('Mit wem? (optional)','With whom? (optional)')+'</span><div class="cpw"><div class="chips cpl"></div><input class="cpin" enterkeyhint="done" placeholder="'+esc(L('Name oder @Benutzername','Name or @username'))+'"><div class="cpsug"></div></div><small class="cphint">'+L('Jemand aus deinem Buch, ein Waypals-Benutzername oder einfach ein Name.','Someone from your book, a Waypals username or just a name.')+'</small></div>';
+  var cl=$('.cpl',host),inp=$('.cpin',host),sg=$('.cpsug',host);
+  function has(x){return list.some(function(y){return (x.fid&&y.fid===x.fid)||(x.uid&&y.uid===x.uid)||(!x.fid&&!x.uid&&!y.fid&&!y.uid&&NORM(y.n||'')===NORM(x.n||''))})}
+  function paintL(){cl.innerHTML=list.map(function(x,i){var f=x.fid&&store.friends.find(function(y){return y.id===x.fid});return '<span class="chip cpc">'+(f?avatar(f):'')+esc(f?f.name:x.n||'@'+x.u)+(x.u?' <small>@'+esc(x.u)+'</small>':'')+'<button type="button" data-cprm="'+i+'" aria-label="'+esc(L('Entfernen','Remove'))+'">×</button></span>'}).join('');cl.hidden=!list.length}
+  function add(x){if(!has(x))list.push(x);inp.value='';sg.innerHTML='';paintL();inp.focus()}
+  function sug(){
+    var q=inp.value.trim(),h='';if(!q){sg.innerHTML='';return}
+    var nq=NORM(q.replace(/^@/,'')),fr=store.friends.filter(function(f){return !has({fid:f.id})&&NORM(f.name||'').indexOf(nq)>=0}).slice(0,4);
+    h+=fr.map(function(f){return '<button type="button" class="cps" data-cpf="'+esc(f.id)+'">'+avatar(f)+'<span><b>'+esc(f.name)+'</b><small>'+esc([f.uname?'@'+f.uname:'',String(f.place||'').split(',')[0]].filter(Boolean).join(' · ')||L('aus deinem Buch','from your book'))+'</small></span></button>'}).join('');
+    var un=unNorm(q.replace(/^@/,''));
+    if(un.length>=3&&!/\s/.test(q.replace(/^@/,'')))h+='<button type="button" class="cps" data-cpu="'+esc(un)+'">'+'<span class="cpat">@</span>'+'<span><b>@'+esc(un)+'</b><small>'+(circleOn()?L('Waypals-Benutzer suchen','Find Waypals user'):L('Zum Suchen bitte anmelden','Sign in to search'))+'</small></span></button>';
+    if(q.charAt(0)!=='@')h+='<button type="button" class="cps" data-cpn="1">'+ic('pen')+'<span><b>„'+esc(q)+'“</b><small>'+L('Nur als Namen hinzufügen','Add just as a name')+'</small></span></button>';
+    sg.innerHTML=h;
+  }
+  function lookup(un,btn){
+    if(!circleOn()){toast(L('Melde dich an, um Benutzer zu suchen.','Sign in to find users.'));return}
+    var my=++seq;$('small',btn).textContent=L('Suche …','Searching …');
+    unLookup(un).then(function(d){if(my!==seq)return;
+      if(!d){$('small',btn).textContent=L('Gibt es nicht. Tipp den Namen ohne @ ein.','Not found. Type the name without @.');return}
+      if(d.uid===circle.me){$('small',btn).textContent=L('Das bist du.','That is you.');return}
+      var f=store.friends.find(function(y){return y.uid===d.uid});
+      add(f?{fid:f.id,n:f.name,u:un,uid:d.uid}:{n:d.name||un,u:un,uid:d.uid});
+    }).catch(function(){if(my===seq)$('small',btn).textContent=L('Suchen geht gerade nicht. Bist du online?','Cannot search right now. Are you online?')});
+  }
+  inp.addEventListener('input',sug);
+  inp.addEventListener('keydown',function(e){if(e.key!=='Enter')return;e.preventDefault();var b=$('.cps',sg);if(b)b.click()});
+  host.addEventListener('click',function(e){
+    var r=e.target.closest('[data-cprm]');if(r){list.splice(+r.getAttribute('data-cprm'),1);paintL();return}
+    var b=e.target.closest('.cps');if(!b)return;
+    if(b.hasAttribute('data-cpf')){var f=store.friends.find(function(y){return y.id===b.getAttribute('data-cpf')});if(f)add(f.uid?{fid:f.id,n:f.name,u:f.uname||undefined,uid:f.uid}:{fid:f.id,n:f.name})}
+    else if(b.hasAttribute('data-cpu'))lookup(b.getAttribute('data-cpu'),b);
+    else add({n:inp.value.trim().slice(0,60)});
+  });
+  paintL();
+  return {get:function(){var q=inp.value.trim();if(q&&q.charAt(0)!=='@'&&!has({n:q}))list.push({n:q.slice(0,60)});return list.map(function(x){var o={n:String(x.n||'').slice(0,60)};if(x.fid)o.fid=x.fid;if(x.u)o.u=x.u;if(x.uid)o.uid=x.uid;return o})}};
+}
 function openTripForm(who,trip){
   var d=Object.assign({who:who||'me',from:'',to:'',dest:null,note:''},trip||{});
   var fr=store.friends,sel='';
   if(who&&who!=='me'){var ff=fr.find(function(x){return x.id===who});sel=_t('<p class="hint">Reise von <b>')+esc(ff?ff.name:'?')+'</b></p>'}
   else sel=_t('<label class="fl"><span>Wer reist?</span><select name="who"><option value="me">Ich</option>')+fr.map(function(f){return '<option value="'+esc(f.id)+'"'+(d.who===f.id?' selected':'')+'>'+esc(f.name)+'</option>'}).join('')+'</select></label>';
   var el=openSheet('<div class="sbar"><button type="button" class="btn ghost" data-act="close">'+ic('back')+_t('Abbrechen</button><button type="button" class="btn pri" data-act="save">Speichern</button></div><h2 class="stitle">')+(trip?_t('Reise bearbeiten'):_t('Reise eintragen'))+'</h2>'+
-    '<form class="form" novalidate autocomplete="off">'+sel+'<div data-pp="dest"></div>'+fld(L('Von','From'),'from',d.from,'type="date"')+fld(L('Bis','To'),'to',tripOpen(d)?todayISO():d.to,'type="date"')+'<label class="fl"><span>'+L('Art','Type')+'</span><select name="kind"><option value="trip"'+(d.kind==='work'?'':' selected')+'>'+L('Reise oder Urlaub','Trip or vacation')+'</option><option value="work"'+(d.kind==='work'?' selected':'')+'>'+L('Arbeiten oder Leben dort','Work or live there')+' (+'+XP_WORK+' XP)</option></select></label>'+'<label class="chk tchk" data-openrow'+(d.kind==='work'?'':' hidden')+'><input type="checkbox" name="open"'+(tripOpen(d)?' checked':'')+'> <span>'+L('Noch dort (ohne Enddatum)','Still there (no end date)')+'</span></label>'+'<label class="chk tchk"><input type="checkbox" name="vague"'+(d.vague?' checked':'')+'> <span>'+L('Datum noch unsicher (ungefähr)','Dates not sure yet (approximate)')+'</span></label>'+((d.who||'me')==='me'?'<label class="chk tchk"><input type="checkbox" name="tell"'+(trip?(d.tell?' checked':''):' checked')+'> <span>'+L('Meinen Freunden im Kreis Bescheid geben','Let my friends in the circle know')+'</span></label>':'')+fld(L('Notiz (optional)','Note (optional)'),'note',d.note,'placeholder="'+L('z. B. Surfurlaub, Besuch bei Familie','e.g. surf trip, visiting family')+'"')+'<p class="err" role="alert" hidden></p></form>'+
+    '<form class="form" novalidate autocomplete="off">'+sel+'<div data-pp="dest"></div><div data-cp="with"></div>'+fld(L('Von','From'),'from',d.from,'type="date"')+fld(L('Bis','To'),'to',tripOpen(d)?todayISO():d.to,'type="date"')+'<label class="fl"><span>'+L('Art','Type')+'</span><select name="kind"><option value="trip"'+(d.kind==='work'?'':' selected')+'>'+L('Reise oder Urlaub','Trip or vacation')+'</option><option value="work"'+(d.kind==='work'?' selected':'')+'>'+L('Arbeiten oder Leben dort','Work or live there')+' (+'+XP_WORK+' XP)</option></select></label>'+'<label class="chk tchk" data-openrow'+(d.kind==='work'?'':' hidden')+'><input type="checkbox" name="open"'+(tripOpen(d)?' checked':'')+'> <span>'+L('Noch dort (ohne Enddatum)','Still there (no end date)')+'</span></label>'+'<label class="chk tchk"><input type="checkbox" name="vague"'+(d.vague?' checked':'')+'> <span>'+L('Datum noch unsicher (ungefähr)','Dates not sure yet (approximate)')+'</span></label>'+((d.who||'me')==='me'?'<label class="chk tchk"><input type="checkbox" name="tell"'+(trip?(d.tell?' checked':''):' checked')+'> <span>'+L('Meinen Freunden im Kreis Bescheid geben','Let my friends in the circle know')+'</span></label>':'')+fld(L('Notiz (optional)','Note (optional)'),'note',d.note,'placeholder="'+L('z. B. Surfurlaub, Besuch bei Familie','e.g. surf trip, visiting family')+'"')+'<p class="err" role="alert" hidden></p></form>'+
     (trip?_t('<div class="dz"><button type="button" class="btn danger" data-act="del">Reise löschen</button></div>'):''),'fsheet');
   var pp=placePicker($('[data-pp=dest]',el),{label:_t('Wohin?'),text:d.dest?d.dest.name:'',lat:d.dest?d.dest.lat:null,lon:d.dest?d.dest.lon:null,tz:d.dest?d.dest.tz:'',placeholder:_t('Stadt oder Ort'),pinText:_t('Ziel gefunden'),noPinText:_t('Wähle einen Vorschlag oder markiere den Ort auf der Karte.')});
+  var cp=companionPicker($('[data-cp=with]',el),d.with);
   var err=$('.err',el);
   function syncOpen(){var w=$('[name=kind]',el).value==='work',ob=$('[name=open]',el),row=$('[data-openrow]',el);row.hidden=!w;$('[name=to]',el).closest('.fl').hidden=w&&ob.checked}
   syncOpen();el.addEventListener('change',function(e){if(e.target.name==='kind'||e.target.name==='open')syncOpen()});
@@ -7134,7 +7178,7 @@ function openTripForm(who,trip){
       if(to<from){var x=from;from=to;to=x}
       var whoSel=$('[name=who]',el),w=whoSel?whoSel.value:(who||'me');
       var rec={id:trip?trip.id:uid(),who:w,dest:{name:s.text,lat:s.lat,lon:s.lon,tz:s.tz||''},from:from,to:to,kind:$('[name=kind]',el).value==='work'?'work':'trip',note:($('[name=note]',el).value||'').trim()};
-      if($('[name=vague]',el).checked)rec.vague=true;var tc=$('[name=tell]',el);if(tc&&tc.checked&&w==='me')rec.tell=true;
+      var wl=cp.get();if(wl.length)rec.with=wl;if($('[name=vague]',el).checked)rec.vague=true;var tc=$('[name=tell]',el);if(tc&&tc.checked&&w==='me')rec.tell=true;
       store.post.trips=(store.post.trips||[]).filter(function(t){return t.id!==rec.id}).concat(rec);
       store.savePost();closeSheet(el);toast(rec.tell&&circleOn()&&pubCfg().on?L('Reise gespeichert. Deine Freunde sehen sie jetzt.','Trip saved. Your friends can see it now.'):_t('Reise gespeichert'));try{circlePublish()}catch(e){}
     }
@@ -8846,7 +8890,7 @@ function cityHTML(g){
   return '<div class="infocard"><h3>'+ic('pin')+esc(g.name)+(c?'<span class="count">'+esc(cn(c))+'</span>':'')+'</h3>'+
     '<div class="cstats">'+st(g.count,g.count===1?L('neuer Mensch','new person'):L('neue Menschen','new people'))+st(trips.length,trips.length===1?L('Reise','trip'):L('Reisen','trips'))+st(ds.length?esc(fmtDate(ds[0]).replace(/^\d+\.?\s*/,'')):'–',L('zuerst hier','first here'))+'</div>'+
     (g.members.length?sec(L('Neu kennengelernt','Met here'),'<ul class="plist">'+sorted(g.members).map(rowHTML).join('')+'</ul>'):'')+
-    (trips.length?sec(L('Reisen','Trips'),'<ul class="ctrips">'+trips.map(function(t){return '<li><div><b>'+esc(fmtDate(t.from))+(t.to&&t.to!==t.from?' – '+esc(tripOpen(t)?L('heute','today'):fmtDate(t.to)):'')+'</b>'+(t.note?'<small>'+esc(t.note)+'</small>':'')+'</div>'+(t.example?'':'<button type="button" class="tpen" data-act="edit-trip" data-id="'+esc(t.id)+'" aria-label="'+L('Reise bearbeiten','Edit trip')+'">'+ic('pen')+'</button>')+'</li>'}).join('')+'</ul>'):'')+
+    (trips.length?sec(L('Reisen','Trips'),'<ul class="ctrips">'+trips.map(function(t){return '<li><div><b>'+esc(fmtDate(t.from))+(t.to&&t.to!==t.from?' – '+esc(tripOpen(t)?L('heute','today'):fmtDate(t.to)):'')+'</b>'+(withList(t).length?'<small>'+esc(withText(t))+'</small>':'')+(t.note?'<small>'+esc(t.note)+'</small>':'')+'</div>'+(t.example?'':'<button type="button" class="tpen" data-act="edit-trip" data-id="'+esc(t.id)+'" aria-label="'+L('Reise bearbeiten','Edit trip')+'">'+ic('pen')+'</button>')+'</li>'}).join('')+'</ul>'):'')+
     sec(L('Gegessen','Food'),lst('food',L('Gericht eintragen','Add a dish')))+
     sec(L('Besuchte Plätze','Places visited'),lst('spots',L('Platz eintragen','Add a place')))+
   '</div>';
