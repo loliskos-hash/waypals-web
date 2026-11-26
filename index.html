@@ -7117,6 +7117,8 @@ function openTripForm(who,trip){
   var fI=$('[name=from]',el),tI=$('[name=to]',el),lastFrom=fI.value;
   function follow(){var f=fI.value;if(f&&(!tI.value||tI.value<f||tI.value===lastFrom))tI.value=f;lastFrom=f}
   fI.addEventListener('input',follow);fI.addEventListener('change',follow);
+  /* Antippen öffnet sofort den Kalender (auch dort, wo der Browser sonst erst ein Textfeld zeigt) */
+  [fI,tI].forEach(function(i){i.addEventListener('click',function(){try{if(i.showPicker)i.showPicker()}catch(e){}})});
   el.addEventListener('click',function(e){
     var a=e.target.closest('[data-act]');if(!a)return;var act=a.getAttribute('data-act');
     if(act==='close')closeSheet(el);
