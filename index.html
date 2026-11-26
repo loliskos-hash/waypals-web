@@ -144,6 +144,7 @@ textarea.ruled:focus{box-shadow:none}
 .seg input:checked+span{background:var(--pen);color:var(--on-pen);border-color:var(--pen)}
 .seg input:focus-visible+span{outline:3px solid var(--pen);outline-offset:2px}
 .chips{display:flex;flex-wrap:wrap;gap:8px}
+.tsrow{border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin:0 0 10px;background:var(--sheet)}.tsrow p{margin:0 0 4px}.tsrow small{color:var(--muted);display:block;margin-bottom:10px}
 .cpw{position:relative;display:grid;gap:8px}.cpl:empty{display:none}.cpc{color:var(--ink);font-size:.85rem;padding:3px 4px 3px 6px}.cpc .av{width:22px;height:22px;font-size:.7rem}.cpc small{color:var(--muted)}.cpc button{border:0;background:none;color:var(--muted);font-size:1.05rem;line-height:1;padding:0 4px;cursor:pointer}.cpsug{display:grid;gap:4px}.cpsug:empty{display:none}.cps{display:flex;align-items:center;gap:10px;text-align:left;border:1px solid var(--line);background:var(--sheet);border-radius:12px;padding:7px 10px;color:var(--ink);font:inherit;cursor:pointer}.cps .av{width:30px;height:30px}.cps span{display:grid}.cps small{color:var(--muted);font-size:.75rem}.cpat{width:30px;height:30px;border-radius:50%;display:inline-grid!important;place-items:center;background:var(--line);font-weight:600}.cps .ic{width:30px}.cphint{color:var(--muted);font-size:.75rem}
 .cb{padding:7px 14px;border:1.5px solid var(--line);border-radius:999px;background:transparent;min-height:40px;font-size:.92rem}
 .cb[aria-pressed="true"]{background:var(--pen);color:var(--on-pen);border-color:var(--pen)}
@@ -5491,7 +5492,7 @@ function frStart(db,me){
       fr[key]=s.docs.map(function(d){return Object.assign({},d.data(),{id:d.id})});fr.ready=true;frSyncPals();frTick();onChange();
     },function(){})}catch(e){}
   }
-  sub('from','out');sub('to','inc');repStart(db,me);
+  sub('from','out');sub('to','inc');repStart(db,me);tsStart(db,me);
   try{db.collection('usernames').where('uid','==',me).get().then(function(s){var d=s.docs&&s.docs[0];if(d&&!unMine()){store.post.username=d.id;store.savePost()}}).catch(function(){})}catch(e){}
   try{db.doc('pals/'+me).onSnapshot(function(d){if(d.exists)circle.pals[me]=Object.assign({},d.data(),{uid:me});else delete circle.pals[me];onChange()},function(){})}catch(e){}
 }
@@ -6158,6 +6159,7 @@ function bellItems(){
     mailsList().filter(function(m){return m.to===me&&m.from!==me&&m.status==='carried'&&m.phase==='out'&&m.holder!==me&&!isHidden(m.from)}).forEach(function(m){it.push({act:'mail',t:LT('Brieftaube von {0} ist unterwegs zu dir (gerade bei {1})','Carrier pigeon from {0} is on its way to you (now with {1})',[m.fromName||'?',m.holderName||'?'])})});
     mailsList().filter(function(m){return m.from===me&&m.holder!==me&&m.status==='carried'}).forEach(function(m){it.push({act:'mail',t:LT('Deine Brieftaube an {0} ist unterwegs (gerade bei {1})','Your carrier pigeon to {0} is on its way (now with {1})',[m.toName||'?',m.holderName||'?'])})});
     var fp=frPendingIn().length;if(fp)it.push({act:'people',hot:1,k:'f'+frPendingIn().map(function(r){return r.id}).sort().join(','),t:LT('Freundschaftsanfragen: {0}','Friend requests: {0}',[fp])});
+    var tso=tsOpen();if(tso.length)it.push({act:'tshare',hot:1,k:'t'+tso.map(function(x){return x.id}).sort().join(','),t:tso.length===1?LT('{0} war mit dir in {1}','{0} was with you in {1}',[first(tso[0].fromName)||'?',String(tso[0].trip.dest.name||'').split(',')[0]]):LT('Gemeinsame Reisen: {0}','Shared trips: {0}',[tso.length])});
     if(flockHeld().length)it.push({act:'flock',hot:1,k:'w'+flockHeld().map(function(f){return f.id}).sort().join(','),t:L('Eine Wander-Taube wartet auf dich','A roaming pigeon is waiting for you')});
   }
   try{todayItems().forEach(function(x){if(x.act==='bdays'||x.act==='meetups'||x.act==='flash')it.push(x)})}catch(e){}
@@ -6182,6 +6184,7 @@ function openBell(){
     if(e.target.closest('[data-act=close]')){closeSheet(el);return}
     var b=e.target.closest('[data-bi]');if(!b)return;var x=it[+b.getAttribute('data-bi')];closeSheet(el);
     if(x.act==='people'){S.tab='people';renderMain();return}
+    if(x.act==='tshare'){tsSheet();return}
     mainAct(x.act);
   });
 }
@@ -7108,7 +7111,7 @@ function withName(x){var f=x.fid&&store.friends.find(function(y){return y.id===x
 function withText(t){var w=withList(t);if(!w.length)return '';var a=w.map(withName);return LT('mit {0}','with {0}',[a.length>1?a.slice(0,-1).join(', ')+' '+L('und','and')+' '+a[a.length-1]:a[0]])}
 function companionPicker(host,init){
   var list=withList({with:init}).map(function(x){return Object.assign({},x)}),seq=0;
-  host.innerHTML='<div class="fl"><span>'+L('Mit wem? (optional)','With whom? (optional)')+'</span><div class="cpw"><div class="chips cpl"></div><input class="cpin" enterkeyhint="done" placeholder="'+esc(L('Name oder @Benutzername','Name or @username'))+'"><div class="cpsug"></div></div><small class="cphint">'+L('Jemand aus deinem Buch, ein Waypals-Benutzername oder einfach ein Name.','Someone from your book, a Waypals username or just a name.')+'</small></div>';
+  host.innerHTML='<div class="fl"><span>'+L('Mit wem? (optional)','With whom? (optional)')+'</span><div class="cpw"><div class="chips cpl"></div><input class="cpin" enterkeyhint="done" placeholder="'+esc(L('Name oder @Benutzername','Name or @username'))+'"><div class="cpsug"></div></div><small class="cphint">'+L('Jemand aus deinem Buch, ein Waypals-Benutzername oder einfach ein Name. Wer ein Konto hat, bekommt die Reise angeboten.','Someone from your book, a Waypals username or just a name. People with an account get the trip offered.')+'</small></div>';
   var cl=$('.cpl',host),inp=$('.cpin',host),sg=$('.cpsug',host);
   function has(x){return list.some(function(y){return (x.fid&&y.fid===x.fid)||(x.uid&&y.uid===x.uid)||(!x.fid&&!x.uid&&!y.fid&&!y.uid&&NORM(y.n||'')===NORM(x.n||''))})}
   function paintL(){cl.innerHTML=list.map(function(x,i){var f=x.fid&&store.friends.find(function(y){return y.id===x.fid});return '<span class="chip cpc">'+(f?avatar(f):'')+esc(f?f.name:x.n||'@'+x.u)+(x.u?' <small>@'+esc(x.u)+'</small>':'')+'<button type="button" data-cprm="'+i+'" aria-label="'+esc(L('Entfernen','Remove'))+'">×</button></span>'}).join('');cl.hidden=!list.length}
@@ -7142,7 +7145,59 @@ function companionPicker(host,init){
     else add({n:inp.value.trim().slice(0,60)});
   });
   paintL();
-  return {get:function(){var q=inp.value.trim();if(q&&q.charAt(0)!=='@'&&!has({n:q}))list.push({n:q.slice(0,60)});return list.map(function(x){var o={n:String(x.n||'').slice(0,60)};if(x.fid)o.fid=x.fid;if(x.u)o.u=x.u;if(x.uid)o.uid=x.uid;return o})}};
+  return {get:function(){var q=inp.value.trim();if(q&&q.charAt(0)!=='@'&&!has({n:q}))list.push({n:q.slice(0,60)});return list.map(function(x){var o={n:String(x.n||'').slice(0,60)};if(x.fid)o.fid=x.fid;if(x.u)o.u=x.u;if(x.uid)o.uid=x.uid;if(x.s)o.s=1;return o})}};
+}
+/* Mitreisende mit Konto: tripShares/{absender_empfänger_reise} = {from,to,fromName,fromUser,trip,at}; der Empfänger kann die Reise übernehmen oder ablehnen */
+var ts_={list:[],seen:{}};
+function tsStart(db,me){
+  try{db.collection('tripShares').where('to','==',me).onSnapshot(function(s){
+    var old=ts_.list.map(function(x){return x.id});
+    ts_.list=s.docs.map(function(d){return Object.assign({},d.data(),{id:d.id})});
+    var nw=tsOpen().filter(function(x){return old.indexOf(x.id)<0});
+    if(nw.length&&old.length+nw.length>0&&ts_.ready)toast(LT('{0} hat dich zu einer Reise hinzugefügt.','{0} added you to a trip.',[first(nw[0].fromName||'')||'?']));
+    ts_.ready=true;onChange();
+  },function(){})}catch(e){}
+}
+function tsOpen(){return ts_.list.filter(function(x){return x&&x.trip&&x.trip.dest&&!isBlocked(x.from)&&!isHidden(x.from)})}
+function tsSend(t){
+  if(!circleOn()||!circle.db||t.who!=='me')return;
+  var w=withList(t),me=circle.me,ch=false;
+  w.forEach(function(x){
+    if(!x.uid||x.uid===me||x.s||isBlocked(x.uid))return;x.s=1;ch=true;
+    var others=w.filter(function(y){return y!==x}).map(function(y){var o={n:String(y.n||'').slice(0,60)};if(y.u)o.u=y.u;if(y.uid)o.uid=y.uid;return o}).slice(0,12);
+    circle.db.doc('tripShares/'+me+'_'+x.uid+'_'+t.id).set({from:me,to:x.uid,fromName:String(myCircleName()||'').slice(0,60),fromUser:unMine()||'',
+      trip:{id:t.id,dest:{name:t.dest.name,lat:t.dest.lat,lon:t.dest.lon,tz:t.dest.tz||''},from:t.from,to:t.to,kind:t.kind||'trip',with:others},at:Date.now()}).catch(function(){
+        var c=(store.post.trips||[]).find(function(y){return y.id===t.id});if(!c)return;withList(c).forEach(function(y){if(y.uid===x.uid)delete y.s});store.savePost()});
+  });
+  if(ch)store.savePost();
+}
+function tsKey(x){return x.from+'_'+(x.trip&&x.trip.id)}
+function tsDel(x){try{circle.db.doc('tripShares/'+x.id).delete()}catch(e){}ts_.list=ts_.list.filter(function(y){return y.id!==x.id});onChange()}
+function tsTake(x){
+  var t=x.trip,k=tsKey(x),f=store.friends.find(function(y){return y.uid===x.from});
+  if(!(store.post.trips||[]).some(function(y){return y.shared===k})){
+    var w=[f?{fid:f.id,n:f.name,u:x.fromUser||undefined,uid:x.from}:{n:x.fromName||x.fromUser||'?',u:x.fromUser||undefined,uid:x.from}].concat((Array.isArray(t.with)?t.with:[]).filter(function(y){return y&&y.uid!==circle.me}).map(function(y){var g=y.uid&&store.friends.find(function(z){return z.uid===y.uid});var o={n:String(g?g.name:y.n||'').slice(0,60)};if(g)o.fid=g.id;if(y.u)o.u=y.u;if(y.uid)o.uid=y.uid;o.s=1;return o}));
+    w=w.map(function(o){if(o.u===undefined)delete o.u;if(o.uid===x.from)o.s=1;return o});
+    store.post.trips=(store.post.trips||[]).concat({id:uid(),who:'me',dest:t.dest,from:t.from,to:t.to,kind:t.kind==='work'?'work':'trip',note:'',with:w,shared:k});store.savePost();
+    try{circlePublish()}catch(e){}
+  }
+  tsDel(x);toast(LT('Reise nach {0} übernommen.','Trip to {0} added.',[String(t.dest.name||'').split(',')[0]]));
+}
+function tsSheet(){
+  var el=openSheet('','fsheet');
+  function paint(){var l=tsOpen();
+    $('.sheet-in',el).innerHTML='<div class="sbar"><button type="button" class="btn ghost" data-act="close">'+ic('back')+L('Zurück','Back')+'</button></div><h2 class="stitle">'+L('Gemeinsame Reisen','Shared trips')+'</h2>'+
+    (l.length?l.map(function(x){var t=x.trip,o=(Array.isArray(t.with)?t.with:[]).filter(function(y){return y.uid!==circle.me}).map(function(y){return first(y.n)||'@'+y.u});
+      return '<div class="tsrow"><p><b>'+esc(first(x.fromName)||'@'+x.fromUser)+'</b> '+L('war mit dir in','was with you in')+' <b>'+esc(t.dest.name)+'</b></p><small>'+esc(tripWhen(t))+(o.length?' · '+esc(LT('auch dabei: {0}','also there: {0}',[o.join(', ')])):'')+'</small><div class="btnrow"><button type="button" class="btn pri sm" data-ts="take" data-id="'+esc(x.id)+'">'+L('In meine Reisen','Add to my trips')+'</button><button type="button" class="btn ghost sm" data-ts="no" data-id="'+esc(x.id)+'">'+L('Nein, danke','No, thanks')+'</button></div></div>'}).join('')
+    :'<p class="hint">'+L('Keine offenen Reisen.','No open trips.')+'</p>');
+  }
+  paint();
+  el.addEventListener('click',function(e){
+    if(e.target.closest('[data-act=close]')){closeSheet(el);return}
+    var b=e.target.closest('[data-ts]');if(!b)return;var x=ts_.list.find(function(y){return y.id===b.getAttribute('data-id')});if(!x)return;
+    if(b.getAttribute('data-ts')==='take')tsTake(x);else tsDel(x);
+    if(tsOpen().length)paint();else closeSheet(el);
+  });
 }
 function openTripForm(who,trip){
   var d=Object.assign({who:who||'me',from:'',to:'',dest:null,note:''},trip||{});
@@ -7180,7 +7235,7 @@ function openTripForm(who,trip){
       var rec={id:trip?trip.id:uid(),who:w,dest:{name:s.text,lat:s.lat,lon:s.lon,tz:s.tz||''},from:from,to:to,kind:$('[name=kind]',el).value==='work'?'work':'trip',note:($('[name=note]',el).value||'').trim()};
       var wl=cp.get();if(wl.length)rec.with=wl;if($('[name=vague]',el).checked)rec.vague=true;var tc=$('[name=tell]',el);if(tc&&tc.checked&&w==='me')rec.tell=true;
       store.post.trips=(store.post.trips||[]).filter(function(t){return t.id!==rec.id}).concat(rec);
-      store.savePost();closeSheet(el);toast(rec.tell&&circleOn()&&pubCfg().on?L('Reise gespeichert. Deine Freunde sehen sie jetzt.','Trip saved. Your friends can see it now.'):_t('Reise gespeichert'));try{circlePublish()}catch(e){}
+      store.savePost();try{tsSend(rec)}catch(e){}closeSheet(el);toast(rec.tell&&circleOn()&&pubCfg().on?L('Reise gespeichert. Deine Freunde sehen sie jetzt.','Trip saved. Your friends can see it now.'):_t('Reise gespeichert'));try{circlePublish()}catch(e){}
     }
   });
 }
