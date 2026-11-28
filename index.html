@@ -4462,7 +4462,7 @@ function Globe(opts){
     for(i=0;i<vis.length;i++){a=vis[i];if(a.lead)continue;for(j=i+1;j<vis.length;j++){b=vis[j];if(b.lead)continue;if(a.g.base&&a.g.base===b.g.base)continue;if((els[a.g.key]&&els[a.g.key].small)?Math.hypot(a.x-b.x,a.y-b.y)<24:(Math.abs(a.x-b.x)<20&&Math.abs(a.y-b.y)<26)){b.lead=a;a.cl++;b.pk=a.cl-1;a.tot+=(curStyle==='pin'?b.tot:b.n)}}}
     /* Figuren etwas kleiner: weit rausgezoomt und bei vielen sichtbaren Figuren noch einen Ticken mehr */
     var nf=0;for(i=0;i<vis.length;i++){a=vis[i];if(!a.lead&&els[a.g.key]&&!els[a.g.key].small)nf++}
-    var fz=(v.zoom>=3?1:v.zoom<=1?0.87:0.87+0.13*(v.zoom-1)/2)*(nf>5?Math.max(0.9,1-0.02*(nf-5)):1);
+    fz=(v.zoom>=3?1:v.zoom<=1?0.87:0.87+0.13*(v.zoom-1)/2)*(nf>5?Math.max(0.9,1-0.02*(nf-5)):1);
     it.forEach(function(a){
       var e=els[a.g.key];if(!e)return;
       var fol=a.lead&&a.pk<5&&a.lead.z>0.03;
@@ -4502,11 +4502,12 @@ function Globe(opts){
     for(k in els)if(k.charAt(0)==='@'&&!keepC[k]){els[k].el.remove();delete els[k]}
   }
   var pEls={};
+  var fz=1;
   function updPlat(it){
     var by={},k;
     it.forEach(function(a){var e=els[a.g.key];if((a.lead&&!(a.pk<5&&a.lead.z>0.03))||a.z<=0.03||!e||e.hid||e.small)return;var b=a.g.base||(a.cl>0?'c'+a.g.key:a.lead?'c'+a.lead.g.key:'');if(!b)return;(by[b]=by[b]||[]).push(a)});
     for(k in by){var L=by[k],x0=1e9,x1=-1e9,y1=-1e9,y0=1e9;L.forEach(function(a){x0=Math.min(x0,a.x);x1=Math.max(x1,a.x);y1=Math.max(y1,a.y);y0=Math.min(y0,a.y)});
-      var w=86,h=22,pe=pEls[k];if(!pe){pe=pEls[k]=document.createElement('div');pe.className='plat';fl.insertBefore(pe,fl.firstChild)}
+      var w=Math.max(44,x1-x0+50)*fz,h=19*fz,pe=pEls[k];if(!pe){pe=pEls[k]=document.createElement('div');pe.className='plat';fl.insertBefore(pe,fl.firstChild)}
       pe.style.width=w.toFixed(0)+'px';pe.style.height=h.toFixed(0)+'px';pe.style.transform='translate('+((x0+x1)/2-w/2).toFixed(1)+'px,'+(y1-h/2-1).toFixed(1)+'px)';pe.style.zIndex='0';pe.style.display=''}
     for(k in pEls)if(!by[k]){pEls[k].remove();delete pEls[k]}
   }
