@@ -4507,8 +4507,8 @@ function Globe(opts){
     var by={},k;
     it.forEach(function(a){var e=els[a.g.key];if((a.lead&&!(a.pk<5&&a.lead.z>0.03))||a.z<=0.03||!e||e.hid||e.small)return;var b=a.g.base||(a.cl>0?'c'+a.g.key:a.lead?'c'+a.lead.g.key:'');if(!b)return;(by[b]=by[b]||[]).push(a)});
     for(k in by){var L=by[k],x0=1e9,x1=-1e9,y1=-1e9,y0=1e9;L.forEach(function(a){x0=Math.min(x0,a.x);x1=Math.max(x1,a.x);y1=Math.max(y1,a.y);y0=Math.min(y0,a.y)});
-      var xn=Math.min(6,Math.max(0,L.length-2)),w=x1-x0+(40+xn*9)*fz,h=(y1-y0)*0.8+(14+xn*3.5)*fz,pe=pEls[k];if(!pe){pe=pEls[k]=document.createElement('div');pe.className='plat';fl.insertBefore(pe,fl.firstChild)}
-      pe.style.width=w.toFixed(0)+'px';pe.style.height=h.toFixed(0)+'px';pe.style.transform='translate('+((x0+x1)/2-3*fz-w/2).toFixed(1)+'px,'+((y0+y1)/2+1.5*fz-h/2).toFixed(1)+'px)';pe.style.zIndex='0';pe.style.display=''}
+      /* gleicher Rand um die äußersten Füße wie bei zwei Figuren (seitlich 20, vorne/hinten 7) */var pcx=(x0+x1)/2,pcy=(y0+y1)/2,B=(y1-y0)/2+7*fz,A=0;L.forEach(function(a){var q=(a.y-pcy)/B;A=Math.max(A,(Math.abs(a.x-pcx)+20*fz)/Math.sqrt(Math.max(0.2,1-q*q)))});var w=2*A,h=2*B,pe=pEls[k];if(!pe){pe=pEls[k]=document.createElement('div');pe.className='plat';fl.insertBefore(pe,fl.firstChild)}
+      pe.style.width=w.toFixed(0)+'px';pe.style.height=h.toFixed(0)+'px';pe.style.transform='translate('+(pcx-3*fz-A).toFixed(1)+'px,'+(pcy+1.5*fz-B).toFixed(1)+'px)';pe.style.zIndex='0';pe.style.display=''}
     for(k in pEls)if(!by[k]){pEls[k].remove();delete pEls[k]}
   }
   function arcPath(A,B,lift,fn,t0,t1){
